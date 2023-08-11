@@ -1,0 +1,31 @@
+Building a HTTP server from scratch guide:
+https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
+
+RFC for HTTP/1.0:
+https://www.rfc-editor.org/rfc/rfc1945
+
+RFC's for HTTP/1.1:
+- Message Syntax and Routing:
+https://www.rfc-editor.org/info/rfc7230
+- Semantics and Content:
+https://www.rfc-editor.org/info/rfc7231
+- Conditional Requests:
+https://www.rfc-editor.org/info/rfc7232
+- Range Requests:
+https://www.rfc-editor.org/info/rfc7233
+- Caching:
+https://www.rfc-editor.org/info/rfc7234
+- Authentication:
+https://www.rfc-editor.org/info/rfc7235
+
+Building a simple server with C++ guide:
+https://ncona.com/2019/04/building-a-simple-server-with-cpp/
+
+Socket Programming In C++:A Beginner's Guide:
+https://marketsplash.com/tutorials/cpp/cplusplus-scoket/#link1
+
+CGI and HTTP methods (POST, GET, etc.) in C++ guide:
+https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm
+
+NGINX resources:
+https://github.com/fcambus/nginx-resources#readme
