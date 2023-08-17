@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  host:
+  server-name:
+  error-page: #error_page route.
+  body-limit: #client body limit
+  methods: GET,POST,DELETE
+  #redirection????
+  #file-route????
+  directory-listing: true
+  default-answer: #file
+  cgi: .php
