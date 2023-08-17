@@ -29,3 +29,9 @@ https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm
 
 NGINX resources:
 https://github.com/fcambus/nginx-resources#readme
+
+A simple server HTTP from scratch:
+https://trungams.github.io/2020-08-23-a-simple-http-server-from-scratch/
+
+Networking programming tutorial:
+https://beej.us/guide/bgnet/html/#client-server-background
