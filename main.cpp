@@ -3,7 +3,15 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string>
+#include <sstream>
 
+std::string toString(int num) {
+	std::stringstream ss;
+
+	ss << num;
+	return (ss.str());
+}
 
 int main(void) {
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -27,21 +35,42 @@ int main(void) {
 		exit(1);
 	}
 
-	int addrlen = sizeof(sockaddr);
-	int connection = accept(sockfd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
-	if (connection < 0) {
-		std::cout << "Error accepting connection" << std::endl;
-		exit(1);
+	while(1) {
+		int addrlen = sizeof(sockaddr);
+		int connection = accept(sockfd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
+		if (connection <= 0) {
+			std::cout << "Error accepting connection" << std::endl;
+			exit(1);
+		} else {
+			char buffer[1000];
+			read(connection, buffer, 1000);
+			std::cout << "The message was: " << buffer << std::endl;
+
+			std::string body =
+				"<!DOCTYPE html>"
+				"<html>"
+				"<head>"
+				"</head>"
+				"<body><h1>Hello World!</h1><p>This is a testing page!!!!!</p></body>"
+				"</html>";
+
+			int bodyLen = body.size();
+
+			std::string header =
+				"HTTP/1.1 200 OK\n"
+				"Content-Type: text/html\n"
+				"Content-Length: " + toString(bodyLen) + "\n"
+				"\n";
+
+			std::string reply = header + body;
+
+			int bytesSent;
+			bytesSent = send(connection, reply.c_str(), reply.size(), 0);
+		}
+
+		close(connection);
 	}
 
-	char buffer[1000];
-	read(connection, buffer, 1000);
-	std::cout << "The message was: " << buffer << std::endl;
-
-	std::string response = "Hello World!";
-	send(connection, response.c_str(), response.size(), 0);
-
-	close(connection);
 	close(sockfd);
 
 	return (0);
