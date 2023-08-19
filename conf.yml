@@ -1,7 +1,7 @@
 server:
   port: 8080
-  host:
-  server-name:
+  host: 127.0.0.1
+  server-name: myserver
   error-page: #error_page route.
   body-limit: #client body limit
   methods: GET,POST,DELETE

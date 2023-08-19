@@ -1,0 +1,7 @@
+TAREAS / PUNTOS A DESARROLLAR:
+- Archivo de configuración y parseo.
+- Estructura del códgio para abrir varios servidores que, a su vez, escuchen de varios puertos.
+- Parseo de las peticiones realizadas por el cliente (comenzar con el método GET).
+- Montar la respuesta de cada petición y realizar el send correspondiente.
+- Funcionamiento de poll() y fnctl().
+- CGI.
