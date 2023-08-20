@@ -1,5 +1,24 @@
 #include "Server.hpp"
 
+// EXCEPTIONS:
+class Server::SocketCreationErrorException : public std::exception {
+	virtual const char *what() const throw() {
+		return ("SocketCreationErrorException: Error creating socket\n");
+	}
+};
+
+class Server::SocketBindErrorException : public std::exception {
+	virtual const char *what() const throw() {
+		return ("SocketBindErrorException: Error binding socket\n");
+	}
+};
+
+class Server::SocketListenErrorException : public std::exception {
+	virtual const char *what() const throw() {
+		return ("SocketListenErrorException: Error listening socket\n");
+	}
+};
+
 // ORTHODOX CANNONICAL FORM:
 Server::Server() {}
 
@@ -10,6 +29,7 @@ Server::Server(std::vector<int> ports, std::vector<std::string> methods) {
 	for (int i = 0; i < methods.size(); i++) {
 		this->_methods.push_back(methods[i]);
 	}
+
 }
 
 Server::~Server() {}
@@ -19,6 +39,7 @@ Server::Server(const Server &cp) {
 	for (int i = 0; i < cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
+	// this->_host attribute!!
 	for (int i = 0; i < cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
@@ -39,6 +60,7 @@ Server &Server::operator=(const Server &cp) {
 	for (int i = 0; i < cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
+	// this->_host attribute!!
 	this->_socks.clear();
 	for (int i = 0; i < cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
@@ -136,4 +158,29 @@ std::string Server::getRedir(void) {
 
 std::string Server::getServRoute(void) {
 	return (this->_servRoute);
+}
+
+// METHODS:
+void Server::openSockets(void) {
+	for (int i = 0; i < this->_ports.size(); i++) {
+		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		if (sockfd == -1) {
+			throw SocketCreationErrorException();
+		}
+
+		this->_socks.push_back(sockfd);
+
+		sockaddr_in	sockaddr;
+		sockaddr.sin_family = AF_INET;
+		sockaddr.sin_addr.s_addr = INADDR_ANY; // MAL! DEBE CONTENER EL HOST DEL SERVIDOR (DIREC. IP).
+		sockaddr.sin_port = htons(this->_ports[i]);
+
+		if (bind(this->_socks[i], (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
+			throw SocketBindErrorException();
+		}
+
+		if (listen(this->_socks[i], 10) < 0) { // Second argument: Maximum length to which the queue of pending connections for sockets may grow
+			throw SocketListenErrorException();
+		}
+	}
 }

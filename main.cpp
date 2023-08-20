@@ -74,3 +74,9 @@ int main(void) {
 
 	return (0);
 }
+
+
+// poll(fds, 3, 10);
+// for (int i = 0; i < 3; i++) {
+// 	if (fds[i].revents == POLL_IN)
+// }

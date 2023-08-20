@@ -4,9 +4,10 @@ server:
   server-name: myserver
   error-page: #error_page route.
   body-limit: #client body limit
-  methods: GET,POST,DELETE
-  #redirection????
-  #file-route????
-  directory-listing: true
-  default-answer: #file
-  cgi: .php
+  location:
+    methods: GET,POST,DELETE
+    #redirection????
+    #file-route????
+    directory-listing: true
+    default-answer: #file
+    cgi: .php

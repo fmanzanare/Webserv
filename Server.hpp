@@ -9,8 +9,10 @@
 
 class Server {
 	private:
+		// ATTRIBUTES
 		std::string					_name;
 		std::vector<int>			_ports;
+		// host -> ip direction for the server (p. ej. 127.0.0.1)
 		std::vector<int>			_socks;
 		std::string					_errPage;
 		int							_cBodyLimit;
@@ -19,9 +21,15 @@ class Server {
 		std::string					_defResponse;
 		std::string					_redir;
 		std::string					_servRoute;
+
+		// PRIVATE CONSTRUCTOR:
+		Server();
+
+		// PRIVATE METHODS:
+		void openSockets(void);
+
 	public:
 		// ORTHODOX CANNONICAL FORM:
-		Server();
 		Server(std::vector<int> ports, std::vector<std::string> methods);
 		~Server();
 		Server(const Server &cp);
@@ -50,6 +58,11 @@ class Server {
 		std::string getDefResponse(void);
 		std::string getRedir(void);
 		std::string getServRoute(void);
+
+		// EXCEPTIONS:
+		class SocketCreationErrorException;
+		class SocketBindErrorException;
+		class SocketListenErrorException;
 };
 
 #endif
