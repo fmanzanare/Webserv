@@ -23,29 +23,29 @@ class Server::SocketListenErrorException : public std::exception {
 Server::Server() {}
 
 Server::Server(std::vector<int> ports, std::vector<std::string> methods) {
-	for (int i = 0; i < ports.size(); i++) {
+	for (int i = 0; i < (int)ports.size(); i++) {
 		this->_ports.push_back(ports[i]);
 	}
-	for (int i = 0; i < methods.size(); i++) {
+	for (int i = 0; i < (int)methods.size(); i++) {
 		this->_methods.push_back(methods[i]);
 	}
-
+	openSockets();
 }
 
 Server::~Server() {}
 
 Server::Server(const Server &cp) {
 	this->_name = cp._name;
-	for (int i = 0; i < cp._ports.size(); i++) {
+	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
 	// this->_host attribute!!
-	for (int i = 0; i < cp._socks.size(); i++) {
+	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
-	for (int i = 0; i < cp._methods.size(); i++) {
+	for (int i = 0; i < (int)cp._methods.size(); i++) {
 		this->_methods.push_back(cp._methods[i]);
 	}
 	this->_dirListing = cp._dirListing;
@@ -57,18 +57,18 @@ Server::Server(const Server &cp) {
 Server &Server::operator=(const Server &cp) {
 	this->_name = cp._name;
 	this->_ports.clear();
-	for (int i = 0; i < cp._ports.size(); i++) {
+	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
 	// this->_host attribute!!
 	this->_socks.clear();
-	for (int i = 0; i < cp._socks.size(); i++) {
+	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
 	this->_methods.clear();
-	for (int i = 0; i < cp._methods.size(); i++) {
+	for (int i = 0; i < (int)cp._methods.size(); i++) {
 		this->_methods.push_back(cp._methods[i]);
 	}
 	this->_dirListing = cp._dirListing;
@@ -162,11 +162,13 @@ std::string Server::getServRoute(void) {
 
 // METHODS:
 void Server::openSockets(void) {
-	for (int i = 0; i < this->_ports.size(); i++) {
+	for (int i = 0; i < (int)this->_ports.size(); i++) {
 		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd == -1) {
 			throw SocketCreationErrorException();
 		}
+		const int enable = 1;
+		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 
 		this->_socks.push_back(sockfd);
 
