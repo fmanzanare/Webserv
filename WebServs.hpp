@@ -11,10 +11,11 @@ class WebServs {
 	private:
 		// ATTRIBUTES:
 		std::vector<Server *> _cluster;
-		std::vector<int> _sockets;
+		std::vector<int> _wSockets;
+		std::vector<int> _cSockets;
 
 		// METHODS:
-		int addServersSocketsToPoll(pollfd *fds);
+		int addSocketsToPoll(pollfd *fds);
 		void getServersSockets(void);
 		void checkServersSockets(pollfd *fds, int nfds);
 
@@ -35,6 +36,7 @@ class WebServs {
 
 		// EXCEPTIONS:
 		class PollErrorException;
+		class AcceptConnectionErrorException;
 };
 
 #endif

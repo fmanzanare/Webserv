@@ -9,7 +9,7 @@
 
 class Server {
 	private:
-		// ATTRIBUTES
+		// ATTRIBUTES:
 		std::string					_name;
 		std::vector<int>			_ports;
 		// host -> ip direction for the server (p. ej. 127.0.0.1)
@@ -21,6 +21,7 @@ class Server {
 		std::string					_defResponse;
 		std::string					_redir;
 		std::string					_servRoute;
+		std::vector<int>			_cSockets;
 
 		// PRIVATE CONSTRUCTOR:
 		Server();
@@ -46,6 +47,7 @@ class Server {
 		void setDefResponse(std::string defResponse);
 		void setRedir(std::string redir);
 		void setServRoute(std::string servRoute);
+		void addCSocket(int sock);
 
 		// GETTERS:
 		std::string getName(void);
@@ -58,6 +60,7 @@ class Server {
 		std::string getDefResponse(void);
 		std::string getRedir(void);
 		std::string getServRoute(void);
+		std::vector<int> getCSockets(void);
 
 		// EXCEPTIONS:
 		class SocketCreationErrorException;

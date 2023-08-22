@@ -119,6 +119,10 @@ void Server::setServRoute(std::string servRoute) {
 	this->_servRoute = servRoute;
 }
 
+void Server::addCSocket(int sock) {
+	this->_cSockets.push_back(sock);
+}
+
 // GETTERS:
 std::string Server::getName(void) {
 	return (this->_name);
@@ -158,6 +162,10 @@ std::string Server::getRedir(void) {
 
 std::string Server::getServRoute(void) {
 	return (this->_servRoute);
+}
+
+std::vector<int> Server::getCSockets(void) {
+	return (this->_cSockets);
 }
 
 // METHODS:
