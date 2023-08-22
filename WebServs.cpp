@@ -137,9 +137,9 @@ void WebServs::checkServersSockets(pollfd *fds, int nfds) {
 
 						int bytesSent;
 						bytesSent = send(cSocket, reply.c_str(), reply.size(), 0);
-						close(cSocket);
+						close(this->_cluster[j]->removeCSocket(cSocket));
 						/* ------------ TESTING CODE ------------ */
-						return ;
+						break ;
 					}
 				}
 			}
@@ -192,23 +192,22 @@ void WebServs::runWebServs() {
 
 	while (true) {
 		std::memset(fds, 0, sizeof(fds));
-		// Modificar a addSocketsToPoll (adding Servers and Clientes sockets all together).
 		int nfds = addSocketsToPoll(fds);
 		int ret = poll(fds, nfds, (10 * 1000));
 		if (ret == -1) {
 			throw PollErrorException();
 		} else if (ret) {
 			checkServersSockets(fds, nfds);
-			std::cout << "Server sockets: ";
-			for (int i = 0; i < (int)this->_wSockets.size(); i++) {
-				std::cout << this->_wSockets[i] << " ";
-			}
-			std::cout << std::endl;
-			std::cout << "Client sockets: ";
-			for (int i = 0; i < (int)this->_cSockets.size(); i++) {
-				std::cout << this->_cSockets[i] << " ";
-			}
-			std::cout << std::endl;
+			// std::cout << "Server sockets: ";
+			// for (int i = 0; i < (int)this->_wSockets.size(); i++) {
+			// 	std::cout << this->_wSockets[i] << " ";
+			// }
+			// std::cout << std::endl;
+			// std::cout << "Client sockets: ";
+			// for (int i = 0; i < (int)this->_cSockets.size(); i++) {
+			// 	std::cout << this->_cSockets[i] << " ";
+			// }
+			// std::cout << std::endl;
 			// checkClientsSockets(fds, nfds);
 		}
 	}

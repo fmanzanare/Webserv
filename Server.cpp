@@ -168,6 +168,15 @@ std::vector<int> Server::getCSockets(void) {
 	return (this->_cSockets);
 }
 
+int Server::removeCSocket(int sock) {
+	for (std::vector<int>::iterator it = this->_cSockets.begin(); it != this->_cSockets.end(); it++) {
+		if (*it == sock) {
+			return (*(this->_cSockets.erase(it)));
+		}
+	}
+	return (-1);
+}
+
 // METHODS:
 void Server::openSockets(void) {
 	for (int i = 0; i < (int)this->_ports.size(); i++) {

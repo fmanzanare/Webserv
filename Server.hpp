@@ -48,6 +48,7 @@ class Server {
 		void setRedir(std::string redir);
 		void setServRoute(std::string servRoute);
 		void addCSocket(int sock);
+		int removeCSocket(int sock);
 
 		// GETTERS:
 		std::string getName(void);
