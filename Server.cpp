@@ -179,6 +179,8 @@ int Server::removeCSocket(int sock) {
 
 // METHODS:
 void Server::openSockets(void) {
+	sockaddr_in	sockaddr;
+
 	for (int i = 0; i < (int)this->_ports.size(); i++) {
 		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd == -1) {
@@ -189,7 +191,6 @@ void Server::openSockets(void) {
 
 		this->_socks.push_back(sockfd);
 
-		sockaddr_in	sockaddr;
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_addr.s_addr = INADDR_ANY; // MAL! DEBE CONTENER EL HOST DEL SERVIDOR (DIREC. IP).
 		sockaddr.sin_port = htons(this->_ports[i]);

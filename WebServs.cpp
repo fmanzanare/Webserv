@@ -111,6 +111,9 @@ void WebServs::checkServersSockets(pollfd *fds, int nfds) {
 							throw AcceptConnectionErrorException();
 						}
 						this->_cluster[j]->addCSocket(cSocket);
+
+
+
 						/* ------------ TESTING CODE ------------ */
 						char buffer[1000];
 						read(cSocket, buffer, 1000);
@@ -143,44 +146,6 @@ void WebServs::checkServersSockets(pollfd *fds, int nfds) {
 					}
 				}
 			}
-
-			/* ------------ TESTING CODE ------------ */
-			// sockaddr_in sockaddr;
-			// int socklen = sizeof(sockaddr);
-			// int connection = accept(fds[i].fd, (struct sockaddr *)&sockaddr, (socklen_t *)&socklen);
-			// if (connection <= 0) {
-			// 	std::cout << "Error accepting connection" << std::endl;
-			// 	exit(1);
-			// } else {
-			// 	char buffer[1000];
-			// 	read(connection, buffer, 1000);
-			// 	std::string str(buffer);
-			// 	std::cout << "The message was: " << str.substr(0, 20) << std::endl;
-
-			// 	std::string body =
-			// 		"<!DOCTYPE html>"
-			// 		"<html>"
-			// 		"<head>"
-			// 		"</head>"
-			// 		"<body><h1>Hello World!</h1><p>This is a testing page!!!!!</p></body>"
-			// 		"</html>";
-
-			// 	int bodyLen = body.size();
-
-			// 	std::string header =
-			// 		"HTTP/1.1 200 OK\n"
-			// 		"Content-Type: text/html\n"
-			// 		"Content-Length: " + toString(bodyLen) + "\n"
-			// 		"\n";
-
-			// 	std::string reply = header + body;
-
-			// 	int bytesSent;
-			// 	bytesSent = send(connection, reply.c_str(), reply.size(), 0);
-			// }
-
-			// close(connection);
-			/* ------------ TESTING CODE ------------ */
 		}
 	}
 }
@@ -198,17 +163,21 @@ void WebServs::runWebServs() {
 			throw PollErrorException();
 		} else if (ret) {
 			checkServersSockets(fds, nfds);
-			// std::cout << "Server sockets: ";
-			// for (int i = 0; i < (int)this->_wSockets.size(); i++) {
-			// 	std::cout << this->_wSockets[i] << " ";
-			// }
-			// std::cout << std::endl;
-			// std::cout << "Client sockets: ";
-			// for (int i = 0; i < (int)this->_cSockets.size(); i++) {
-			// 	std::cout << this->_cSockets[i] << " ";
-			// }
-			// std::cout << std::endl;
 			// checkClientsSockets(fds, nfds);
+
+
+			/* ------------ TESTING CODE ------------ */
+			std::cout << "Server sockets: ";
+			for (int i = 0; i < (int)this->_wSockets.size(); i++) {
+				std::cout << this->_wSockets[i] << " ";
+			}
+			std::cout << std::endl;
+			std::cout << "Client sockets: ";
+			for (int i = 0; i < (int)this->_cSockets.size(); i++) {
+				std::cout << this->_cSockets[i] << " ";
+			}
+			std::cout << std::endl;
+			/* ------------ TESTING CODE ------------ */
 		}
 	}
 }
