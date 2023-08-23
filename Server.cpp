@@ -171,7 +171,8 @@ std::vector<int> Server::getCSockets(void) {
 int Server::removeCSocket(int sock) {
 	for (std::vector<int>::iterator it = this->_cSockets.begin(); it != this->_cSockets.end(); it++) {
 		if (*it == sock) {
-			return (*(this->_cSockets.erase(it)));
+			this->_cSockets.erase(it);
+			return (sock);
 		}
 	}
 	return (-1);

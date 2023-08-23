@@ -20,6 +20,12 @@ class WebServs::AcceptConnectionErrorException : public std::exception {
 	}
 };
 
+class WebServs::FcntlErrorException : public std::exception {
+	virtual const char *what() const throw() {
+		return ("FcntlErrorException: Error while setting a non-blocking socket\n");
+	}
+};
+
 // ORTHODOX CANNONICAL FORM:
 WebServs::WebServs() {}
 
@@ -27,6 +33,7 @@ WebServs::WebServs(std::vector<Server *> cluster) {
 	for (int i = 0; i < (int)cluster.size(); i++) {
 		this->_cluster.push_back(cluster[i]);
 	}
+	this->_nfds = 0;
 }
 
 WebServs::~WebServs() {
@@ -72,12 +79,12 @@ void WebServs::addServer(Server *s) {
 }
 
 // METHODS:
-int WebServs::addSocketsToPoll(pollfd *fds) {
-	int nfds = 0;
+void WebServs::addSocketsToPoll(pollfd *fds) {
+	this->_nfds = 0;
 	for (int i = 0; i < (int)this->_wSockets.size(); i++) {
 		fds[i].fd = this->_wSockets[i];
 		fds[i].events = POLLIN;
-		nfds++;
+		this->_nfds++;
 	}
 
 	this->_cSockets.clear();
@@ -89,16 +96,14 @@ int WebServs::addSocketsToPoll(pollfd *fds) {
 		}
 	}
 	for (int i = 0; i < (int)this->_cSockets.size(); i++) {
-		fds[nfds].fd = this->_cSockets[i];
-		fds[nfds].events = POLLIN | POLLOUT | POLLHUP;
-		nfds++;
+		fds[this->_nfds].fd = this->_cSockets[i];
+		fds[this->_nfds].events =  POLLOUT | POLLHUP;
+		this->_nfds++;
 	}
-
-	return (nfds);
 }
 
-void WebServs::checkServersSockets(pollfd *fds, int nfds) {
-	for (int i = 0; i < nfds; i++) {
+void WebServs::checkServersSockets(pollfd *fds) {
+	for (int i = 0; i < this->_nfds; i++) {
 		if (fds[i].revents == POLLIN) {
 			for (int j = 0; j < (int)this->_cluster.size(); j++) {
 				std::vector<int> tmp = this->_cluster[j]->getSockets();
@@ -106,20 +111,36 @@ void WebServs::checkServersSockets(pollfd *fds, int nfds) {
 					if (tmp[k] == fds[i].fd) {
 						sockaddr_in sockaddr;
 						int socklen = sizeof(sockaddr);
+						std::cout << "ACCPEPTS: " << i << " " << j << " " << k << std::endl;
 						int cSocket = accept(fds[i].fd, (struct sockaddr *)&sockaddr, (socklen_t *)&socklen);
 						if (cSocket <= 0) {
 							throw AcceptConnectionErrorException();
 						}
+						int flags = fcntl(cSocket, F_SETFL, O_NONBLOCK);
+						if (flags < 0) {
+							throw FcntlErrorException();
+						}
 						this->_cluster[j]->addCSocket(cSocket);
+						break ;
+					}
+				}
+			}
+		}
+	}
+}
 
-
-
+void WebServs::checkClientsSockets(pollfd *fds) {
+	for (int i = 0; i < this->_nfds; i++) {
+		if (fds[i].revents == POLLOUT) {
+			for (int j = 0; j < (int)this->_cluster.size(); j++) {
+				std::vector<int> tmp = this->_cluster[j]->getCSockets();
+				for (int k = 0; k < (int)tmp.size(); k++) {
+					if (tmp[k] == fds[i].fd) {
 						/* ------------ TESTING CODE ------------ */
 						char buffer[1000];
-						read(cSocket, buffer, 1000);
+						read(tmp[k], buffer, 1000);
 						std::string str(buffer);
 						std::cout << "The message was: " << str.substr(0, 20) << std::endl;
-
 						std::string body =
 							"<!DOCTYPE html>"
 							"<html>"
@@ -127,22 +148,17 @@ void WebServs::checkServersSockets(pollfd *fds, int nfds) {
 							"</head>"
 							"<body><h1>Hello World!</h1><p>This is a testing page!!!!!</p></body>"
 							"</html>";
-
 						int bodyLen = body.size();
-
 						std::string header =
 							"HTTP/1.1 200 OK\n"
 							"Content-Type: text/html\n"
 							"Content-Length: " + toString(bodyLen) + "\n"
 							"\n";
-
 						std::string reply = header + body;
-
 						int bytesSent;
-						bytesSent = send(cSocket, reply.c_str(), reply.size(), 0);
-						close(this->_cluster[j]->removeCSocket(cSocket));
+						bytesSent = send(tmp[k], reply.c_str(), reply.size(), 0);
+						close(this->_cluster[j]->removeCSocket(tmp[k]));
 						/* ------------ TESTING CODE ------------ */
-						break ;
 					}
 				}
 			}
@@ -157,13 +173,15 @@ void WebServs::runWebServs() {
 
 	while (true) {
 		std::memset(fds, 0, sizeof(fds));
-		int nfds = addSocketsToPoll(fds);
-		int ret = poll(fds, nfds, (10 * 1000));
+		addSocketsToPoll(fds);
+		int ret = poll(fds, this->_nfds, (2 * 1000));
 		if (ret == -1) {
 			throw PollErrorException();
-		} else if (ret) {
-			checkServersSockets(fds, nfds);
-			// checkClientsSockets(fds, nfds);
+		}
+		if (ret) {
+			std::cout << "after poll!!!" << std::endl;
+			checkServersSockets(fds);
+			checkClientsSockets(fds);
 
 
 			/* ------------ TESTING CODE ------------ */

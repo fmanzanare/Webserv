@@ -4,6 +4,7 @@
 #include "Server.hpp"
 #include <poll.h>
 #include <sstream>
+#include <fcntl.h>
 
 #define MAX_CONNECTIONS 1000
 
@@ -13,11 +14,13 @@ class WebServs {
 		std::vector<Server *> _cluster;
 		std::vector<int> _wSockets;
 		std::vector<int> _cSockets;
+		int _nfds;
 
 		// METHODS:
-		int addSocketsToPoll(pollfd *fds);
+		void addSocketsToPoll(pollfd *fds);
 		void getServersSockets(void);
-		void checkServersSockets(pollfd *fds, int nfds);
+		void checkServersSockets(pollfd *fds);
+		void checkClientsSockets(pollfd *fds);
 
 	public:
 		// ORTHODOOX CANNONICAL FORM:
@@ -37,6 +40,7 @@ class WebServs {
 		// EXCEPTIONS:
 		class PollErrorException;
 		class AcceptConnectionErrorException;
+		class FcntlErrorException;
 };
 
 #endif
