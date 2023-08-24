@@ -69,6 +69,7 @@ void WebServs::getServersSockets() {
 	for (int i = 0; i < (int)this->_cluster.size(); i++) {
 		for (int j = 0; j < (int)this->_cluster[i]->getSockets().size(); j++) {
 			this->_wSockets.push_back(this->_cluster[i]->getSockets()[j]);
+			std::cout << "Socket " << this->_cluster[i]->getSockets()[j] << " on server " << i << std::endl;
 		}
 	}
 }
@@ -97,7 +98,10 @@ void WebServs::addSocketsToPoll(pollfd *fds) {
 	}
 	for (int i = 0; i < (int)this->_cSockets.size(); i++) {
 		fds[this->_nfds].fd = this->_cSockets[i];
-		fds[this->_nfds].events =  POLLOUT | POLLHUP;
+		// if (request_incoming is finished == true)
+		fds[this->_nfds].events = POLLOUT;
+		// else
+		// fds[this->_nfds].events = POLLIN;
 		this->_nfds++;
 	}
 }
@@ -111,11 +115,12 @@ void WebServs::checkServersSockets(pollfd *fds) {
 					if (tmp[k] == fds[i].fd) {
 						sockaddr_in sockaddr;
 						int socklen = sizeof(sockaddr);
-						std::cout << "ACCPEPTS: " << i << " " << j << " " << k << std::endl;
 						int cSocket = accept(fds[i].fd, (struct sockaddr *)&sockaddr, (socklen_t *)&socklen);
 						if (cSocket <= 0) {
 							throw AcceptConnectionErrorException();
 						}
+						std::cout << "Accepted incoming client through fd: " << fds[i].fd << std::endl;
+						std::cout << "Assigned fd for client: " << cSocket << std::endl;
 						int flags = fcntl(cSocket, F_SETFL, O_NONBLOCK);
 						if (flags < 0) {
 							throw FcntlErrorException();
@@ -137,10 +142,10 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 				for (int k = 0; k < (int)tmp.size(); k++) {
 					if (tmp[k] == fds[i].fd) {
 						/* ------------ TESTING CODE ------------ */
-						char buffer[1000];
-						read(tmp[k], buffer, 1000);
-						std::string str(buffer);
-						std::cout << "The message was: " << str.substr(0, 20) << std::endl;
+						// char buffer[1000];
+						// read(tmp[k], buffer, 1000);
+						// std::string str(buffer);
+						// std::cout << "The message was: " << str.substr(0, 20) << std::endl;
 						std::string body =
 							"<!DOCTYPE html>"
 							"<html>"
@@ -159,6 +164,33 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 						bytesSent = send(tmp[k], reply.c_str(), reply.size(), 0);
 						close(this->_cluster[j]->removeCSocket(tmp[k]));
 						/* ------------ TESTING CODE ------------ */
+						break ;
+					}
+				}
+			}
+		}
+		// if (fds[i].revents == POLLIN) {
+		// 	for (int j = 0; j < (int)this->_cluster.size(); j++) {
+		// 		std::vector<int> tmp = this->_cluster[j]->getCSockets();
+		// 		for (int k = 0; k < (int)tmp.size(); k++) {
+		// 			if (tmp[k] == fds[i].fd) {
+
+		// 				¡¡¡READING AND PARSING REQUEST SEQUENTIALLY!!!
+
+		// 				break ;
+		// 			}
+		// 		}
+		// 	}
+		// }
+		if (fds[i].revents == POLLHUP) {
+			for (int j = 0; j < (int)this->_cluster.size(); j++) {
+				std::vector<int> tmp = this->_cluster[j]->getCSockets();
+				for (int k = 0; k < (int)tmp.size(); k++) {
+					if (tmp[k] == fds[i].fd) {
+						/* ------------ TESTING CODE ------------ */
+						close(this->_cluster[j]->removeCSocket(tmp[k]));
+						/* ------------ TESTING CODE ------------ */
+						break ;
 					}
 				}
 			}
@@ -179,23 +211,22 @@ void WebServs::runWebServs() {
 			throw PollErrorException();
 		}
 		if (ret) {
-			std::cout << "after poll!!!" << std::endl;
 			checkServersSockets(fds);
 			checkClientsSockets(fds);
 
 
-			/* ------------ TESTING CODE ------------ */
-			std::cout << "Server sockets: ";
-			for (int i = 0; i < (int)this->_wSockets.size(); i++) {
-				std::cout << this->_wSockets[i] << " ";
-			}
-			std::cout << std::endl;
-			std::cout << "Client sockets: ";
-			for (int i = 0; i < (int)this->_cSockets.size(); i++) {
-				std::cout << this->_cSockets[i] << " ";
-			}
-			std::cout << std::endl;
-			/* ------------ TESTING CODE ------------ */
+			// /* ------------ TESTING CODE ------------ */
+			// std::cout << "Server sockets: ";
+			// for (int i = 0; i < (int)this->_wSockets.size(); i++) {
+			// 	std::cout << this->_wSockets[i] << " ";
+			// }
+			// std::cout << std::endl;
+			// std::cout << "Client sockets: ";
+			// for (int i = 0; i < (int)this->_cSockets.size(); i++) {
+			// 	std::cout << this->_cSockets[i] << " ";
+			// }
+			// std::cout << std::endl;
+			// /* ------------ TESTING CODE ------------ */
 		}
 	}
 }
