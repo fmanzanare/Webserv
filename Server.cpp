@@ -179,6 +179,10 @@ int Server::removeCSocket(int sock) {
 }
 
 // METHODS:
+/**
+ * It opens the server sockets and binds them to the host addresses.
+ * Finally, it prepares the queue to receive connection requests.
+*/
 void Server::openSockets(void) {
 	sockaddr_in	sockaddr;
 

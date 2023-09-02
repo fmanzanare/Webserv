@@ -80,6 +80,14 @@ void WebServs::addServer(Server *s) {
 }
 
 // METHODS:
+/**
+ * Get all the openned sockets (server and clients) from each server and save them on the pollfd struct.
+ * Firstly, get all the sever sockets and save them.
+ * Secondly, clears the cSockets std::vector<int>.
+ * Then gets the server clients sockets and adds the to the cScokets std::vector<int>.
+ * Finally, adds all the cScokets to the pollfd struct.
+ * @param *fds pollfd struct where all the sockets fd are save with the events and revents.
+*/
 void WebServs::addSocketsToPoll(pollfd *fds) {
 	this->_nfds = 0;
 	for (int i = 0; i < (int)this->_wSockets.size(); i++) {
@@ -106,6 +114,12 @@ void WebServs::addSocketsToPoll(pollfd *fds) {
 	}
 }
 
+/**
+ * It goes through all the server sockets saved on the pollfd struct.
+ * If a new connection is received, the POLLIN revent will be activated.
+ * Then a new connection is accepted and saved into the server clients sockets std::vector<int>.
+ * @param *fds pollfd struct where all the sockets fd are save with the events and revents.
+*/
 void WebServs::checkServersSockets(pollfd *fds) {
 	for (int i = 0; i < this->_nfds; i++) {
 		if (fds[i].revents == POLLIN) {
@@ -134,6 +148,13 @@ void WebServs::checkServersSockets(pollfd *fds) {
 	}
 }
 
+/**
+ * It checks all the clients sockets to see if any action can be taken on them.
+ * POLLOUT is activated when the socket is ready to send data through.
+ * POLLHUP is activated when the client closes his connection from his side.
+ * POLLIN is activated when there is outstanding data to be read from the client socket.
+ * @param *fds pollfd struct where all the sockets fd are save with the events and revents.
+*/
 void WebServs::checkClientsSockets(pollfd *fds) {
 	for (int i = 0; i < this->_nfds; i++) {
 		if (fds[i].revents == POLLOUT) {
@@ -198,6 +219,15 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 	}
 }
 
+/**
+ * This function starts the Web server logic.
+ * Its flow is as follows:
+ * Gets all the servers sockets.
+ * Add them to the pollfd struct.
+ * Check the poll() function to see if there is any socket with outstanding actions.
+ * Checks servers sockets to add new incoming connections.
+ * Checks clients sockets to read or write or them if they are ready to.
+*/
 void WebServs::runWebServs() {
 	getServersSockets();
 
