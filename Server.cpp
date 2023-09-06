@@ -52,6 +52,9 @@ Server::Server(const Server &cp) {
 	this->_defResponse = cp._defResponse;
 	this->_redir = cp._redir;
 	this->_servRoute = cp._servRoute;
+	for (int i = 0; i < (int)cp._clients.size(); i++) {
+		this->_clients.push_back(cp._clients[i]);
+	}
 }
 
 Server &Server::operator=(const Server &cp) {
@@ -75,98 +78,73 @@ Server &Server::operator=(const Server &cp) {
 	this->_defResponse = cp._defResponse;
 	this->_redir = cp._redir;
 	this->_servRoute = cp._servRoute;
+	for (int i = 0; i < (int)cp._clients.size(); i++) {
+		this->_clients.push_back(cp._clients[i]);
+	}
 	return (*this);
 }
 
 // SETTERS:
-void Server::setName(std::string name) {
-	this->_name = name;
+void Server::setName(std::string name) { this->_name = name; }
+
+void Server::addPort(int port) { this->_ports.push_back(port); }
+
+void Server::addSocket(int sock) { this->_socks.push_back(sock); }
+
+void Server::setErrPage(std::string errPage) { this->_errPage = errPage; }
+
+void Server::setCBodyLimit(int cBodyLimit) { this->_cBodyLimit = cBodyLimit; }
+
+void Server::addMethod(std::string method) { this->_methods.push_back(method); }
+
+void Server::setDirListing(bool dirListing) { this->_dirListing = dirListing; }
+
+void Server::setDefResponse(std::string defResponse) { this->_defResponse = defResponse; }
+
+void Server::setRedir(std::string redir) { this->_redir = redir; }
+
+void Server::setServRoute(std::string servRoute) { this->_servRoute = servRoute; }
+
+void Server::addClient(Client *client) { this->_clients.push_back(client); }
+
+void Server::removeClient(int idx) {
+	std::vector<Client *>::iterator it = this->_clients.begin() + idx;
+	Client *tmp = *it;
+
+	this->_clients.erase(it);
+	delete tmp;
 }
 
-void Server::addPort(int port) {
-	this->_ports.push_back(port);
-}
-
-void Server::addSocket(int sock) {
-	this->_socks.push_back(sock);
-}
-
-void Server::setErrPage(std::string errPage) {
-	this->_errPage = errPage;
-}
-
-void Server::setCBodyLimit(int cBodyLimit) {
-	this->_cBodyLimit = cBodyLimit;
-}
-
-void Server::addMethod(std::string method) {
-	this->_methods.push_back(method);
-}
-
-void Server::setDirListing(bool dirListing) {
-	this->_dirListing = dirListing;
-}
-
-void Server::setDefResponse(std::string defResponse) {
-	this->_defResponse = defResponse;
-}
-
-void Server::setRedir(std::string redir) {
-	this->_redir = redir;
-}
-
-void Server::setServRoute(std::string servRoute) {
-	this->_servRoute = servRoute;
-}
-
-void Server::addCSocket(int sock) {
-	this->_cSockets.push_back(sock);
-}
+/* ------TO BE REMOVED------ */
+void Server::addCSocket(int sock) { this->_cSockets.push_back(sock); }
+/* ------TO BE REMOVED------ */
 
 // GETTERS:
-std::string Server::getName(void) {
-	return (this->_name);
-}
+std::string Server::getName(void) { return (this->_name); }
 
-std::vector<int> Server::getPorts(void) {
-	return (this->_ports);
-}
+std::vector<int> Server::getPorts(void) { return (this->_ports); }
 
-std::vector<int> Server::getSockets(void) {
-	return (this->_socks);
-}
+std::vector<int> Server::getSockets(void) { return (this->_socks); }
 
-std::string Server::getErrPage(void) {
-	return (this->_errPage);
-}
+std::string Server::getErrPage(void) { return (this->_errPage); }
 
-int Server::getCBodyLimit(void) {
-	return (this->_cBodyLimit);
-}
+int Server::getCBodyLimit(void) { return (this->_cBodyLimit); }
 
-std::vector<std::string> Server::getMethods(void) {
-	return (this->_methods);
-}
+std::vector<std::string> Server::getMethods(void) { return (this->_methods); }
 
-bool Server::hasDirListing(void) {
-	return (this->_dirListing);
-}
+bool Server::hasDirListing(void) { return (this->_dirListing); }
 
-std::string Server::getDefResponse(void) {
-	return (this->_defResponse);
-}
+std::string Server::getDefResponse(void) { return (this->_defResponse); }
 
-std::string Server::getRedir(void) {
-	return (this->_redir);
-}
+std::string Server::getRedir(void) { return (this->_redir); }
 
-std::string Server::getServRoute(void) {
-	return (this->_servRoute);
-}
+std::string Server::getServRoute(void) { return (this->_servRoute); }
 
-std::vector<int> Server::getCSockets(void) {
-	return (this->_cSockets);
-}
+std::vector<Client *> Server::getClients(void) { return (this->_clients); }
+
+/* ------TO BE REMOVED------ */
+std::vector<int> Server::getCSockets(void) { return (this->_cSockets); }
+/* ------TO BE REMOVED------ */
 
 int Server::removeCSocket(int sock) {
 	for (std::vector<int>::iterator it = this->_cSockets.begin(); it != this->_cSockets.end(); it++) {

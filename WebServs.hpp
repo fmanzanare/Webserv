@@ -5,6 +5,7 @@
 #include <poll.h>
 #include <sstream>
 #include <fcntl.h>
+#include "Client.hpp"
 
 #define MAX_CONNECTIONS 1000
 
@@ -13,7 +14,10 @@ class WebServs {
 		// ATTRIBUTES:
 		std::vector<Server *> _cluster;
 		std::vector<int> _wSockets;
+		std::vector<Client *> _clients;
+		/* ------TO BE REMOVED------ */
 		std::vector<int> _cSockets;
+		/* ------TO BE REMOVED------ */
 		int _nfds;
 
 		// METHODS:
@@ -21,6 +25,7 @@ class WebServs {
 		void getServersSockets(void);
 		void checkServersSockets(pollfd *fds);
 		void checkClientsSockets(pollfd *fds);
+		void acceptPollinConnection(int inFd, int serverIdx);
 
 	public:
 		// ORTHODOOX CANNONICAL FORM:

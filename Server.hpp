@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include "Client.hpp"
 
 class Server {
 	private:
@@ -21,7 +22,8 @@ class Server {
 		std::string					_defResponse;
 		std::string					_redir;
 		std::string					_servRoute;
-		std::vector<int>			_cSockets;
+		std::vector<int>			_cSockets; // To be removed!!!
+		std::vector<Client *>		_clients;
 
 		// PRIVATE CONSTRUCTOR:
 		Server();
@@ -47,7 +49,9 @@ class Server {
 		void setDefResponse(std::string defResponse);
 		void setRedir(std::string redir);
 		void setServRoute(std::string servRoute);
-		void addCSocket(int sock);
+		void addClient(Client *client);
+		void removeClient(int idx);
+		void addCSocket(int sock); // To be removed!!!
 		int removeCSocket(int sock);
 
 		// GETTERS:
@@ -61,7 +65,8 @@ class Server {
 		std::string getDefResponse(void);
 		std::string getRedir(void);
 		std::string getServRoute(void);
-		std::vector<int> getCSockets(void);
+		std::vector<Client *> getClients(void);
+		std::vector<int> getCSockets(void); // To be removed!!!
 
 		// EXCEPTIONS:
 		class SocketCreationErrorException;
