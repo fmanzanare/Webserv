@@ -35,3 +35,9 @@ https://trungams.github.io/2020-08-23-a-simple-http-server-from-scratch/
 
 Networking programming tutorial:
 https://beej.us/guide/bgnet/html/#client-server-background
+
+Non-Blocking file descriptors and multiplexing:
+https://copyconstruct.medium.com/nonblocking-i-o-99948ad7c957
+
+Andres and Jarre repo:
+https://github.com/andresja75/webserv
