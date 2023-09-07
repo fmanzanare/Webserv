@@ -115,10 +115,6 @@ void Server::removeClient(int idx) {
 	delete tmp;
 }
 
-/* ------TO BE REMOVED------ */
-void Server::addCSocket(int sock) { this->_cSockets.push_back(sock); }
-/* ------TO BE REMOVED------ */
-
 // GETTERS:
 std::string Server::getName(void) { return (this->_name); }
 
@@ -141,20 +137,6 @@ std::string Server::getRedir(void) { return (this->_redir); }
 std::string Server::getServRoute(void) { return (this->_servRoute); }
 
 std::vector<Client *> Server::getClients(void) { return (this->_clients); }
-
-/* ------TO BE REMOVED------ */
-std::vector<int> Server::getCSockets(void) { return (this->_cSockets); }
-/* ------TO BE REMOVED------ */
-
-int Server::removeCSocket(int sock) {
-	for (std::vector<int>::iterator it = this->_cSockets.begin(); it != this->_cSockets.end(); it++) {
-		if (*it == sock) {
-			this->_cSockets.erase(it);
-			return (sock);
-		}
-	}
-	return (-1);
-}
 
 // METHODS:
 /**

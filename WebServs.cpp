@@ -115,7 +115,7 @@ void WebServs::addSocketsToPoll(pollfd *fds) {
 
 /**
  * Gets the fd where there is an incomming connection and the server index on the cluster.
- * Accepts the connection and add the new client socket to the server.
+ * Accepts the connection and add the new client to the server.
  * @param inFd fd of the pollfd struct where the incomming connection is.
  * @param serverIdx Index of the server on the cluster vector.
 */
@@ -138,7 +138,7 @@ void WebServs::acceptPollinConnection(int inFd, int serverIdx) {
 /**
  * It goes through all the server sockets saved on the pollfd struct.
  * If a new connection is received, the POLLIN revent will be activated.
- * Then a new connection is accepted and saved into the server clients sockets std::vector<int>.
+ * Then a new connection is accepted and saved into the server clients vector.
  * @param *fds pollfd struct where all the sockets fd are save with the events and revents.
 */
 void WebServs::checkServersSockets(pollfd *fds) {
@@ -171,7 +171,9 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 					// Read request and save it on a string, until it is completely finished.
 					// Otherwise, keep reading and filling the string.
 					serverClients[j]->receiveData();
-					std::cout << serverClients[j]->getRequest();
+					/* ----------TESTING----------*/
+					std::cout << serverClients[j]->getRequest() << std::endl;
+					/* ----------TESTING----------*/
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
@@ -186,74 +188,6 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 			}
 		}
 	}
-
-
-
-	// for (int i = 0; i < this->_nfds; i++) {
-	// 	if (fds[i].revents == POLLIN) {
-	// 		for (int j = 0; j < (int)this->_cluster.size(); j++) {
-	// 			std::vector<int> tmp = this->_cluster[j]->getCSockets();
-	// 			for (int k = 0; k < (int)tmp.size(); k++) {
-	// 				if (tmp[k] == fds[i].fd) {
-	// 					/* ------------ TESTING CODE ------------ */
-	// 					char buffer[1000];
-	// 					read(tmp[k], buffer, 1000);
-	// 					std::string str(buffer);
-	// 					this->_cluster[j]->addRequest(new Request(str));
-	// 					std::cout << "GOES OUT!!!!" << std::endl;
-	// 					std::cout << "The message was: " << str.substr(0, 20) << std::endl;
-	// 					std::cout << "\n\n\n";
-	// 					std::cout << str << std::endl;
-	// 					std::string body =
-	// 						"<!DOCTYPE html>"
-	// 						"<html>"
-	// 						"<head>"
-	// 						"</head>"
-	// 						"<body><h1>Hello World!</h1><p>This is a testing page!!!!!</p></body>"
-	// 						"</html>";
-	// 					int bodyLen = body.size();
-	// 					std::string header =
-	// 						"HTTP/1.1 200 OK\n"
-	// 						"Content-Type: text/html\n"
-	// 						"Content-Length: " + toString(bodyLen) + "\n"
-	// 						"\n";
-	// 					std::string reply = header + body;
-	// 					int bytesSent;
-	// 					bytesSent = send(tmp[k], reply.c_str(), reply.size(), 0);
-	// 					close(this->_cluster[j]->removeCSocket(tmp[k]));
-	// 					/* ------------ TESTING CODE ------------ */
-	// 					break ;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	if (fds[i].revents == POLLIN) {
-	// 		for (int j = 0; j < (int)this->_cluster.size(); j++) {
-	// 			std::vector<int> tmp = this->_cluster[j]->getCSockets();
-	// 			for (int k = 0; k < (int)tmp.size(); k++) {
-	// 				if (tmp[k] == fds[i].fd) {
-
-	// 					¡¡¡READING AND PARSING REQUEST SEQUENTIALLY!!!
-
-	// 					break ;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	if (fds[i].revents == POLLHUP) {
-	// 		for (int j = 0; j < (int)this->_cluster.size(); j++) {
-	// 			std::vector<int> tmp = this->_cluster[j]->getCSockets();
-	// 			for (int k = 0; k < (int)tmp.size(); k++) {
-	// 				if (tmp[k] == fds[i].fd) {
-	// 					/* ------------ TESTING CODE ------------ */
-	// 					close(this->_cluster[j]->removeCSocket(tmp[k]));
-	// 					/* ------------ TESTING CODE ------------ */
-	// 					break ;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 /**

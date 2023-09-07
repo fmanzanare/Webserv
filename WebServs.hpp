@@ -15,9 +15,6 @@ class WebServs {
 		std::vector<Server *> _cluster;
 		std::vector<int> _wSockets;
 		std::vector<Client *> _clients;
-		/* ------TO BE REMOVED------ */
-		std::vector<int> _cSockets;
-		/* ------TO BE REMOVED------ */
 		int _nfds;
 
 		// METHODS:

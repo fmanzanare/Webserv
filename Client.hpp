@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <string>
+#include <cstdlib>
 
 #define BUFFER_SIZE 1000
 

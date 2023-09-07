@@ -22,7 +22,6 @@ class Server {
 		std::string					_defResponse;
 		std::string					_redir;
 		std::string					_servRoute;
-		std::vector<int>			_cSockets; // To be removed!!!
 		std::vector<Client *>		_clients;
 
 		// PRIVATE CONSTRUCTOR:
@@ -51,8 +50,6 @@ class Server {
 		void setServRoute(std::string servRoute);
 		void addClient(Client *client);
 		void removeClient(int idx);
-		void addCSocket(int sock); // To be removed!!!
-		int removeCSocket(int sock);
 
 		// GETTERS:
 		std::string getName(void);
@@ -66,7 +63,6 @@ class Server {
 		std::string getRedir(void);
 		std::string getServRoute(void);
 		std::vector<Client *> getClients(void);
-		std::vector<int> getCSockets(void); // To be removed!!!
 
 		// EXCEPTIONS:
 		class SocketCreationErrorException;

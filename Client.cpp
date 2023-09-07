@@ -49,7 +49,7 @@ bool Client::isFinishedRequest() { return (this->_finishedReq); }
 
 // METHODS:
 void Client::receiveData() {
-	char	buffer[BUFFER_SIZE];
+	char	buffer[BUFFER_SIZE + 1] = {0};
 
 	if (recv(this->_socket, buffer, BUFFER_SIZE, 0) == -1) {
 		throw RecvErrorException();
@@ -57,10 +57,35 @@ void Client::receiveData() {
 
 	this->_request += buffer;
 
-	if (this->_request.find("\r\n\r\n") == std::string::npos) {
+	size_t pos = this->_request.find("\r\n\r\n");
+	if (pos == std::string::npos) {
 		this->_finishedReq = false;
 		return ;
 	}
 
-	this->_finishedReq = true;
+	size_t contLenPos = this->_request.find("Content-Length: ");
+	if (contLenPos == std::string::npos) {
+		if (this->_request.find("Transfer-Encoding: chunked") != std::string::npos) {
+			if (this->_request.substr(this->_request.size() - 5) == "0\r\n\r\n") {
+				this->_finishedReq = true;
+				return ;
+			} else {
+				this->_finishedReq = false;
+				return ;
+			}
+		}
+		this->_finishedReq = true;
+		return ;
+	}
+
+	size_t newLine = this->_request.find("\n", contLenPos);
+	std::string tmp = this->_request.substr((contLenPos + 16), ((contLenPos + 16) - (newLine)));
+	int bodyLen = std::atoi(tmp.c_str());
+
+	if (this->_request.size() >= bodyLen + pos + 4) {
+		this->_finishedReq = true;
+		return ;
+	}
+
+	this->_finishedReq = false;
 }
