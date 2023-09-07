@@ -18,7 +18,7 @@ class Request
 		Request & operator=(const Request &assign);
 
 		// Methods //
-		
+		std::string	processRequest(std::string);	
 
 		// Setters
 		void		setRawRequest(std::string);
@@ -33,6 +33,7 @@ class Request
 		std::string	getPath(void);
 		std::string	getProtocol(void);
 		std::string	getHost(void);
+		std::string	getBody(void);
 
 	private:
 		std::string	_rawRequest;
@@ -40,6 +41,7 @@ class Request
 		std::string	_path;
 		std::string	_protocol;
 		std::string	_host;
+		std::string	_body;
 };
 
 #endif
