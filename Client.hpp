@@ -15,6 +15,8 @@ class Client {
 		int				_socket;
 		std::string		_request;
 		bool			_finishedReq;
+		bool			_finishedRes;
+		size_t			_resPos;
 
 		// PRIVATE CONSTRUCTOR:
 		Client();
@@ -30,14 +32,17 @@ class Client {
 		void setSocket(int socket);
 		void setRequest(std::string request);
 		void setFinishedRequest(bool finishedReq);
+		void setFinishedResponse(bool finishedRes);
 
 		// GETTERS:
 		int getSocket(void);
 		std::string getRequest(void);
 		bool isFinishedRequest(void);
+		bool isFinishedResponse(void);
 
 		// METHODS:
 		void receiveData(void);
+		void sendData(std::string response);
 
 		// EXCEPTIONS:
 		class RecvErrorException;

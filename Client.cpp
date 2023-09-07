@@ -14,6 +14,8 @@ Client::Client(int socket) {
 	this->_socket = socket;
 	this->_request = "";
 	this->_finishedReq = false;
+	this->_finishedRes = false;
+	this->_resPos = 0;
 }
 
 Client::~Client() {
@@ -40,12 +42,16 @@ void Client::setRequest(std::string request) { this->_request = request; }
 
 void Client::setFinishedRequest(bool finishedReq) { this->_finishedReq = finishedReq; }
 
+void Client::setFinishedResponse(bool finishedRes) { this->_finishedRes = finishedRes; }
+
 // GETTERS:
 int Client::getSocket() { return (this->_socket); }
 
 std::string Client::getRequest() { return (this->_request); }
 
 bool Client::isFinishedRequest() { return (this->_finishedReq); }
+
+bool Client::isFinishedResponse() { return (this->_finishedRes); }
 
 // METHODS:
 void Client::receiveData() {
@@ -88,4 +94,18 @@ void Client::receiveData() {
 	}
 
 	this->_finishedReq = false;
+}
+
+void Client::sendData(std::string response) {
+	size_t sent = 0;
+
+	sent = send(this->_socket, &response.c_str()[this->_resPos], response.size(), 0);
+	this->_resPos += sent;
+
+	if (this->_resPos >= response.size()) {
+		this->_finishedRes = true;
+		return ;
+	}
+
+	this->_finishedRes = false;
 }

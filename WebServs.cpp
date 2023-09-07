@@ -168,17 +168,30 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 		for (int j = 0; j < (int)serverClients.size(); j++) {
 			for (int k = 0; k < this->_nfds; k++) {
 				if (fds[k].revents == POLLIN && fds[k].fd == serverClients[j]->getSocket()) {
-					// Read request and save it on a string, until it is completely finished.
-					// Otherwise, keep reading and filling the string.
 					serverClients[j]->receiveData();
-					/* ----------TESTING----------*/
-					std::cout << serverClients[j]->getRequest() << std::endl;
-					/* ----------TESTING----------*/
+					/* ----------TESTING---------- */
+					if (serverClients[j]->isFinishedRequest())
+						std::cout << serverClients[j]->getRequest() << std::endl;
+					/* ----------TESTING---------- */
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
-					this->_cluster[i]->removeClient(j);
+					std::cout << "Goes into POLLOUT" << std::endl;
+					/* ----------TESTING---------- */
+					std::string header = "HTTP/1.1 200 OK\n"
+										"Content-Type: text/html\n"
+										"Content-Length: XX\r\n"
+										"\r\n";
+					std::string body = "<!DOCTYPE html><html><head></head><body><h1>"
+										"Hello World!<br>"
+										"</h1></body></html>\r\n\r\n";
+					std::string response = header + body;
+					/* ----------TESTING---------- */
+
+					serverClients[j]->sendData(response);
+					if (serverClients[j]->isFinishedResponse())
+						this->_cluster[i]->removeClient(j);
 					break;
 				}
 				if (fds[k].revents == POLLHUP && fds[k].fd == serverClients[j]->getSocket()) {
