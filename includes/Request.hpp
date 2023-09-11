@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string>
 # include <unistd.h>
+# include <map>
 
 class Request
 {
@@ -42,6 +43,7 @@ class Request
 		std::string	_method;
 		std::string	_path;
 		std::string	_protocol;
+		// std::map<std::string,std::string> _headers;
 		// std::string	_host;
 		std::string	_body;
 };
