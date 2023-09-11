@@ -22,13 +22,9 @@ Request::~Request()
 }
 
 // Methods
-bool	Request::parseFirstLine(void)
+bool	Request::parseMethod(int &startPos, int &endPos)
 {
-	int startPos;
-	int endPos;
-
 	startPos = 0;
-	endPos = 0;
 	endPos = this->_rawRequest.find(" ");
 	if (endPos != (int)std::string::npos)
 	{
@@ -37,12 +33,25 @@ bool	Request::parseFirstLine(void)
 			return false;
 		startPos = endPos + 1;
 	}
+	return true;
+}
+
+bool	Request::parsePath(int &startPos, int &endPos)
+{
 	endPos = this->_rawRequest.find(" ", startPos);
 	if (endPos != (int)std::string::npos)
 	{
 		this->_path = _rawRequest.substr(startPos, endPos - startPos);
+		const char *path = this->_path.c_str();
+		if (access(path, F_OK | R_OK) == -1)
+			return false;
 		startPos = endPos + 1;
 	}
+	return true;
+}
+
+bool	Request::parseProtocol(int &startPos, int &endPos)
+{
 	endPos = this->_rawRequest.find("\n", startPos);
 	if (endPos != (int)std::string::npos)
 	{
@@ -54,9 +63,24 @@ bool	Request::parseFirstLine(void)
 	return true;
 }
 
+bool	Request::parseFirstLine(void)
+{
+	int startPos;
+	int endPos;
+
+	endPos = 0;
+	if (parseMethod(startPos, endPos) == false)
+		return false;
+	if (parsePath(startPos, endPos) == false)
+		return false;
+	if (parseProtocol(startPos, endPos) == false)
+		return false;
+	return true;
+}
+
 std::string	Request::processRequest(void)
 {
-	if (parseFirstLine() == false)
+	if (_rawRequest.empty() == false && parseFirstLine() == false)
 		std::cout << "Non valid header\n";
 	return _method;
 }

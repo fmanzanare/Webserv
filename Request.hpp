@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <string>
+# include <unistd.h>
 
 class Request
 {
@@ -21,6 +22,9 @@ class Request
 		// Methods //
 		std::string	processRequest(void);
 		bool		parseFirstLine(void);
+		bool		parseMethod(int &, int &);
+		bool		parsePath(int &, int &);
+		bool		parseProtocol(int &, int &);
 
 		// Setters
 		void	setRawRequest(std::string);
