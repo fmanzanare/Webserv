@@ -23,6 +23,8 @@ COLOR = \033[1;32m
 
 VPATH	= ./src/
 
+VPATH	= ./src/
+
 SRCS =	main.cpp\
 		Server.cpp\
 		WebServs.cpp\
