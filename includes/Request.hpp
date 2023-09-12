@@ -5,6 +5,7 @@
 # include <string>
 # include <unistd.h>
 # include <map>
+# include <sstream>
 
 class Request
 {
@@ -26,26 +27,27 @@ class Request
 		bool		parseMethod(int &, int &);
 		bool		parsePath(int &, int &);
 		bool		parseProtocol(int &, int &);
+		bool		parseHeader(void);
 
 		// Setters
 		void	setRawRequest(std::string);
 
 		// Getters
-		std::string	getRawRequest(void);
-		std::string	getMethod(void);
-		std::string	getPath(void);
-		std::string	getProtocol(void);
-		// std::string	getHost(void);
-		std::string	getBody(void);
+		std::string							getRawRequest(void);
+		std::string							getMethod(void);
+		std::string							getPath(void);
+		std::string							getProtocol(void);
+		std::string							getBody(void);
+		std::string	getHeader(std::string);
+		void printHeaders(void) ;
 
 	private:
-		std::string	_rawRequest;
-		std::string	_method;
-		std::string	_path;
-		std::string	_protocol;
-		// std::map<std::string,std::string> _headers;
-		// std::string	_host;
-		std::string	_body;
+		std::string							_rawRequest;
+		std::string							_method;
+		std::string							_path;
+		std::string							_protocol;
+		std::map<std::string,std::string>	_headers;
+		std::string							_body;
 };
 
 #endif

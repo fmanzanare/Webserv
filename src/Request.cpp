@@ -78,23 +78,55 @@ bool	Request::parseFirstLine(void)
 	return true;
 }
 
+bool	Request::parseHeader(void)
+{
+	std::stringstream	input(_rawRequest);
+	std::string			line;
+	std::string firstLine;
+	std::getline(input, firstLine);
+	std::getline(input, line);
+	while (!line.empty())
+	{
+		std::string key = line.substr(0, line.find(":"));
+		std::string value = line.substr(line.find(": ") + 2);
+		_headers[key] = value;
+		std::getline(input, line);
+	}
+	return true;
+}
+
 std::string	Request::processRequest(void)
 {
 	if (_rawRequest.empty() == false && parseFirstLine() == false)
+	{
 		std::cout << "Non valid header\n";
+		return "";
+	}
+	if(parseHeader() == false)
+	{
+		std::cout << "Non valid header\n"; 	
+		return "";
+	}
 	return _method;
 }
 
 // Setters
-void	Request::setRawRequest(std::string raw) {this->_rawRequest = raw;}
+void		Request::setRawRequest(std::string raw) {this->_rawRequest = raw;}
 
 // Getters
-std::string	Request::getRawRequest(void)				{return this->_rawRequest;}
-std::string	Request::getMethod(void)					{return this->_method;}
-std::string	Request::getPath(void)						{return this->_path;}
-std::string	Request::getProtocol(void)					{return this->_protocol;}
-// std::string	Request::getHost(void)						{return _host;}
-std::string	Request::getBody(void)						{return _body;}
+std::string							Request::getRawRequest(void)	{return this->_rawRequest;}
+std::string							Request::getMethod(void)		{return this->_method;}
+std::string							Request::getPath(void)			{return this->_path;}
+std::string							Request::getProtocol(void)		{return this->_protocol;}
+std::string							Request::getBody(void)			{return _body;}
+std::string	Request::getHeader(std::string key)		{
+	try {
+		return _headers[key];
+	} catch(...) {
+		return "";
+	}
+}
+
 
 // Operators
 Request & Request::operator=(const Request &assign)
@@ -107,3 +139,9 @@ Request & Request::operator=(const Request &assign)
 	return *this;
 }
 
+void Request::printHeaders(void) {
+	std::map<std::string, std::string>::iterator it;
+	for (it = _headers.begin(); it != _headers.end(); it++) {
+		std::cout << "Key: " << it->first << ", value: " << it->second << std::endl;
+	}
+}
