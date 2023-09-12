@@ -22,19 +22,6 @@ class Server::SocketListenErrorException : public std::exception {
 // ORTHODOX CANNONICAL FORM:
 Server::Server() {}
 
-/* ---------- REMOVE ---------- */
-Server::Server(std::vector<int> ports, std::vector<std::string> methods, std::string host) {
-	this->_host = host;
-	for (int i = 0; i < (int)ports.size(); i++) {
-		this->_ports.push_back(ports[i]);
-	}
-	for (int i = 0; i < (int)methods.size(); i++) {
-		this->_methods.push_back(methods[i]);
-	}
-	openSockets();
-}
-/* ---------- REMOVE ---------- */
-
 Server::Server(std::vector<int> ports, std::vector<Route *> routes, std::string host) {
 	this->_host = host;
 	for (int i = 0; i < (int)ports.size(); i++) {
@@ -59,17 +46,6 @@ Server::Server(const Server &cp) {
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
-
-	/* ---------- REMOVE ---------- */
-	for (int i = 0; i < (int)cp._methods.size(); i++) {
-		this->_methods.push_back(cp._methods[i]);
-	}
-	this->_dirListing = cp._dirListing;
-	this->_defResponse = cp._defResponse;
-	this->_redir = cp._redir;
-	this->_servRoute = cp._servRoute;
-	/* ---------- REMOVE ---------- */
-
 	for (int i = 0; i < (int)cp._routes.size(); i++) {
 		this->_routes.push_back(cp._routes[i]);
 	}
@@ -91,18 +67,6 @@ Server &Server::operator=(const Server &cp) {
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
-
-	/* ---------- REMOVE ---------- */
-	this->_methods.clear();
-	for (int i = 0; i < (int)cp._methods.size(); i++) {
-		this->_methods.push_back(cp._methods[i]);
-	}
-	this->_dirListing = cp._dirListing;
-	this->_defResponse = cp._defResponse;
-	this->_redir = cp._redir;
-	this->_servRoute = cp._servRoute;
-	/* ---------- REMOVE ---------- */
-
 	this->_routes.clear();
 	for (int i = 0; i < (int)cp._routes.size(); i++) {
 		this->_routes.push_back(cp._routes[i]);
@@ -125,18 +89,6 @@ void Server::addSocket(int sock) { this->_socks.push_back(sock); }
 void Server::setErrPage(std::string errPage) { this->_errPage = errPage; }
 
 void Server::setCBodyLimit(int cBodyLimit) { this->_cBodyLimit = cBodyLimit; }
-
-/* ---------- REMOVE ---------- */
-void Server::addMethod(std::string method) { this->_methods.push_back(method); }
-
-void Server::setDirListing(bool dirListing) { this->_dirListing = dirListing; }
-
-void Server::setDefResponse(std::string defResponse) { this->_defResponse = defResponse; }
-
-void Server::setRedir(std::string redir) { this->_redir = redir; }
-
-void Server::setServRoute(std::string servRoute) { this->_servRoute = servRoute; }
-/* ---------- REMOVE ---------- */
 
 void Server::setRoutes(std::vector<Route *> routes) {
 	for (int i = 0; i < (int)routes.size(); i++) {
@@ -168,18 +120,6 @@ std::vector<int> Server::getSockets(void) { return (this->_socks); }
 std::string Server::getErrPage(void) { return (this->_errPage); }
 
 int Server::getCBodyLimit(void) { return (this->_cBodyLimit); }
-
-/* ---------- REMOVE ---------- */
-std::vector<std::string> Server::getMethods(void) { return (this->_methods); }
-
-bool Server::hasDirListing(void) { return (this->_dirListing); }
-
-std::string Server::getDefResponse(void) { return (this->_defResponse); }
-
-std::string Server::getRedir(void) { return (this->_redir); }
-
-std::string Server::getServRoute(void) { return (this->_servRoute); }
-/* ---------- REMOVE ---------- */
 
 std::vector<Route *> Server::getRoutes(void) { return (this->_routes); }
 

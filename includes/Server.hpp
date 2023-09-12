@@ -19,11 +19,6 @@ class Server {
 		std::string					_errPage;
 		int							_cBodyLimit;
 		std::vector<Route *>		_routes;
-		std::vector<std::string>	_methods; // Route -> _methods
-		bool						_dirListing; // Route -> _dirListing
-		std::string					_defResponse; // Route -> _default
-		std::string					_redir; // Route -> _redir
-		std::string					_servRoute; // Route -> _root
 		std::vector<Client *>		_clients;
 
 		// PRIVATE CONSTRUCTOR:
@@ -47,11 +42,6 @@ class Server {
 		void addSocket(int sock);
 		void setErrPage(std::string errPage);
 		void setCBodyLimit(int cBodyLimit);
-		void addMethod(std::string method); // Route
-		void setDirListing(bool dirListing); // Route
-		void setDefResponse(std::string defResponse); // Route
-		void setRedir(std::string redir); // Route
-		void setServRoute(std::string servRoute); // Route
 		void setRoutes(std::vector<Route *> routes);
 		void addRoute(Route *route);
 		void addClient(Client *client);
@@ -64,11 +54,6 @@ class Server {
 		std::vector<int> getSockets(void);
 		std::string getErrPage(void);
 		int getCBodyLimit(void);
-		std::vector<std::string> getMethods(void); // Route
-		bool hasDirListing(void); // Route
-		std::string getDefResponse(void); // Route
-		std::string getRedir(void); // Route
-		std::string getServRoute(void); // Route
 		std::vector<Route *> getRoutes(void);
 		std::vector<Client *> getClients(void);
 
