@@ -4,7 +4,7 @@ server:
   server-name: myserver
   error-page: #error_page route.
   body-limit: #client body limit
-  location:
+  route:
     methods: GET,POST,DELETE
     #redirection????
     #file-route????

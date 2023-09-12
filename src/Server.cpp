@@ -22,7 +22,8 @@ class Server::SocketListenErrorException : public std::exception {
 // ORTHODOX CANNONICAL FORM:
 Server::Server() {}
 
-Server::Server(std::vector<int> ports, std::vector<std::string> methods) {
+Server::Server(std::vector<int> ports, std::vector<std::string> methods, std::string host) {
+	this->_host = host;
 	for (int i = 0; i < (int)ports.size(); i++) {
 		this->_ports.push_back(ports[i]);
 	}
@@ -39,7 +40,7 @@ Server::Server(const Server &cp) {
 	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
-	// this->_host attribute!!
+	this->_host = cp._host;
 	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
@@ -63,7 +64,7 @@ Server &Server::operator=(const Server &cp) {
 	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
-	// this->_host attribute!!
+	this->_host = cp._host;
 	this->_socks.clear();
 	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
@@ -88,6 +89,8 @@ Server &Server::operator=(const Server &cp) {
 void Server::setName(std::string name) { this->_name = name; }
 
 void Server::addPort(int port) { this->_ports.push_back(port); }
+
+void Server::setHost(std::string host) { this->_host = host; }
 
 void Server::addSocket(int sock) { this->_socks.push_back(sock); }
 
@@ -119,6 +122,8 @@ void Server::removeClient(int idx) {
 std::string Server::getName(void) { return (this->_name); }
 
 std::vector<int> Server::getPorts(void) { return (this->_ports); }
+
+std::string Server::getHost(void) { return (this->_host); }
 
 std::vector<int> Server::getSockets(void) { return (this->_socks); }
 
@@ -157,7 +162,7 @@ void Server::openSockets(void) {
 		this->_socks.push_back(sockfd);
 
 		sockaddr.sin_family = AF_INET;
-		sockaddr.sin_addr.s_addr = INADDR_ANY; // MAL! DEBE CONTENER EL HOST DEL SERVIDOR (DIREC. IP).
+		sockaddr.sin_addr.s_addr = inet_addr(this->_host.c_str());
 		sockaddr.sin_port = htons(this->_ports[i]);
 
 		if (bind(this->_socks[i], (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {

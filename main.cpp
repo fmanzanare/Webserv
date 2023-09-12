@@ -21,15 +21,20 @@ int main(void) {
 	method.push_back("GET");
 
 	WebServs c1;
-	c1.addServer(new Server(port, method));
+	Server *s1 = new Server(port, method, "127.0.0.1");
+
+	c1.addServer(s1);
 
 	port.clear();
-	port.push_back(1001);
-	port.push_back(1002);
+	port.push_back(8001);
+	port.push_back(8002);
 
 	method.clear();
 	method.push_back("PUT");
-	c1.addServer(new Server(port, method));
+
+	Server *s2 = new Server(port, method, "0.0.0.0");
+
+	c1.addServer(s2);
 
 	signal(SIGINT, signalHandler);
 	c1.runWebServs();

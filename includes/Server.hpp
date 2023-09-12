@@ -13,7 +13,7 @@ class Server {
 		// ATTRIBUTES:
 		std::string					_name;
 		std::vector<int>			_ports;
-		// host -> ip direction for the server (p. ej. 127.0.0.1)
+		std::string					_host;
 		std::vector<int>			_socks;
 		std::string					_errPage;
 		int							_cBodyLimit;
@@ -32,7 +32,7 @@ class Server {
 
 	public:
 		// ORTHODOX CANNONICAL FORM:
-		Server(std::vector<int> ports, std::vector<std::string> methods);
+		Server(std::vector<int> ports, std::vector<std::string> methods, std::string host);
 		~Server();
 		Server(const Server &cp);
 		Server &operator=(const Server &cp);
@@ -40,6 +40,7 @@ class Server {
 		// SETTERS:
 		void setName(std::string name);
 		void addPort(int port);
+		void setHost(std::string host);
 		void addSocket(int sock);
 		void setErrPage(std::string errPage);
 		void setCBodyLimit(int cBodyLimit);
@@ -54,6 +55,7 @@ class Server {
 		// GETTERS:
 		std::string getName(void);
 		std::vector<int> getPorts(void);
+		std::string getHost(void);
 		std::vector<int> getSockets(void);
 		std::string getErrPage(void);
 		int getCBodyLimit(void);
