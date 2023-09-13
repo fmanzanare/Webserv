@@ -8,6 +8,10 @@ Request::Request()
 Request::Request(std::string raw)
 {
 	this->_rawRequest = raw;
+	this->_method = "";
+	this->_path = "";
+	this->_protocol = "";
+	this->_body = "";
 }
 
 Request::Request(const Request &copy)
@@ -82,7 +86,8 @@ bool	Request::parseHeader(void)
 {
 	std::stringstream	input(_rawRequest);
 	std::string			line;
-	std::string firstLine;
+	std::string 		firstLine;
+	
 	std::getline(input, firstLine);
 	std::getline(input, line);
 	while (!line.empty())
@@ -107,6 +112,8 @@ std::string	Request::processRequest(void)
 		std::cout << "Non valid header\n"; 	
 		return "";
 	}
+	if (this->_rawRequest.length() - (this->_rawRequest.find("\n\n") + 2) > 0)
+		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\n\n") + 2);
 	return _method;
 }
 

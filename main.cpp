@@ -58,9 +58,13 @@ int main()
 "Sec-Fetch-User: ?1\n"
 "Sec-Fetch-Dest: document\n"
 "Accept-Encoding: gzip, deflate, br\n"
-"Accept-Language: es-ES,es;q=0.9,en;q=0.8\n\n";
+"Accept-Language: es-ES,es;q=0.9,en;q=0.8\n\n"
+"Hola Mundo\n"
+"Como estamo\n";
 	Request req = Request(raw);
 
 	req.processRequest();
+	std::cout << "method: " << req.getMethod() << " path:" << req.getPath() << " protocol:" << req.getProtocol() << std::endl;
 	req.printHeaders();
+	std::cout << " body:\n" << req.getBody() << std::endl;
 }
