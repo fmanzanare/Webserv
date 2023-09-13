@@ -22,12 +22,13 @@ class Server::SocketListenErrorException : public std::exception {
 // ORTHODOX CANNONICAL FORM:
 Server::Server() {}
 
-Server::Server(std::vector<int> ports, std::vector<std::string> methods) {
+Server::Server(std::vector<int> ports, std::vector<Route *> routes, std::string host) {
+	this->_host = host;
 	for (int i = 0; i < (int)ports.size(); i++) {
 		this->_ports.push_back(ports[i]);
 	}
-	for (int i = 0; i < (int)methods.size(); i++) {
-		this->_methods.push_back(methods[i]);
+	for (int i = 0; i < (int)routes.size(); i++) {
+		this->_routes.push_back(routes[i]);
 	}
 	openSockets();
 }
@@ -39,19 +40,15 @@ Server::Server(const Server &cp) {
 	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
-	// this->_host attribute!!
+	this->_host = cp._host;
 	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
-	for (int i = 0; i < (int)cp._methods.size(); i++) {
-		this->_methods.push_back(cp._methods[i]);
+	for (int i = 0; i < (int)cp._routes.size(); i++) {
+		this->_routes.push_back(cp._routes[i]);
 	}
-	this->_dirListing = cp._dirListing;
-	this->_defResponse = cp._defResponse;
-	this->_redir = cp._redir;
-	this->_servRoute = cp._servRoute;
 	for (int i = 0; i < (int)cp._clients.size(); i++) {
 		this->_clients.push_back(cp._clients[i]);
 	}
@@ -63,21 +60,17 @@ Server &Server::operator=(const Server &cp) {
 	for (int i = 0; i < (int)cp._ports.size(); i++) {
 		this->_ports.push_back(cp._ports[i]);
 	}
-	// this->_host attribute!!
+	this->_host = cp._host;
 	this->_socks.clear();
 	for (int i = 0; i < (int)cp._socks.size(); i++) {
 		this->_socks.push_back(cp._socks[i]);
 	}
 	this->_errPage = cp._errPage;
 	this->_cBodyLimit = cp._cBodyLimit;
-	this->_methods.clear();
-	for (int i = 0; i < (int)cp._methods.size(); i++) {
-		this->_methods.push_back(cp._methods[i]);
+	this->_routes.clear();
+	for (int i = 0; i < (int)cp._routes.size(); i++) {
+		this->_routes.push_back(cp._routes[i]);
 	}
-	this->_dirListing = cp._dirListing;
-	this->_defResponse = cp._defResponse;
-	this->_redir = cp._redir;
-	this->_servRoute = cp._servRoute;
 	for (int i = 0; i < (int)cp._clients.size(); i++) {
 		this->_clients.push_back(cp._clients[i]);
 	}
@@ -89,21 +82,21 @@ void Server::setName(std::string name) { this->_name = name; }
 
 void Server::addPort(int port) { this->_ports.push_back(port); }
 
+void Server::setHost(std::string host) { this->_host = host; }
+
 void Server::addSocket(int sock) { this->_socks.push_back(sock); }
 
 void Server::setErrPage(std::string errPage) { this->_errPage = errPage; }
 
 void Server::setCBodyLimit(int cBodyLimit) { this->_cBodyLimit = cBodyLimit; }
 
-void Server::addMethod(std::string method) { this->_methods.push_back(method); }
+void Server::setRoutes(std::vector<Route *> routes) {
+	for (int i = 0; i < (int)routes.size(); i++) {
+		this->_routes.push_back(routes[i]);
+	}
+}
 
-void Server::setDirListing(bool dirListing) { this->_dirListing = dirListing; }
-
-void Server::setDefResponse(std::string defResponse) { this->_defResponse = defResponse; }
-
-void Server::setRedir(std::string redir) { this->_redir = redir; }
-
-void Server::setServRoute(std::string servRoute) { this->_servRoute = servRoute; }
+void Server::addRoute(Route *route) { this->_routes.push_back(route); }
 
 void Server::addClient(Client *client) { this->_clients.push_back(client); }
 
@@ -120,21 +113,15 @@ std::string Server::getName(void) { return (this->_name); }
 
 std::vector<int> Server::getPorts(void) { return (this->_ports); }
 
+std::string Server::getHost(void) { return (this->_host); }
+
 std::vector<int> Server::getSockets(void) { return (this->_socks); }
 
 std::string Server::getErrPage(void) { return (this->_errPage); }
 
 int Server::getCBodyLimit(void) { return (this->_cBodyLimit); }
 
-std::vector<std::string> Server::getMethods(void) { return (this->_methods); }
-
-bool Server::hasDirListing(void) { return (this->_dirListing); }
-
-std::string Server::getDefResponse(void) { return (this->_defResponse); }
-
-std::string Server::getRedir(void) { return (this->_redir); }
-
-std::string Server::getServRoute(void) { return (this->_servRoute); }
+std::vector<Route *> Server::getRoutes(void) { return (this->_routes); }
 
 std::vector<Client *> Server::getClients(void) { return (this->_clients); }
 
@@ -157,7 +144,7 @@ void Server::openSockets(void) {
 		this->_socks.push_back(sockfd);
 
 		sockaddr.sin_family = AF_INET;
-		sockaddr.sin_addr.s_addr = INADDR_ANY; // MAL! DEBE CONTENER EL HOST DEL SERVIDOR (DIREC. IP).
+		sockaddr.sin_addr.s_addr = inet_addr(this->_host.c_str());
 		sockaddr.sin_port = htons(this->_ports[i]);
 
 		if (bind(this->_socks[i], (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
