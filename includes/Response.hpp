@@ -19,6 +19,10 @@ class Response
 
 		// Methods
 		std::string	responseMaker(std::string, std::string, std::string);		
+		void		errorResponse(int);
+		void		getResponse(std::string);
+		void		postResponse(std::string);
+		void		deleteResponse(std::string);
 		
 	private:
 		std::string	_response;

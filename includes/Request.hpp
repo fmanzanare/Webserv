@@ -56,7 +56,7 @@ class Request
 
 // request header example
 /*
-GET / HTTP/1.12
+GET / HTTP/1.1
 Host: localhost:8080
 Connection: keep-alive
 sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"

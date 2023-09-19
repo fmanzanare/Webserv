@@ -25,15 +25,17 @@ Response::~Response()
 // Methods
 std::string	Response::responseMaker(std::string method, std::string path, std::string protocol)
 {
+	if (path != "HTTP/1.1")
+		errorResponse(426);
 	if (method == "GET")
-		// llamar funcion para generar respuesta para GET
+		getResponse(path);
 	else if (method == "POST")
-		// llamar funcion para generar respuesta para POST
-	else if (methods == "DELETE")
-		// llamar funcion para generar respuesta para DELETE
+		postResponse(path);
+	else if (method == "DELETE")
+		deleteResponse(path);
 	else
-		//pasar codigo de error a funcion que genera la respuesta
-	return _response;
+		errorResponse(405);
+	return this->_response;
 }
 
 // Operators
