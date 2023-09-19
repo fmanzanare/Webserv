@@ -177,7 +177,11 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
-					std::cout << "Goes into POLLOUT" << std::endl;
+					Request req = Request(serverClients[j]->getRequest());
+					req.processRequest();
+					std::cout << "REQUEST!!!!!!" << std::endl;
+					req.printHeaders();
+					std::cout << "REQUEST!!!!!!" << std::endl;
 					/* ----------TESTING---------- */
 					std::string header = "HTTP/1.1 200 OK\n"
 										"Content-Type: text/html\n"

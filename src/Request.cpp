@@ -26,63 +26,56 @@ Request::~Request()
 }
 
 // Methods
-bool	Request::parseMethod(int &startPos, int &endPos)
+void	Request::parseMethod(int &startPos, int &endPos)
 {
 	startPos = 0;
 	endPos = this->_rawRequest.find(" ");
 	if (endPos != (int)std::string::npos)
 	{
 		this->_method = _rawRequest.substr(startPos, endPos - startPos);
-		if (this->_method != "GET" && this->_method != "PUT" && this->_method != "DELETE")
-			return false;
 		startPos = endPos + 1;
+		return ;
 	}
-	return true;
+	this->_method = "";
 }
 
-bool	Request::parsePath(int &startPos, int &endPos)
+void	Request::parsePath(int &startPos, int &endPos)
 {
 	endPos = this->_rawRequest.find(" ", startPos);
 	if (endPos != (int)std::string::npos)
 	{
 		this->_path = _rawRequest.substr(startPos, endPos - startPos);
 		const char *path = this->_path.c_str();
-		if (access(path, F_OK | R_OK) == -1)
-			return false;
 		startPos = endPos + 1;
+		return ;
 	}
-	return true;
+	this->_path = "";
 }
 
-bool	Request::parseProtocol(int &startPos, int &endPos)
+void	Request::parseProtocol(int &startPos, int &endPos)
 {
-	endPos = this->_rawRequest.find("\n", startPos);
+	endPos = this->_rawRequest.find("\r\n", startPos);
 	if (endPos != (int)std::string::npos)
 	{
 		this->_protocol = _rawRequest.substr(startPos, endPos - startPos);
-		if (this->_protocol != "HTTP/1.1")
-			return false;
 		startPos = endPos + 1;
+		return ;
 	}
-	return true;
+	this->_protocol = "";
 }
 
-bool	Request::parseFirstLine(void)
+void	Request::parseFirstLine(void)
 {
 	int startPos;
 	int endPos;
 
 	endPos = 0;
-	if (parseMethod(startPos, endPos) == false)
-		return false;
-	if (parsePath(startPos, endPos) == false)
-		return false;
-	if (parseProtocol(startPos, endPos) == false)
-		return false;
-	return true;
+	parseMethod(startPos, endPos);
+	parsePath(startPos, endPos);
+	parseProtocol(startPos, endPos);
 }
 
-bool	Request::parseHeader(void)
+void	Request::parseHeader(void)
 {
 	std::stringstream	input(_rawRequest);
 	std::string			line;
@@ -97,23 +90,15 @@ bool	Request::parseHeader(void)
 		_headers[key] = value;
 		std::getline(input, line);
 	}
-	return true;
 }
 
 std::string	Request::processRequest(void)
 {
-	if (_rawRequest.empty() == false && parseFirstLine() == false)
-	{
-		std::cout << "Non valid header\n";
-		return "";
-	}
-	if(parseHeader() == false)
-	{
-		std::cout << "Non valid header\n"; 	
-		return "";
-	}
-	if (this->_rawRequest.length() - (this->_rawRequest.find("\n\n") + 2) > 0)
-		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\n\n") + 2);
+	parseFirstLine();
+	parseHeader();
+	if (this->_rawRequest.length() - (this->_rawRequest.find("\r\n\r\n") + 4) > 0)
+		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\r\n\r\n") + 4);
+	
 	return _method;
 }
 
@@ -126,7 +111,7 @@ std::string							Request::getMethod(void)		{return this->_method;}
 std::string							Request::getPath(void)			{return this->_path;}
 std::string							Request::getProtocol(void)		{return this->_protocol;}
 std::string							Request::getBody(void)			{return _body;}
-std::string	Request::getHeader(std::string key)		{
+std::string	Request::getHeader(std::string key){
 	try {
 		return _headers[key];
 	} catch(...) {
