@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <string>
+# include <sstream>
 
 class Response
 {
@@ -19,11 +20,15 @@ class Response
 
 		// Methods
 		std::string	responseMaker(std::string, std::string, std::string);		
-		void		errorResponse(int);
+		void		bodyResponseCode(const int&);
+		void		errorResponse(const int&);
 		void		getResponse(std::string);
 		void		postResponse(std::string);
 		void		deleteResponse(std::string);
+		void		generateFinalResponse();
 		
+		std::string	getResponses(){return _response;}
+
 	private:
 		std::string	_response;
 		std::string	_statusCode;

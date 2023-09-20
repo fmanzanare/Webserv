@@ -45,7 +45,7 @@ void	Request::parsePath(int &startPos, int &endPos)
 	if (endPos != (int)std::string::npos)
 	{
 		this->_path = _rawRequest.substr(startPos, endPos - startPos);
-		const char *path = this->_path.c_str();
+		// const char *path = this->_path.c_str();
 		startPos = endPos + 1;
 		return ;
 	}
@@ -111,7 +111,8 @@ std::string							Request::getMethod(void)		{return this->_method;}
 std::string							Request::getPath(void)			{return this->_path;}
 std::string							Request::getProtocol(void)		{return this->_protocol;}
 std::string							Request::getBody(void)			{return _body;}
-std::string	Request::getHeader(std::string key){
+std::string							Request::getHeader(std::string key)
+{
 	try {
 		return _headers[key];
 	} catch(...) {
