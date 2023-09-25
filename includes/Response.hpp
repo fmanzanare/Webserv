@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string>
 # include <sstream>
+# include <fstream>
 # include "Request.hpp"
 
 # define UPPERDEFBODY "<!DOCTYPE html><html><head></head><body><h1>"

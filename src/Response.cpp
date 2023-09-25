@@ -75,19 +75,24 @@ void	Response::errorResponse(const int &code)
 	this->_response += body;
 }
 
+/**
+ * Implementation of the response for a GET request.
+*/
 void	Response::getResponse(std::string path)
 {
-	std::string	response;
+	std::string			response;
+	std::stringstream	buffer;
 
 	path.insert(0, 1, '.');
 	if (access(path.c_str(), F_OK | W_OK) == 0)
 	{
-		
+		std::ifstream file(path);
+		buffer << file.rdbuf();
 	}
 }
 
 /**
- * This function generate a valid http response from the data of the 
+ * This function generates a valid http response from the data of the 
  * Request object passed to Response constructor
 */
 std::string	Response::responseMaker()
