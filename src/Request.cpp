@@ -92,25 +92,24 @@ void	Request::parseHeader(void)
 	}
 }
 
-std::string	Request::processRequest(void)
+void	Request::processRequest(void)
 {
 	parseFirstLine();
 	parseHeader();
 	if (this->_rawRequest.length() - (this->_rawRequest.find("\r\n\r\n") + 4) > 0)
-		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\r\n\r\n") + 4);
-	
-	return _method;
+		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\r\n\r\n") + 4);	
 }
 
 // Setters
 void		Request::setRawRequest(std::string raw) {this->_rawRequest = raw;}
 
 // Getters
-std::string							Request::getRawRequest(void)	{return this->_rawRequest;}
-std::string							Request::getMethod(void)		{return this->_method;}
-std::string							Request::getPath(void)			{return this->_path;}
-std::string							Request::getProtocol(void)		{return this->_protocol;}
-std::string							Request::getBody(void)			{return _body;}
+std::string							Request::getRawRequest(void)		{return this->_rawRequest;}
+std::string							Request::getMethod(void)			{return this->_method;}
+std::string							Request::getPath(void)				{return this->_path;}
+std::string							Request::getProtocol(void)			{return this->_protocol;}
+std::string							Request::getBody(void)				{return _body;}
+
 std::string							Request::getHeader(std::string key)
 {
 	try {
@@ -128,6 +127,7 @@ Request & Request::operator=(const Request &assign)
 	this->_method = assign._method;
 	this->_path = assign._path;
 	this->_protocol = assign._protocol;
+	this->_headers = assign._headers;
 	this->_body = assign._body;
 	return *this;
 }

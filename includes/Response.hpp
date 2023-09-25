@@ -4,12 +4,19 @@
 # include <iostream>
 # include <string>
 # include <sstream>
+# include "Request.hpp"
+
+# define UPPERDEFBODY "<!DOCTYPE html><html><head></head><body><h1>"
+# define LOWERDEFBODY "</h1></body></html>\r\n\r\n"
+# define CONTTYPE "Content type: text/html\n"
+# define CONTLENGTH "Content length: "
 
 class Response
 {
 	public:
 		// Constructors
 		Response();
+		Response(Request &req);
 		Response(const Response &copy);
 		
 		// Destructor
@@ -19,23 +26,21 @@ class Response
 		Response & operator=(const Response &assign);
 
 		// Methods
-		std::string	responseMaker(std::string, std::string, std::string);		
-		void		bodyResponseCode(const int&);
-		void		errorResponse(const int&);
-		void		getResponse(std::string);
-		void		postResponse(std::string);
-		void		deleteResponse(std::string);
-		void		generateFinalResponse();
-		
-		std::string	getResponses(){return _response;}
+		std::string		responseMaker();
+		std::string		bodyResponseCode(const int&);
+		void			errorResponse(const int&);
+		void			getResponse(std::string);
+		void			postResponse(std::string);
+		void			deleteResponse(std::string);
+		void			generateFinalResponse();
+
+		std::string	getResponses(){return _response;} // testing function
 
 	private:
-		std::string	_response;
-		std::string	_statusCode;
-		std::string	_status;
-		std::string	_contentType;
-		std::string _contentLength;
-		std::string	_body;
+		std::string		_response;
+		std::string		_statusCode;
+		std::string		_status;
+		Request			_request;
 };
 
 #endif

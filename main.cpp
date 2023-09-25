@@ -58,6 +58,6 @@ int main()
 {
 	Response req = Response();
 
-	req.errorResponse(405);
+	req.errorResponse(426);
 	std::cout << req.getResponses();
 }

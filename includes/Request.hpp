@@ -23,7 +23,7 @@ class Request
 		Request & operator=(const Request &assign);
 
 		// Methods //
-		std::string	processRequest(void);
+		void		processRequest(void);
 		void		parseFirstLine(void);
 		void		parseMethod(int &, int &);
 		void		parsePath(int &, int &);
@@ -49,7 +49,6 @@ class Request
 		std::string							_protocol;
 		std::map<std::string,std::string>	_headers;
 		std::string							_body;
-		Response							_response;
 };
 
 #endif

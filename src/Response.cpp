@@ -6,9 +6,15 @@ Response::Response()
 	this->_response = "";
 	this->_statusCode = "";
 	this->_status = "";
-	this->_contentType = "";
-	this->_contentLength = "";
-	this->_body = "";
+}
+
+Response::Response(Request &req)
+{
+	this->_request = req;
+	this->_response = "";
+	this->_statusCode = "";
+	this->_status = "";
+	req.processRequest();
 }
 
 Response::Response(const Response &copy)
@@ -22,47 +28,74 @@ Response::~Response()
 {
 }
 
-// Methods
-void	Response::bodyResponseCode(const int &code)
+// Non member functions
+std::string	headerGenerator(const std::string &code, const std::string &bodyLen)
 {
-	this->_body = "<!DOCTYPE html><html><head></head><body><h1>";
+	std::string header;
+
+	if (code == "200")
+		header = "HTTP/1.1 " + code + " OK\n";
+	else
+		header = "HTTP/1.1 " + code + " KO\n";
+	header += CONTTYPE;
+	header += CONTLENGTH + bodyLen + "\r\n\r\n";
+	return header;
+}
+
+// Methods
+std::string	Response::bodyResponseCode(const int &code)
+{
+	std::string body = UPPERDEFBODY;
+
 	switch(code)
 	{
 		case 426:
-			this->_body += "426 Upgrade Required<br>";
+			body += "426 Upgrade Required<br>";
 			break;
 		case 405:
-			this->_body += "405 Method Not Allowed<br>";
+			body += "405 Method Not Allowed<br>";
 			break;
 		default:
-			this->_body += "404 Server Error<br>";
+			body += "404 Server Error<br>";
 	}
+	body += LOWERDEFBODY;
+	return body;
 }
+
 
 void	Response::errorResponse(const int &code)
 {
-	std::stringstream itostr;
+	std::stringstream	code_str(code);
+	std::stringstream	len_str;
+	std::string			body = bodyResponseCode(code);
 
-	itostr << code;
-	this->_response = "HTTP/1.1 " + itostr.str() + " KO\n";
-	this->_response += "Content type: text/html\n";
-	bodyResponseCode(code);
-	this->_body += "</h1></body></html>\r\n\r\n";
-	itostr.str("");
-	itostr.clear();
-	itostr << this->_body.length();
-	this->_response += "Content length: " + itostr.str() + "\r\n\r\n";
-	this->_response += this->_body;
+	code_str << code;
+	len_str << body.length();
+	this->_response = headerGenerator(code_str.str(), len_str.str());
+	this->_response += body;
 }
 
-std::string	Response::responseMaker(std::string method, std::string path, std::string protocol)
+void	Response::getResponse(std::string path)
 {
-	(void)method;
-	(void)path;
-	if (protocol != "HTTP/1.1")
+	std::string	response;
+
+	path.insert(0, 1, '.');
+	if (access(path.c_str(), F_OK | W_OK) == 0)
+	{
+		
+	}
+}
+
+/**
+ * This function generate a valid http response from the data of the 
+ * Request object passed to Response constructor
+*/
+std::string	Response::responseMaker()
+{
+	if (this->_request.getProtocol() != "HTTP/1.1")
 		errorResponse(426);
-	// if (method == "GET")
-	// 	getResponse(path);
+	if (this->_request.getMethod() == "GET")
+		getResponse(this->_request.getPath());
 	// else if (method == "POST")
 	// 	postResponse(path);
 	// else if (method == "DELETE")
@@ -79,8 +112,6 @@ Response & Response::operator=(const Response &assign)
 	this->_response = assign._response;
 	this->_statusCode = assign._statusCode;
 	this->_status = assign._status;
-	this->_contentType = assign._contentType;
-	this->_contentLength = assign._contentLength;
-	this->_body = assign._body;
+	this->_request = assign._request;
 	return *this;
 }
