@@ -6,7 +6,6 @@
 # include <unistd.h>
 # include <map>
 # include <sstream>
-# include "Response.hpp"
 
 class Request
 {

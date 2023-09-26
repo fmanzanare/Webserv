@@ -12,19 +12,3 @@ server:
     default-answer: #file
     cgi: .php
     root: /
-  route:
-    methods: DELETE
-    #redirection????
-    #file-route????
-    directory-listing: true
-    default-answer: #file
-    cgi: .php
-    root: /src
-  route:
-    methods: POST
-    #redirection????
-    #file-route????
-    directory-listing: true
-    default-answer: #file
-    cgi: .php
-    root: /src/index

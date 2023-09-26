@@ -1,4 +1,5 @@
 #include "../includes/Response.hpp"
+#include "../includes/Request.hpp"
 
 // Constructors
 Response::Response()
@@ -15,6 +16,7 @@ Response::Response(Request &req)
 	this->_statusCode = "";
 	this->_status = "";
 	req.processRequest();
+	this->_request = req;
 }
 
 Response::Response(const Response &copy)
@@ -80,14 +82,20 @@ void	Response::errorResponse(const int &code)
 */
 void	Response::getResponse(std::string path)
 {
-	std::string			response;
+	std::string			body;
 	std::stringstream	buffer;
+	std::stringstream	body_len;
 
 	path.insert(0, 1, '.');
 	if (access(path.c_str(), F_OK | W_OK) == 0)
 	{
 		std::ifstream file(path);
 		buffer << file.rdbuf();
+		body = buffer.str();
+		body += "\r\n\r\n";
+		body_len << body.length();
+		this->_response = headerGenerator("200", body_len.str());
+		this->_response += body;
 	}
 }
 
@@ -98,14 +106,18 @@ void	Response::getResponse(std::string path)
 std::string	Response::responseMaker()
 {
 	if (this->_request.getProtocol() != "HTTP/1.1")
+	{
 		errorResponse(426);
+		return this->_response;
+	}
+	
 	if (this->_request.getMethod() == "GET")
 		getResponse(this->_request.getPath());
 	// else if (method == "POST")
 	// 	postResponse(path);
 	// else if (method == "DELETE")
 	// 	deleteResponse(path);
-	// else
+	else
 		errorResponse(405);
 	// generateFinalResponse();
 	return this->_response;
