@@ -11,3 +11,4 @@ server:
     directory-listing: true
     default-answer: #file
     cgi: .php
+    root: /

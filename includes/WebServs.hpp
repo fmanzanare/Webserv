@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fcntl.h>
 #include "Client.hpp"
+#include "Request.hpp"
 
 #define MAX_CONNECTIONS 1000
 

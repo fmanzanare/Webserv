@@ -22,12 +22,12 @@ class Request
 		Request & operator=(const Request &assign);
 
 		// Methods //
-		std::string	processRequest(void);
-		bool		parseFirstLine(void);
-		bool		parseMethod(int &, int &);
-		bool		parsePath(int &, int &);
-		bool		parseProtocol(int &, int &);
-		bool		parseHeader(void);
+		void		processRequest(void);
+		void		parseFirstLine(void);
+		void		parseMethod(int &, int &);
+		void		parsePath(int &, int &);
+		void		parseProtocol(int &, int &);
+		void		parseHeader(void);
 
 		// Setters
 		void	setRawRequest(std::string);
@@ -38,8 +38,8 @@ class Request
 		std::string							getPath(void);
 		std::string							getProtocol(void);
 		std::string							getBody(void);
-		std::string	getHeader(std::string);
-		void printHeaders(void) ;
+		std::string							getHeader(std::string);
+		void								printHeaders(void);
 
 	private:
 		std::string							_rawRequest;
@@ -54,7 +54,7 @@ class Request
 
 // request header example
 /*
-GET / HTTP/1.1\n
+GET / HTTP/1.1
 Host: localhost:8080
 Connection: keep-alive
 sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"
@@ -71,11 +71,3 @@ Accept-Encoding: gzip, deflate, br
 Accept-Language: es-ES,es;q=0.9,en;q=0.8
 */
 
-// response header example
-/*
-HTTP/1.1 200 OK\n
-Content-Type: text/html\n
-Content-Length:  XX\n
-\n
-[Body]\n\n
-*/
