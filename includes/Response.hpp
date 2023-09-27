@@ -5,7 +5,10 @@
 # include <string>
 # include <sstream>
 # include <fstream>
+# include <cerrno>
+# include <cerrno>
 # include "Request.hpp"
+
 
 # define UPPERDEFBODY "<!DOCTYPE html><html><head></head><body><h1>"
 # define LOWERDEFBODY "</h1></body></html>\r\n\r\n"

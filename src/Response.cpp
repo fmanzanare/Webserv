@@ -57,8 +57,15 @@ std::string	Response::bodyResponseCode(const int &code)
 		case 405:
 			body += "405 Method Not Allowed<br>";
 			break;
+		case 401:
+			body += "401 Unauthorized<br>";
+			break;
+		case 404:
+			body += "404 Not Found<br>";
+			break;
 		default:
-			body += "404 Server Error<br>";
+			body += "505 Internal Server Error<br>";
+			break;
 	}
 	body += LOWERDEFBODY;
 	return body;
@@ -87,7 +94,21 @@ void	Response::getResponse(std::string path)
 	std::stringstream	body_len;
 
 	path.insert(0, 1, '.');
-	if (access(path.c_str(), F_OK | W_OK) == 0)
+	if (access(path.c_str(), F_OK | W_OK) == -1)
+	{
+		switch(errno)
+		{
+			case EACCES:
+				errorResponse(401);
+				break;
+			case ENOENT:
+				errorResponse(404);
+				break;
+			default:
+				errorResponse(404);
+		}
+	}
+	else
 	{
 		std::ifstream file(path);
 		buffer << file.rdbuf();
@@ -98,6 +119,11 @@ void	Response::getResponse(std::string path)
 		this->_response += body;
 	}
 }
+
+// void	Response::postResponse(std::string path)
+// {
+
+// }
 
 /**
  * This function generates a valid http response from the data of the 
