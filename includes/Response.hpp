@@ -1,16 +1,21 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
+/* ----------- INCLUDES ------------*/
 # include <iostream>
 # include <string>
 # include <sstream>
 # include <fstream>
 # include <cerrno>
 # include <cerrno>
+# include <vector>
 # include "Request.hpp"
 
+/* ------------ DEFINES ------------*/
+# define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
+						<body style=\"background-color: black;\">\
+						<h1 style=\"color: #4AF626;\">"
 
-# define UPPERDEFBODY "<!DOCTYPE html><html><head></head><body><h1>"
 # define LOWERDEFBODY "</h1></body></html>\r\n\r\n"
 # define CONTTYPE "Content type: text/html\n"
 # define CONTLENGTH "Content length: "
@@ -50,9 +55,9 @@ class Response
 #endif
 // response header example
 /*
-HTTP/1.1 200 OK\n
-Content-Type: text/html\n
-Content-Length:  XX\n
-\n
-[Body]\n\n
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length:  XX
+
+[Body]
 */

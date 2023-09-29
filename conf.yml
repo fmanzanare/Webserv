@@ -12,3 +12,15 @@ server:
     default-answer: #file
     cgi: .php
     root: /
+
+/index/src/hola.html
+/misc/src/hola.html
+
+localhost:8000/index.html
+localhost:8000/pdf/quixote.pdf
+
+/pdf --> route(URL)
+/myweb/home/archivos --> root
+
+/
+myweb/home/

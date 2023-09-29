@@ -31,7 +31,7 @@ Response::~Response()
 }
 
 // Non member functions
-std::string	headerGenerator(const std::string &code, const std::string &bodyLen)
+std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
 {
 	std::string header;
 
@@ -44,6 +44,21 @@ std::string	headerGenerator(const std::string &code, const std::string &bodyLen)
 	return header;
 }
 
+std::vector<std::string>	splitFilePath(std::string path)
+{
+	std::vector<std::string>	splitted;
+	std::stringstream			input(path);
+	std::string					subString;
+
+	std::getline(input, subString, splitted)
+	while (std::getline(input, subString, splitted))
+		splitted.push_back(subString);
+	if (splitted.size() == 0)
+		return "";
+	else
+		return splitted;
+}
+
 // Methods
 std::string	Response::bodyResponseCode(const int &code)
 {
@@ -51,17 +66,20 @@ std::string	Response::bodyResponseCode(const int &code)
 
 	switch(code)
 	{
-		case 426:
-			body += "426 Upgrade Required<br>";
-			break;
-		case 405:
-			body += "405 Method Not Allowed<br>";
+		case 204:
+			body += "204 No Content<br>";
 			break;
 		case 401:
 			body += "401 Unauthorized<br>";
 			break;
 		case 404:
 			body += "404 Not Found<br>";
+			break;
+		case 405:
+			body += "405 Method Not Allowed<br>";
+			break;
+		case 426:
+			body += "426 Upgrade Required<br>";
 			break;
 		default:
 			body += "505 Internal Server Error<br>";
@@ -72,7 +90,7 @@ std::string	Response::bodyResponseCode(const int &code)
 }
 
 
-void	Response::errorResponse(const int &code)
+void		Response::errorResponse(const int &code)
 {
 	std::stringstream	code_str(code);
 	std::stringstream	len_str;
@@ -87,14 +105,14 @@ void	Response::errorResponse(const int &code)
 /**
  * Implementation of the response for a GET request.
 */
-void	Response::getResponse(std::string path)
+void		Response::getResponse(std::string path)
 {
 	std::string			body;
 	std::stringstream	buffer;
 	std::stringstream	body_len;
 
 	path.insert(0, 1, '.');
-	if (access(path.c_str(), F_OK | W_OK) == -1)
+	if (access(path.c_str(), F_OK | R_OK) == -1)
 	{
 		switch(errno)
 		{
@@ -112,6 +130,7 @@ void	Response::getResponse(std::string path)
 	{
 		std::ifstream file(path);
 		buffer << file.rdbuf();
+		file.close();
 		body = buffer.str();
 		body += "\r\n\r\n";
 		body_len << body.length();
@@ -120,10 +139,19 @@ void	Response::getResponse(std::string path)
 	}
 }
 
-// void	Response::postResponse(std::string path)
-// {
+void		Response::postResponse(std::string path)
+{
+	std::vector<std::string> splitted = getFilePath(path);
 
-// }
+	if (fileName.empty() == true)
+	{
+		errorResponse(204);
+		return ;
+	}
+	std::ofstream	outputFile(fileName);
+	outputFile << _request.getBody();
+	outputFile.close();
+}
 
 /**
  * This function generates a valid http response from the data of the 
@@ -135,12 +163,11 @@ std::string	Response::responseMaker()
 	{
 		errorResponse(426);
 		return this->_response;
-	}
-	
+	}	
 	if (this->_request.getMethod() == "GET")
 		getResponse(this->_request.getPath());
-	// else if (method == "POST")
-	// 	postResponse(path);
+	else if (this->_request.getMethod() == "POST")
+		postResponse(this->_request.getPath());
 	// else if (method == "DELETE")
 	// 	deleteResponse(path);
 	else
