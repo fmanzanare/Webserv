@@ -1,14 +1,48 @@
 server:
-  port: 8080
+  port: 8080,12313,324
   host: 127.0.0.1
-  server-name: myserver
-  error-page: #error_page route.
-  body-limit: #client body limit
+  server-name: myserver1
+  error-page: error.html
+  body-limit: 1024
+  route:
+    methods: GET
+    directory-listing: true
+    default-answer: index.html
+    cgi: .php
+    redirection: / 
+    root: /server1
+  route:
+    methods: GET,POST
+    directory-listing: true
+    default-answer: index.html
+    cgi: .php
+    redirection: /src
+    root: /server1/src
+
+server:
+  port: 100,42,24
+  host: 127.0.0.2
+  server-name: myserver2
+  error-page: error.html
+  body-limit: 2048
+  route:
+    methods: GET
+    directory-listing: true
+    default-answer: index.html
+    cgi: .php
+    redirection: / 
+    root: /server1
   route:
     methods: GET,POST,DELETE
-    #redirection????
-    #file-route????
     directory-listing: true
-    default-answer: #file
+    default-answer: index.html
+    cgi: .py
+    redirection: / 
+    root: /server1
+  route:
+    methods: DELETE
+    directory-listing: true
+    default-answer: index.html
     cgi: .php
-    root: /
+    redirection: / 
+    root: /server1
