@@ -10,29 +10,30 @@ class Conf
 {
     private:
 		//Atributos
-		int				_port;
-		std::string		_host;
-		std::string		_serverName;
+		std::string				_name;
+		std::vector<int>		_ports;
+		std::string				_host;
+		std::string				_errPage;
+		int						_cBodyLimit;
+		std::vector<Route *>	_routes;
 		//Metodos
-        void			setPort(int port);
-		void			setHost(std::string host);
-		void			setServerName(std::string serverName);
-		//void			setError_page();
-		//void			setBody_limit();
-		//void			Route::Route();
+        int			addPort(int port);
+		int			addRoute(Route *route)
+		int			setHost(std::string host);
+		int			setName(std::string serverName);
+		int			setError_page(std::string errPage);
+		int			setBody_limit(int cBodyLimit);
     public:
 		//Atributos
         Conf();
         ~Conf();
 		//Metodos
-		int				getPort(void);
-		std::string		getHost(void);
-		std::string		getServerName(void);
-		//void			getError_page();
-		//void			getBody_limit();
-
-        //Conf(Conf const &copy);
-        //Conf	&operator=(Conf const &copy);
+		std::string				getServerName(void);
+		std::string				getError_page(void);
+		int						getBody_limit(void);
+		std::string				getHost(void);
+		std::vector<int>		getPorts(void);
+		std::vector<Route *>	getRoutes(void);
 };
 
 #endif

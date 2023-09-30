@@ -40,6 +40,8 @@ Conf::~Conf()
 {
 }
 //SETs
+
+
 void    Conf::setPort(int port)
 {
 	this->_port = port;
@@ -56,9 +58,17 @@ void	 Conf::setServerName(std::string serverName)
 }
 
 //GET
-int				 Conf::getPort(void)
+int				getBody_limit(void)
 {
-	return (this->_port);
+	return (this->_cBodyLimit);
+}
+std::vector<Route *>	getRoutes(void)
+{
+	return (this->_routes);
+}
+std::vector<int>		getPorts(void)
+{
+	return (this->_ports);
 }
 std::string	 Conf::getHost(void)
 {
@@ -68,6 +78,11 @@ std::string	 Conf::getServerName(void)
 {
 	return (this->_serverName);
 }
+std::string				getError_page(void)
+{
+	return (this->_errPage);
+}
+
 // Conf::Conf(Conf const &copy)
 // {
 // /* Class::Class(const Class &copy) : someValue(copy.someValue) {} */
