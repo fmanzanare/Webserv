@@ -1,9 +1,9 @@
 server:
-  port: 8080,12313,324
-  host: 127.0.0.1
   server-name: myserver1
   error-page: error.html
   body-limit: 1024
+  host: 127.0.0.1
+  port: 8080,12313,324
   route:
     methods: GET
     directory-listing: true
@@ -20,11 +20,11 @@ server:
     root: /server1/src
 
 server:
-  port: 100,42,24
-  host: 127.0.0.2
   server-name: myserver2
   error-page: error.html
   body-limit: 2048
+  host: 127.0.0.2
+  port: 100,42,24
   route:
     methods: GET
     directory-listing: true
