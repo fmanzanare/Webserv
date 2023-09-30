@@ -21,28 +21,21 @@ server:
 
 server:
   server-name: myserver2
-  error-page: error.html
+  error-page: error2.html
   body-limit: 2048
   host: 127.0.0.2
-  port: 100,42,24
+  port: 42,24
   route:
-    methods: GET
+    methods: GET,POST
     directory-listing: true
-    default-answer: index.html
-    cgi: .php
-    redirection: / 
-    root: /server1
-  route:
-    methods: GET,POST,DELETE
-    directory-listing: true
-    default-answer: index.html
+    default-answer: index2.html
     cgi: .py
     redirection: / 
-    root: /server1
+    root: /server2
   route:
-    methods: DELETE
+    methods: GET,POST
     directory-listing: true
     default-answer: index.html
     cgi: .php
-    redirection: / 
-    root: /server1
+    redirection: /src
+    root: /server2/src

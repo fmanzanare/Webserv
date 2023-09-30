@@ -9,50 +9,53 @@ Conf::Conf()
     }
 	std::string line;
 
+	//Iteramos por los servers
 	while(std::getline(archivo, line))
 	{
 		if (line.find("server:") != std::string::npos)
 		{
+			//Añadimos los parametros del server
 			std::getline(archivo, line);
 			if (line.find("server-name:") != std::string::npos)
-			{
-				size_t position = line.find('\r');
-				if (position != std::string::npos)
-					line.erase(position);
 				Conf::setName(line.substr(line.find("server-name: ") + 13));
-			}
 			std::getline(archivo, line);
 			if (line.find("error-page:") != std::string::npos)
-			{
-				size_t position = line.find('\r');
-				if (position != std::string::npos)
-					line.erase(position);
 				Conf::setError_page(line.substr(line.find("error-page: ") + 12));
-			}
 			std::getline(archivo, line);
 			if (line.find("body-limit:") != std::string::npos)
-			{
-				size_t position = line.find('\r');
-				if (position != std::string::npos)
-					line.erase(position);
 				Conf::setError_page(line.substr(line.find("body-limit: ") + 12));
-			}
 			std::getline(archivo, line);
-			if (line.find("host:"))
-			{
-				size_t position = line.find('\r');
-				if (position != std::string::npos)
-					line.erase(position);
+			if (line.find("host:") != std::string::npos)
 				Conf::setHost(line.substr(line.find("host: ") + 6));
-			}
 			std::getline(archivo, line);
-			if (line.find("port:"))
-			{
-				size_t position = line.find('\r');
-				if (position != std::string::npos)
-					line.erase(position);
+			if (line.find("port:") != std::string::npos)
 				Conf::setPorts(line.substr(line.find("port: ") + 6));
+			std::getline(archivo, line);
+			//Iteramos por las routes
+			while (line.find("route:") != std::string::npos)
+			{
+				std::getline(archivo, line);
+				if (line.find("methods:") != std::string::npos)
+					Conf::setMethods(line.substr(line.find("methods: ") + 9));
+				std::getline(archivo, line);
+				if (line.find("directory-listing:") != std::string::npos)
+					Conf::setDirListing(line.substr(line.find("directory-listing: ") + 19));
+				std::getline(archivo, line);
+				if (line.find("default-answer:") != std::string::npos)
+					Conf::setDef(line.substr(line.find("default-answer: ") + 16));
+				std::getline(archivo, line);
+				if (line.find("cgi:") != std::string::npos)
+					Conf::setCgi(line.substr(line.find("cgi: ") + 5));
+				std::getline(archivo, line);
+				if (line.find("redirection:") != std::string::npos)
+					Conf::setRedir(line.substr(line.find("redirection: ") + 13));
+				std::getline(archivo, line);
+				if (line.find("root:") != std::string::npos)
+					Conf::setRoot(line.substr(line.find("root: ") + 6));
+				//Crear el Router 
+				std::getline(archivo, line);
 			}
+			//Crear el Server
 		}
 	}
 	archivo.close();
@@ -72,7 +75,7 @@ int			Conf::setError_page(std::string errPage){
 	this->_errPage = errPage;
 	return (1);
 }
-int			Conf::setBody_limit(int cBodyLimit){
+int			Conf::setCBodyLimit(int cBodyLimit){
 	this->_cBodyLimit = cBodyLimit;
 	return (1);
 }
@@ -127,7 +130,7 @@ std::string				Conf::getName(void){
 std::string				Conf::getError_page(void){
 	return (this->_errPage);
 }
-int						Conf::getBody_limit(void){
+int						Conf::getCBodyLimit(void){
 	return (this->_cBodyLimit);
 }
 std::string				Conf::getHost(void){

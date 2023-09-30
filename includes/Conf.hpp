@@ -16,7 +16,7 @@ class Conf
 		std::string					_host;
 		std::vector<int>			_ports;
 
-		std::vector<Route *>		_routes;
+		std::vector<Route *>		_routes;//?
 
 		std::vector<std::string>	_methods;
 		bool 						_dirListing;
@@ -29,7 +29,7 @@ class Conf
 		//Metodos
 		int			setName(std::string name);
 		int			setError_page(std::string errPage);
-		int			setBody_limit(int cBodyLimit);
+		int			setCBodyLimit(int cBodyLimit);
 		int			setHost(std::string host);
         int			setPorts(std::string ports);
 
@@ -49,7 +49,7 @@ class Conf
 		//Metodos
 		std::string					getName(void);
 		std::string					getError_page(void);
-		int							getBody_limit(void);
+		int							getCBodyLimit(void);
 		std::string					getHost(void);
 		std::vector<int>			getPorts(void);
 
