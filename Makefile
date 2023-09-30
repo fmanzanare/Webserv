@@ -26,8 +26,9 @@ SRCS =	main.cpp\
 		Server.cpp\
 		WebServs.cpp\
 		Client.cpp \
-		Request.cpp\
-		Route.cpp
+		Request.cpp \
+		Route.cpp \
+		Response.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

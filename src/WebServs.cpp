@@ -1,4 +1,6 @@
 #include "../includes/WebServs.hpp"
+#include "../includes/Request.hpp"
+#include "../includes/Response.hpp"
 
 std::string toString(int num) {
 	std::stringstream ss;
@@ -177,19 +179,23 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
-					std::cout << "Goes into POLLOUT" << std::endl;
-					/* ----------TESTING---------- */
-					std::string header = "HTTP/1.1 200 OK\n"
-										"Content-Type: text/html\n"
-										"Content-Length: XX\r\n"
-										"\r\n";
-					std::string body = "<!DOCTYPE html><html><head></head><body><h1>"
-										"Hello World!<br>"
-										"</h1></body></html>\r\n\r\n";
-					std::string response = header + body;
+					Request req = Request(serverClients[j]->getRequest());
+					Response res = Response(req);
+					std::cout << "REQUEST!!!!!!" << std::endl;
+					req.printHeaders();
+					std::cout << "REQUEST!!!!!!" << std::endl;
+					// /* ----------TESTING---------- */
+					// std::string header = "HTTP/1.1 200 OK\n"
+					// 					"Content-Type: text/html\n"
+					// 					"Content-Length: XX\r\n"
+					// 					"\r\n";
+					// std::string body = "<!DOCTYPE html><html><head></head><body><h1>"
+					// 					"Hello World!<br>"
+					// 					"</h1></body></html>\r\n\r\n";
+					// std::string response = header + body;
 					/* ----------TESTING---------- */
 
-					serverClients[j]->sendData(response);
+					serverClients[j]->sendData(res.responseMaker());
 					if (serverClients[j]->isFinishedResponse())
 						this->_cluster[i]->removeClient(j);
 					break;
