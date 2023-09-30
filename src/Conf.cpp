@@ -18,6 +18,20 @@ Conf::Conf()
 				line.erase(position);
 			Conf::setHost(line.substr(line.find("host: ") + 6));
 		}
+		else if (line.find("port:") != std::string::npos)
+		{
+			size_t position = line.find('\r');
+			if (position != std::string::npos)
+				line.erase(position);
+			Conf::setPort(std::stoi(line.substr(line.find("port: ") + 6)));
+		}
+		else if (line.find("server-name:") != std::string::npos)
+		{
+			size_t position = line.find('\r');
+			if (position != std::string::npos)
+				line.erase(position);
+			Conf::setServerName(line.substr(line.find("server-name: ") + 13));
+		}
 	}
 	archivo.close();
 }
