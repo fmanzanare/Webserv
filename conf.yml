@@ -3,21 +3,21 @@ server:
   error-page: error.html
   body-limit: 1024
   host: 127.0.0.1
-  port: 8080,9000,8000
+  port: 8080,9000,8001
   route:
     methods: GET
-    directory-listing: true
+    directory-listing: false
     default-answer: index.html
     cgi: .php
     redirection: / 
     root: /server1
   route:
-    methods: GET,POST
+    methods: POST,DELETE
     directory-listing: true
-    default-answer: index.html
+    default-answer: none
     cgi: .php
-    redirection: /src
-    root: /server1/src
+    redirection: /storage
+    root: /server1/storage
 
 server:
   server-name: myserver2
@@ -33,7 +33,7 @@ server:
     redirection: / 
     root: /server2
   route:
-    methods: GET,POST,DELETE
+    methods: GET,POST
     directory-listing: true
     default-answer: index.html
     cgi: .php
