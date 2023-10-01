@@ -64,6 +64,7 @@ std::string		bodyLen(std::string body)
 	return body_len.str();
 }
 
+
 // Methods
 std::string	Response::bodyResponseCode(const int &code)
 {
@@ -82,6 +83,9 @@ std::string	Response::bodyResponseCode(const int &code)
 			break;
 		case 405:
 			body += "405 Method Not Allowed<br>";
+			break;
+		case 422:
+			body += "422 Unprocessable Entity<br>";
 			break;
 		case 426:
 			body += "426 Upgrade Required<br>";
@@ -162,6 +166,17 @@ void		Response::postResponse(std::string path)
 
 }
 
+void		Response::deleteResponse(std::string path)
+{
+	path = "." + path;
+	if (std::remove(path.c_str()))
+	{
+		errorResponse(422);
+		return ;
+	}
+	this->_response = headerGenerator("200", "0");
+}
+
 /**
  * This function generates a valid http response from the data of the 
  * Request object passed to Response constructor
@@ -177,8 +192,8 @@ std::string	Response::responseMaker()
 		getResponse(this->_request.getPath());
 	else if (this->_request.getMethod() == "POST")
 		postResponse(this->_request.getPath());
-	// else if (this->_request.getMethod() == "DELETE")
-	// 	deleteResponse(this->_request.getPath());
+	else if (this->_request.getMethod() == "DELETE")
+		deleteResponse(this->_request.getPath());
 	else
 		errorResponse(405);
 	return this->_response;
