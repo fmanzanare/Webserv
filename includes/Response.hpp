@@ -7,7 +7,8 @@
 # include <sstream>
 # include <fstream>
 # include <cerrno>
-# include <cerrno>
+# include <cstdio>
+# include <cstdlib>
 # include <vector>
 # include "Request.hpp"
 
