@@ -33,7 +33,11 @@ Server::Server(std::vector<int> ports, std::vector<Route *> routes, std::string 
 	openSockets();
 }
 
-Server::~Server() {}
+Server::~Server() {
+	for (int i = 0; i < (int)this->_routes.size(); i++) {
+		delete this->_routes[i];
+	}
+}
 
 Server::Server(const Server &cp) {
 	this->_name = cp._name;
