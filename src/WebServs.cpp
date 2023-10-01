@@ -171,10 +171,10 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 			for (int k = 0; k < this->_nfds; k++) {
 				if (fds[k].revents == POLLIN && fds[k].fd == serverClients[j]->getSocket()) {
 					serverClients[j]->receiveData();
-					// /* ----------TESTING---------- */
-					// if (serverClients[j]->isFinishedRequest())
-					// 	std::cout << serverClients[j]->getRequest() << std::endl;
-					// /* ----------TESTING---------- */
+					/* ----------TESTING---------- */
+					if (serverClients[j]->isFinishedRequest())
+						std::cout << serverClients[j]->getRequest() << std::endl;
+					/* ----------TESTING---------- */
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
