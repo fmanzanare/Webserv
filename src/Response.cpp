@@ -31,7 +31,7 @@ Response::~Response()
 }
 
 // Non member functions
-std::string	headerGenerator(const std::string &code, const std::string &bodyLen)
+std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
 {
 	std::string header;
 
@@ -44,6 +44,26 @@ std::string	headerGenerator(const std::string &code, const std::string &bodyLen)
 	return header;
 }
 
+std::vector<std::string>	splitFilePath(std::string path)
+{
+	std::vector<std::string>	splitted;
+	std::stringstream			input(path);
+	std::string					subString;
+
+	std::getline(input, subString, '/');
+	while (std::getline(input, subString, '/'))
+		splitted.push_back(subString);
+	return splitted;
+}
+
+std::string		bodyLen(std::string body)
+{
+	std::stringstream body_len;
+
+	body_len << body.length();
+	return body_len.str();
+}
+
 // Methods
 std::string	Response::bodyResponseCode(const int &code)
 {
@@ -51,21 +71,31 @@ std::string	Response::bodyResponseCode(const int &code)
 
 	switch(code)
 	{
-		case 426:
-			body += "426 Upgrade Required<br>";
+		case 204:
+			body += "204 No Content<br>";
+			break;
+		case 401:
+			body += "401 Unauthorized<br>";
+			break;
+		case 404:
+			body += "404 Not Found<br>";
 			break;
 		case 405:
 			body += "405 Method Not Allowed<br>";
 			break;
+		case 426:
+			body += "426 Upgrade Required<br>";
+			break;
 		default:
-			body += "404 Server Error<br>";
+			body += "505 Internal Server Error<br>";
+			break;
 	}
 	body += LOWERDEFBODY;
 	return body;
 }
 
 
-void	Response::errorResponse(const int &code)
+void		Response::errorResponse(const int &code)
 {
 	std::stringstream	code_str(code);
 	std::stringstream	len_str;
@@ -77,26 +107,59 @@ void	Response::errorResponse(const int &code)
 	this->_response += body;
 }
 
+
 /**
  * Implementation of the response for a GET request.
 */
-void	Response::getResponse(std::string path)
+void		Response::getResponse(std::string path)
 {
 	std::string			body;
 	std::stringstream	buffer;
-	std::stringstream	body_len;
 
 	path.insert(0, 1, '.');
-	if (access(path.c_str(), F_OK | W_OK) == 0)
+	if (access(path.c_str(), F_OK | R_OK) == -1)
+	{
+		switch(errno)
+		{
+			case EACCES:
+				errorResponse(401);
+				break;
+			case ENOENT:
+				errorResponse(404);
+				break;
+			default:
+				errorResponse(404);
+		}
+	}
+	else
 	{
 		std::ifstream file(path);
 		buffer << file.rdbuf();
+		file.close();
 		body = buffer.str();
 		body += "\r\n\r\n";
-		body_len << body.length();
-		this->_response = headerGenerator("200", body_len.str());
+		this->_response = headerGenerator("200", bodyLen(body));
 		this->_response += body;
 	}
+}
+
+void		Response::postResponse(std::string path)
+{
+	std::vector<std::string> splitted = splitFilePath(path);
+
+	if (splitted.empty() == true)
+	{
+		errorResponse(204);
+		return ;
+	}
+	// std::ofstream	outputFile(*(splitted.end() - 1));
+	// std::cout << *(splitted.end() - 1) << std::endl;
+	std::ofstream	outputFile("." + path);
+	std::cout << "." + path << std::endl;
+	outputFile << _request.getBody();
+	outputFile.close();
+	this->_response = headerGenerator("200", "0");
+
 }
 
 /**
@@ -109,17 +172,15 @@ std::string	Response::responseMaker()
 	{
 		errorResponse(426);
 		return this->_response;
-	}
-	
+	}	
 	if (this->_request.getMethod() == "GET")
 		getResponse(this->_request.getPath());
-	// else if (method == "POST")
-	// 	postResponse(path);
-	// else if (method == "DELETE")
-	// 	deleteResponse(path);
+	else if (this->_request.getMethod() == "POST")
+		postResponse(this->_request.getPath());
+	// else if (this->_request.getMethod() == "DELETE")
+	// 	deleteResponse(this->_request.getPath());
 	else
 		errorResponse(405);
-	// generateFinalResponse();
 	return this->_response;
 }
 

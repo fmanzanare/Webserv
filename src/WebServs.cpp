@@ -171,19 +171,21 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 			for (int k = 0; k < this->_nfds; k++) {
 				if (fds[k].revents == POLLIN && fds[k].fd == serverClients[j]->getSocket()) {
 					serverClients[j]->receiveData();
-					/* ----------TESTING---------- */
-					if (serverClients[j]->isFinishedRequest())
-						std::cout << serverClients[j]->getRequest() << std::endl;
-					/* ----------TESTING---------- */
+					// /* ----------TESTING---------- */
+					// if (serverClients[j]->isFinishedRequest())
+					// 	std::cout << serverClients[j]->getRequest() << std::endl;
+					// /* ----------TESTING---------- */
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
 					Request req = Request(serverClients[j]->getRequest());
 					Response res = Response(req);
-					std::cout << "REQUEST!!!!!!" << std::endl;
+					/* ----------TESTING---------- */
+					std::cout << "1.REQUEST!!!!!!" << std::endl;
 					req.printHeaders();
-					std::cout << "REQUEST!!!!!!" << std::endl;
+					std::cout << "2.REQUEST!!!!!!" << std::endl;
+					/* ----------TESTING---------- */
 					// /* ----------TESTING---------- */
 					// std::string header = "HTTP/1.1 200 OK\n"
 					// 					"Content-Type: text/html\n"

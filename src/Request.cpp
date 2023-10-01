@@ -82,13 +82,12 @@ void	Request::parseHeader(void)
 	std::string 		firstLine;
 	
 	std::getline(input, firstLine);
-	std::getline(input, line);
-	while (!line.empty())
+	while (std::getline(input, line))
 	{
 		std::string key = line.substr(0, line.find(":"));
 		std::string value = line.substr(line.find(": ") + 2);
 		_headers[key] = value;
-		std::getline(input, line);
+		std::cout << line << std::endl;
 	}
 }
 
