@@ -1,5 +1,16 @@
 #include "../includes/Conf.hpp"
 
+class Conf::NoAllowPort : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Port\n");
+	} 
+};
+
+class Conf::NoAllowMethod : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Method\n");
+	} 
+};
 
 Conf::Conf()
 {
@@ -17,41 +28,41 @@ Conf::Conf()
 			//Añadimos los parametros del server
 			std::getline(archivo, line);
 			if (line.find("server-name:") != std::string::npos)
-				Conf::setName(line.substr(line.find("server-name: ") + 13));
+				setName(line.substr(line.find("server-name: ") + 13));
 			std::getline(archivo, line);
 			if (line.find("error-page:") != std::string::npos)
-				Conf::setError_page(line.substr(line.find("error-page: ") + 12));
+				setError_page(line.substr(line.find("error-page: ") + 12));
 			std::getline(archivo, line);
 			if (line.find("body-limit:") != std::string::npos)
-				Conf::setCBodyLimit(std::stoi(line.substr(line.find("body-limit: ") + 12)));
+				setCBodyLimit(std::stoi(line.substr(line.find("body-limit: ") + 12)));
 			std::getline(archivo, line);
 			if (line.find("host:") != std::string::npos)
-				Conf::setHost(line.substr(line.find("host: ") + 6));
+				setHost(line.substr(line.find("host: ") + 6));
 			std::getline(archivo, line);
 			if (line.find("port:") != std::string::npos)
-				Conf::setPorts(line.substr(line.find("port: ") + 6));
+				setPorts(line.substr(line.find("port: ") + 6));
 			std::getline(archivo, line);
 			//Iteramos por las routes
 			while (line.find("route:") != std::string::npos)
 			{
 				std::getline(archivo, line);
 				if (line.find("methods:") != std::string::npos)
-					Conf::setMethods(line.substr(line.find("methods: ") + 9));
+					setMethods(line.substr(line.find("methods: ") + 9));
 				std::getline(archivo, line);
 				if (line.find("directory-listing:") != std::string::npos)
-					Conf::setDirListing(line.substr(line.find("directory-listing: ") + 19));
+					setDirListing(line.substr(line.find("directory-listing: ") + 19));
 				std::getline(archivo, line);
 				if (line.find("default-answer:") != std::string::npos)
-					Conf::setDef(line.substr(line.find("default-answer: ") + 16));
+					setDef(line.substr(line.find("default-answer: ") + 16));
 				std::getline(archivo, line);
 				if (line.find("cgi:") != std::string::npos)
-					Conf::setCgi(line.substr(line.find("cgi: ") + 5));
+					setCgi(line.substr(line.find("cgi: ") + 5));
 				std::getline(archivo, line);
 				if (line.find("redirection:") != std::string::npos)
-					Conf::setRedir(line.substr(line.find("redirection: ") + 13));
+					setRedir(line.substr(line.find("redirection: ") + 13));
 				std::getline(archivo, line);
 				if (line.find("root:") != std::string::npos)
-					Conf::setRoot(line.substr(line.find("root: ") + 6));
+					setRoot(line.substr(line.find("root: ") + 6));
 				//Crear el Router 
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
 				std::getline(archivo, line);
@@ -85,8 +96,17 @@ int			Conf::setHost(std::string host){
 	this->_host = host;
 	return (1);
 }
-int			Conf::setPorts(std::string port){
-	//
+int			Conf::setPorts(std::string ports){
+	std::istringstream iss(ports);
+	std::string			token;
+
+	while (std::getline(iss, token, ','))
+	{
+		int result = std::atoi(token.c_str());
+		if (2000 >= result)
+			throw NoAllowPort();
+		this->_ports.push_back(result);
+	}
 	return (1);
 }
 
@@ -96,7 +116,24 @@ int			Conf::addRoute(Route *route){
 }
 
 int			Conf::setMethods(std::string method){
-	//
+	std::istringstream iss(method);
+	std::string			token;
+
+	int	nGet = 0;
+	int	nPost = 0;
+	int	nDelete = 0;
+	while (std::getline(iss, token, ','))
+	{
+		if (token != "GET" && token != "POST" && token != "DELETE")
+			throw NoAllowMethod();
+		if (token == "GET" && !nGet++)
+			this->_methods.push_back(token);
+		else if (token == "POST" && !nPost++)
+			this->_methods.push_back(token);
+		else if (token == "DELETE" && !nDelete++)
+			this->_methods.push_back(token);
+		else	throw NoAllowMethod();
+	}
 	return (1);
 }
 int			Conf::setDirListing(std::string dirListing){

@@ -4,6 +4,7 @@
 # include <iostream>
 # include <fstream>
 # include <string>
+# include <sstream>
 # include "../includes/Route.hpp"
 # include "../includes/Server.hpp"
 
@@ -46,6 +47,9 @@ class Conf
 		int			setRoot(std::string root);
 
     public:
+		//C
+		class						NoAllowPort;
+		class						NoAllowMethod;
 		//Atributos
         Conf();
         ~Conf();

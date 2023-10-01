@@ -6,7 +6,14 @@
 
 int main()
 {
-    Conf myConf;
+    try {
+        Conf myConf;
+        std::vector<Server *> Servers = myConf.getServers();
+        std::vector<int> a = Servers[0]->getPorts();
+        std::cout << a[1] << std::endl;
+    } catch (...) {
+        std::cout << "Wrong configuration!" << std::endl;
+    }
 
     // std::cout << "Name=>|" << myConf.getName() << std::endl;
     // std::cout << "Error_page=>|" << myConf.getError_page() << std::endl;
@@ -21,7 +28,5 @@ int main()
     // std::cout << "Redir=>|" << myConf.getRedir() << std::endl;
     // std::cout << "Root=>|" << myConf.getRoot() << std::endl;
 
-    std::vector<Server *> Servers = myConf.getServers();
-    std::cout << Servers[0]->getCBodyLimit() << std::endl;
     return 0;
 }

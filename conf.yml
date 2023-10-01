@@ -3,7 +3,7 @@ server:
   error-page: error.html
   body-limit: 1024
   host: 127.0.0.1
-  port: 8080,12313,324
+  port: 8080,9000,8000
   route:
     methods: GET
     directory-listing: true
@@ -23,8 +23,8 @@ server:
   server-name: myserver2
   error-page: error2.html
   body-limit: 2048
-  host: 127.0.0.2
-  port: 42,24
+  host: 10.13.2.4
+  port: 8002,8003
   route:
     methods: GET,POST
     directory-listing: true
@@ -33,7 +33,7 @@ server:
     redirection: / 
     root: /server2
   route:
-    methods: GET,POST
+    methods: GET,POST,DELETE
     directory-listing: true
     default-answer: index.html
     cgi: .php
