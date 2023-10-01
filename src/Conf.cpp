@@ -9,7 +9,6 @@ Conf::Conf()
         
     }
 	std::string line;
-	std::vector<Route *> myRoutes;
 	//Iteramos por los servers
 	while(std::getline(archivo, line))
 	{
@@ -24,7 +23,7 @@ Conf::Conf()
 				Conf::setError_page(line.substr(line.find("error-page: ") + 12));
 			std::getline(archivo, line);
 			if (line.find("body-limit:") != std::string::npos)
-				Conf::setError_page(line.substr(line.find("body-limit: ") + 12));
+				Conf::setCBodyLimit(std::stoi(line.substr(line.find("body-limit: ") + 12)));
 			std::getline(archivo, line);
 			if (line.find("host:") != std::string::npos)
 				Conf::setHost(line.substr(line.find("host: ") + 6));
@@ -54,10 +53,11 @@ Conf::Conf()
 				if (line.find("root:") != std::string::npos)
 					Conf::setRoot(line.substr(line.find("root: ") + 6));
 				//Crear el Router 
-				myRoutes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
+				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
 				std::getline(archivo, line);
 			}
 			//Crear el Server
+			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 		}
 	}
 	archivo.close();
@@ -165,6 +165,9 @@ std::string					Conf::getRoot(void){
 	return (this->_root);
 }
 
+std::vector<Server *>		Conf::getServers(void){
+	return (this->_servers);
+}
 
 
 // Conf::Conf(Conf const &copy)

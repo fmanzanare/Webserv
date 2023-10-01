@@ -17,7 +17,7 @@ class Conf
 		std::string					_host;
 		std::vector<int>			_ports;
 
-		std::vector<Route *>		_routes;//?
+		std::vector<Route *>		_routes;
 
 		std::vector<std::string>	_methods;
 		bool 						_dirListing;
@@ -25,6 +25,8 @@ class Conf
 		std::string 				_cgi;
 		std::string					_redir;
 		std::string					_root;
+
+		std::vector<Server *>		_servers;
 
 		
 		//Metodos
@@ -62,6 +64,7 @@ class Conf
 		std::string					getCgi(void);
 		std::string					getRedir(void);
 		std::string					getRoot(void);
+		std::vector<Server *>		getServers(void);
 
 };
 
