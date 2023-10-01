@@ -1,5 +1,6 @@
 #include "../includes/Conf.hpp"
 
+
 Conf::Conf()
 {
 	std::fstream archivo("conf.yml");
@@ -8,7 +9,7 @@ Conf::Conf()
         
     }
 	std::string line;
-
+	std::vector<Route *> myRoutes;
 	//Iteramos por los servers
 	while(std::getline(archivo, line))
 	{
@@ -53,6 +54,7 @@ Conf::Conf()
 				if (line.find("root:") != std::string::npos)
 					Conf::setRoot(line.substr(line.find("root: ") + 6));
 				//Crear el Router 
+				myRoutes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
 				std::getline(archivo, line);
 			}
 			//Crear el Server

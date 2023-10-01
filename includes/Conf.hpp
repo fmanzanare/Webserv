@@ -5,6 +5,7 @@
 # include <fstream>
 # include <string>
 # include "../includes/Route.hpp"
+# include "../includes/Server.hpp"
 
 class Conf
 {

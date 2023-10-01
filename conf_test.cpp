@@ -1,9 +1,11 @@
 #include "includes/Conf.hpp"
+#include "includes/WebServs.hpp"
+#include "includes/Request.hpp"
+#include "includes/Response.hpp"
+#include <csignal>
 
 int main()
 {
-	
-
     Conf myConf;
 
     std::cout << "Name=>|" << myConf.getName() << std::endl;
