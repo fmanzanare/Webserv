@@ -5,13 +5,31 @@ server:
   error-page: #error_page route.
   body-limit: #client body limit
   route:
-    methods: GET,POST,DELETE
-    #redirection????
+    methods: GET
     #file-route????
     directory-listing: true
     default-answer: #file
     cgi: .php
-    root: /
+    root: /web
+    redirection: /
+  route:
+    methods: POST
+    #file-route????
+    directory-listing: true
+    default-answer: #file
+    cgi: .php
+    root: /web
+    redirection: /misc
+  route:
+    methods: GET,POST,DELETE
+    #file-route????
+    directory-listing: true
+    default-answer: #file
+    cgi: .php
+    root: /web
+    redirection: /ifno
+
+/misc
 
 /index/src/hola.html
 /misc/src/hola.html

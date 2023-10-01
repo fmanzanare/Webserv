@@ -20,6 +20,7 @@
 # define CONTTYPE "Content type: text/html\n"
 # define CONTLENGTH "Content length: "
 
+std::vector<std::string>	splitFilePath(std::string path);
 class Response
 {
 	public:

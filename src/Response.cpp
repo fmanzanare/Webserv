@@ -50,13 +50,18 @@ std::vector<std::string>	splitFilePath(std::string path)
 	std::stringstream			input(path);
 	std::string					subString;
 
-	std::getline(input, subString, splitted)
-	while (std::getline(input, subString, splitted))
+	std::getline(input, subString, '/');
+	while (std::getline(input, subString, '/'))
 		splitted.push_back(subString);
-	if (splitted.size() == 0)
-		return "";
-	else
-		return splitted;
+	return splitted;
+}
+
+std::string		bodyLen(std::string body)
+{
+	std::stringstream body_len;
+
+	body_len << body.length();
+	return body_len.str();
 }
 
 // Methods
@@ -102,6 +107,7 @@ void		Response::errorResponse(const int &code)
 	this->_response += body;
 }
 
+
 /**
  * Implementation of the response for a GET request.
 */
@@ -109,7 +115,6 @@ void		Response::getResponse(std::string path)
 {
 	std::string			body;
 	std::stringstream	buffer;
-	std::stringstream	body_len;
 
 	path.insert(0, 1, '.');
 	if (access(path.c_str(), F_OK | R_OK) == -1)
@@ -133,24 +138,28 @@ void		Response::getResponse(std::string path)
 		file.close();
 		body = buffer.str();
 		body += "\r\n\r\n";
-		body_len << body.length();
-		this->_response = headerGenerator("200", body_len.str());
+		this->_response = headerGenerator("200", bodyLen(body));
 		this->_response += body;
 	}
 }
 
 void		Response::postResponse(std::string path)
 {
-	std::vector<std::string> splitted = getFilePath(path);
+	std::vector<std::string> splitted = splitFilePath(path);
 
-	if (fileName.empty() == true)
+	if (splitted.empty() == true)
 	{
 		errorResponse(204);
 		return ;
 	}
-	std::ofstream	outputFile(fileName);
+	// std::ofstream	outputFile(*(splitted.end() - 1));
+	// std::cout << *(splitted.end() - 1) << std::endl;
+	std::ofstream	outputFile("." + path);
+	std::cout << "." + path << std::endl;
 	outputFile << _request.getBody();
 	outputFile.close();
+	this->_response = headerGenerator("200", "0");
+
 }
 
 /**
@@ -168,11 +177,10 @@ std::string	Response::responseMaker()
 		getResponse(this->_request.getPath());
 	else if (this->_request.getMethod() == "POST")
 		postResponse(this->_request.getPath());
-	// else if (method == "DELETE")
-	// 	deleteResponse(path);
+	// else if (this->_request.getMethod() == "DELETE")
+	// 	deleteResponse(this->_request.getPath());
 	else
 		errorResponse(405);
-	// generateFinalResponse();
 	return this->_response;
 }
 
