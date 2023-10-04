@@ -12,6 +12,11 @@ class Conf::NoAllowMethod : public std::exception {
 	} 
 };
 
+class Conf::NoAllowDirListing : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow DirListing\n");
+	} 
+};
 Conf::Conf()
 {
 	std::fstream archivo("conf.yml");
@@ -80,23 +85,19 @@ Conf::~Conf()
 //SETs
 
 
-int			Conf::setName(std::string name){
+void	Conf::setName(std::string name){
 	this->_name = name;
-	return (1);
 }
-int			Conf::setError_page(std::string errPage){
+void	Conf::setError_page(std::string errPage){
 	this->_errPage = errPage;
-	return (1);
 }
-int			Conf::setCBodyLimit(int cBodyLimit){
+void	Conf::setCBodyLimit(int cBodyLimit){
 	this->_cBodyLimit = cBodyLimit;
-	return (1);
 }
-int			Conf::setHost(std::string host){
+void	Conf::setHost(std::string host){
 	this->_host = host;
-	return (1);
 }
-int			Conf::setPorts(std::string ports){
+void	Conf::setPorts(std::string ports){
 	std::istringstream iss(ports);
 	std::string			token;
 
@@ -107,15 +108,13 @@ int			Conf::setPorts(std::string ports){
 			throw NoAllowPort();
 		this->_ports.push_back(result);
 	}
-	return (1);
 }
 
-int			Conf::addRoute(Route *route){
+void	Conf::addRoute(Route *route){
 	this->_routes.push_back(route);
-	return (1);
 }
 
-int			Conf::setMethods(std::string method){
+void	Conf::setMethods(std::string method){
 	std::istringstream iss(method);
 	std::string			token;
 
@@ -134,32 +133,25 @@ int			Conf::setMethods(std::string method){
 			this->_methods.push_back(token);
 		else	throw NoAllowMethod();
 	}
-	return (1);
 }
-int			Conf::setDirListing(std::string dirListing){
+void	Conf::setDirListing(std::string dirListing){
 	if (dirListing.find("true"))
 		this->_dirListing = true;
 	else if (dirListing.find("false"))
 		this->_dirListing = false;
-	else
-		return (0);
-	return (1);
+	else	throw NoAllowDirListing();
 }
-int			Conf::setDef(std::string def){
+void	Conf::setDef(std::string def){
 	this->_def = def;
-	return (1);
 }
-int			Conf::setCgi(std::string cgi){
+void	Conf::setCgi(std::string cgi){
 	this->_cgi = cgi;
-	return (1);
 }
-int			Conf::setRedir(std::string redir){
+void	Conf::setRedir(std::string redir){
 	this->_redir = redir;
-	return (1);
 }
-int			Conf::setRoot(std::string root){
+void	Conf::setRoot(std::string root){
 	this->_root = root;
-	return (1);
 }
 
 //GET
