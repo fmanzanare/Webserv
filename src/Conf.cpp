@@ -75,6 +75,7 @@ Conf::Conf()
 			//Crear el Server
 			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 			this->_routes.clear();
+			this->_ports.clear();
 		}
 	}
 	archivo.close();
