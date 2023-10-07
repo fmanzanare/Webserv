@@ -67,7 +67,7 @@ void Client::receiveData() {
 	char	buffer[BUFFER_SIZE + 1] = {0};
 
 	int recvValue = recv(this->_socket, buffer, BUFFER_SIZE, 0);
-	if (recvValue == -1 || recvValue == 0) { // Check this bullshit!!!!!!!!
+	if (recvValue == -1 || recvValue == 0) {
 		this->_errReadWrite = true;
 	}
 
