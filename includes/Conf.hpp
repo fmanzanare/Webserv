@@ -51,6 +51,8 @@ class Conf
 		class						NoAllowPort;
 		class						NoAllowMethod;
 		class						NoAllowDirListing;
+		class 						NoAllowNameServer;
+		class						NoAllowHost;
 		//Atributos
         Conf();
         ~Conf();

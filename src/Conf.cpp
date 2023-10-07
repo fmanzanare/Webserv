@@ -17,12 +17,24 @@ class Conf::NoAllowDirListing : public std::exception {
 		return ("No Allow DirListing\n");
 	}
 };
+
+class Conf::NoAllowNameServer : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Name Server\n");
+	}
+};
+
+class Conf::NoAllowHost : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Host\n");
+	}
+};
+
 Conf::Conf()
 {
 	std::fstream archivo("conf.yml");
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
-
     }
 	std::string line;
 	//Iteramos por los servers
@@ -88,7 +100,13 @@ Conf::~Conf()
 
 
 void	Conf::setName(std::string name){
-	//No repetir
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+		if (name == this->_servers[i]->getName())
+		{
+			for (int i = 0; i < (int)this->_servers.size(); i++)
+				delete(this->_servers[i]);
+			throw NoAllowNameServer();
+		}
 	this->_name = name;
 }
 void	Conf::setError_page(std::string errPage){
@@ -100,9 +118,17 @@ void	Conf::setCBodyLimit(int cBodyLimit){
 	this->_cBodyLimit = cBodyLimit;
 }
 void	Conf::setHost(std::string host){
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+		if (host == this->_servers[i]->getHost())
+		{
+			for (int i = 0; i < (int)this->_servers.size(); i++)
+				delete(this->_servers[i]);
+			throw NoAllowHost();
+		}
 	this->_host = host;
 }
 void	Conf::setPorts(std::string ports){
+	//Comprobar port repetidos
 	std::istringstream iss(ports);
 	std::string			token;
 
@@ -116,6 +142,19 @@ void	Conf::setPorts(std::string ports){
 			for (int i = 0; i < (int)this->_routes.size(); i++)
 				delete(this->_routes[i]);
 			throw NoAllowPort();
+		}
+		for (int i = 0; i < (int)this->_servers.size(); i++)
+		{
+			std::vector<int> ports = this->_servers[i]->getPorts();
+			for (int j = 0; i < (int)ports[j]; j++)
+				if (ports[j] == result)
+				{
+					for (int i = 0; i < (int)this->_servers.size(); i++)
+						delete(this->_servers[i]);
+					for (int i = 0; i < (int)this->_routes.size(); i++)
+						delete(this->_routes[i]);
+					throw NoAllowPort();
+				}
 		}
 		this->_ports.push_back(result);
 	}
