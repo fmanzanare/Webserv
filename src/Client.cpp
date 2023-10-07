@@ -19,6 +19,7 @@ Client::Client(int socket) {
 }
 
 Client::~Client() {
+	// std::cout << "Client socket: " << this->_socket << " erased" << std::endl;
 	close(this->_socket);
 }
 
@@ -52,6 +53,11 @@ std::string Client::getRequest() { return (this->_request); }
 bool Client::isFinishedRequest() { return (this->_finishedReq); }
 
 bool Client::isFinishedResponse() { return (this->_finishedRes); }
+
+// OPERATORS:
+bool Client::operator==(const Client client) {
+	return (this->_socket == client._socket);
+}
 
 // METHODS:
 void Client::receiveData() {

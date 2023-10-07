@@ -106,12 +106,11 @@ void Server::addRoute(Route *route) { this->_routes.push_back(route); }
 
 void Server::addClient(Client *client) { this->_clients.push_back(client); }
 
-void Server::removeClient(int idx) {
-	std::vector<Client *>::iterator it = this->_clients.begin() + idx;
-	Client *tmp = *it;
+void Server::removeClient(Client *client) {
+	std::vector<Client *>::iterator it = std::find(this->_clients.begin(), this->_clients.end(), client);
 
+	delete *it;
 	this->_clients.erase(it);
-	delete tmp;
 }
 
 // GETTERS:

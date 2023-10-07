@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <algorithm>
 #include "Client.hpp"
 #include "Route.hpp"
 
@@ -44,7 +45,7 @@ class Server {
 		void setRoutes(std::vector<Route *> routes);
 		void addRoute(Route *route);
 		void addClient(Client *client);
-		void removeClient(int idx);
+		void removeClient(Client *client);
 
 		// GETTERS:
 		std::string getName(void);

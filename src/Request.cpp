@@ -80,14 +80,14 @@ void	Request::parseHeader(void)
 	std::stringstream	input(_rawRequest);
 	std::string			line;
 	std::string 		firstLine;
-	
+
 	std::getline(input, firstLine);
 	while (std::getline(input, line))
 	{
 		std::string key = line.substr(0, line.find(":"));
 		std::string value = line.substr(line.find(": ") + 2);
 		_headers[key] = value;
-		std::cout << line << std::endl;
+		// std::cout << line << std::endl;
 	}
 }
 
@@ -96,7 +96,7 @@ void	Request::processRequest(void)
 	parseFirstLine();
 	parseHeader();
 	if (this->_rawRequest.length() - (this->_rawRequest.find("\r\n\r\n") + 4) > 0)
-		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\r\n\r\n") + 4);	
+		this->_body = this->_rawRequest.substr(this->_rawRequest.find("\r\n\r\n") + 4);
 }
 
 // Setters

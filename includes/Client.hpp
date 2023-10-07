@@ -40,6 +40,9 @@ class Client {
 		bool isFinishedRequest(void);
 		bool isFinishedResponse(void);
 
+		// OPERATORS:
+		bool operator==(const Client client);
+
 		// METHODS:
 		void receiveData(void);
 		void sendData(std::string response);
