@@ -20,7 +20,7 @@ server:
     root: /s1/storage
 
 server:
-  server-name: myserver1
+  server-name: myserver2
   error-page: error2.html
   body-limit: 2048
   host: 10.13.9.6

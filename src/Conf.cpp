@@ -134,6 +134,18 @@ void	Conf::setPorts(std::string ports){
 
 	while (std::getline(iss, token, ','))
 	{
+		for (int i = 0; i < (int)token.size(); i++)
+		{
+			char *aux = (char *)token.c_str();
+			if (!std::isdigit(aux[i]))
+			{
+				for (int i = 0; i < (int)this->_servers.size(); i++)
+					delete(this->_servers[i]);
+				for (int i = 0; i < (int)this->_routes.size(); i++)
+					delete(this->_routes[i]);
+				throw NoAllowPort();
+			}
+		}
 		int result = std::atoi(token.c_str());
 		if (2000 >= result)
 		{
