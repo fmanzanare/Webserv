@@ -16,44 +16,20 @@ void leaks(void) {
 
 int main(void) {
 	atexit(leaks);
+	try {
+		Conf myConf = Conf();
+		std::vector<Server *> servers = myConf.getServers();
 
-	Conf myConf = Conf();
-	std::vector<Server *> Servers = myConf.getServers();
+		WebServs c1;
+		for (int i = 0; i < (int)servers.size(); i++) {
+			c1.addServer(servers[i]);
+		}
 
-	// std::vector<std::string> methods;
-	// methods.push_back("GET");
-	// std::vector<Route *> routes;
-	// routes.push_back(new Route(methods, "./server1", "/", false, "index.html"));
-	// methods.clear();
-	// methods.push_back("POST");
-	// methods.push_back("DELETE");
-	// routes.push_back(new Route(methods, "./server1/storage", "/storage", true, "none"));
-
-	// std::vector<int> port;
-	// port.push_back(8080);
-	// port.push_back(8081);
-
-	WebServs c1;
-	// Server *s1 = new Server(port, routes, "127.0.0.1");
-	c1.addServer(Servers[0]);
-
-	// routes.clear();
-	// methods.clear();
-	// methods.push_back("GET");
-	// routes.push_back(new Route(methods, "./server2", "/", true, "hello.html"));
-	// methods.clear();
-	// methods.push_back("GET");
-	// routes.push_back(new Route(methods, "./server2/images", "/images", true, "default.html"));
-
-	// port.clear();
-	// port.push_back(8001);
-	// port.push_back(8002);
-
-	// Server *s2 = new Server(port, routes, "0.0.0.0");
-	//c1.addServer(Servers[1]);
-
-	signal(SIGINT, signalHandler);
-	c1.runWebServs();
+		signal(SIGINT, signalHandler);
+		c1.runWebServs();
+	} catch(...) {
+		std::cout << "Non valid config." << std::endl;
+	}
 
 	return (0);
 }

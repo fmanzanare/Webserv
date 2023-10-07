@@ -33,7 +33,6 @@ Server::Server(std::string name, std::vector<int> ports, std::string host, std::
 	for (int i = 0; i < (int)routes.size(); i++) {
 		this->_routes.push_back(routes[i]);
 	}
-	openSockets();
 }
 
 Server::~Server() {
