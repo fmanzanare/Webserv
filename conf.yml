@@ -3,7 +3,7 @@ server:
   error-page: error.html
   body-limit: 1024
   host: 127.0.0.1
-  port: 8080,8081,9000
+  port: 8080,8081
   route:
     methods: GET
     directory-listing: false
@@ -20,11 +20,11 @@ server:
     root: /s1/storage
 
 server:
-  server-name: myserver2
+  server-name: myserver1
   error-page: error2.html
   body-limit: 2048
   host: 10.13.9.2
-  port: 8002,8003
+  port: 8002,8003,9000
   route:
     methods: GET,POST
     directory-listing: true

@@ -16,11 +16,12 @@ void leaks(void) {
 
 int main(void) {
 	atexit(leaks);
+	// WebServs *c1 = new WebServs();
+	WebServs c1;
 	try {
 		Conf myConf = Conf();
 		std::vector<Server *> servers = myConf.getServers();
 
-		WebServs c1;
 		for (int i = 0; i < (int)servers.size(); i++) {
 			c1.addServer(servers[i]);
 		}
@@ -29,6 +30,7 @@ int main(void) {
 		c1.runWebServs();
 	} catch(...) {
 		std::cout << "Non valid config." << std::endl;
+		// delete c1;
 	}
 
 	return (0);

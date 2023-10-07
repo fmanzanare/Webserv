@@ -3,26 +3,26 @@
 class Conf::NoAllowPort : public std::exception {
 	virtual const char *what() const throw(){
 		return ("No Allow Port\n");
-	} 
+	}
 };
 
 class Conf::NoAllowMethod : public std::exception {
 	virtual const char *what() const throw(){
 		return ("No Allow Method\n");
-	} 
+	}
 };
 
 class Conf::NoAllowDirListing : public std::exception {
 	virtual const char *what() const throw(){
 		return ("No Allow DirListing\n");
-	} 
+	}
 };
 Conf::Conf()
 {
 	std::fstream archivo("conf.yml");
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
-        
+
     }
 	std::string line;
 	//Iteramos por los servers
@@ -68,12 +68,13 @@ Conf::Conf()
 				std::getline(archivo, line);
 				if (line.find("root:") != std::string::npos)
 					setRoot(line.substr(line.find("root: ") + 6));
-				//Crear el Router 
+				//Crear el Router
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
 				std::getline(archivo, line);
 			}
 			//Crear el Server
 			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
+			this->_routes.clear();
 		}
 	}
 	archivo.close();
