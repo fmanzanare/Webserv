@@ -69,6 +69,7 @@ void Client::receiveData() {
 	int recvValue = recv(this->_socket, buffer, BUFFER_SIZE, 0);
 	if (recvValue == -1 || recvValue == 0) {
 		this->_errReadWrite = true;
+		return ;
 	}
 
 	this->_request += buffer;
@@ -112,6 +113,7 @@ void Client::sendData(std::string response) {
 	sent = send(this->_socket, &response.c_str()[this->_resPos], response.size(), 0);
 	if ((int)sent == -1 || (int)sent == 0) {
 		this->_errReadWrite = true;
+		return ;
 	}
 	this->_resPos += sent;
 
