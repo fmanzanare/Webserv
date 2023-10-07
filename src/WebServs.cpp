@@ -173,6 +173,9 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 			for (int k = 0; k < this->_nfds; k++) {
 				if (fds[k].revents == POLLIN && fds[k].fd == serverClients[j]->getSocket()) {
 					serverClients[j]->receiveData();
+					if (serverClients[j]->isErrorReadWrite()) {
+						this->_cluster[i]->removeClient(serverClients[j]);
+					}
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
@@ -181,7 +184,7 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 					Response res = Response(req);
 
 					serverClients[j]->sendData(res.responseMaker());
-					if (serverClients[j]->isFinishedResponse())
+					if (serverClients[j]->isFinishedResponse() || serverClients[j]->isErrorReadWrite())
 						this->_cluster[i]->removeClient(serverClients[j]);
 					break;
 				}

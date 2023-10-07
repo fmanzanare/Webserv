@@ -108,9 +108,10 @@ void Server::addClient(Client *client) { this->_clients.push_back(client); }
 
 void Server::removeClient(Client *client) {
 	std::vector<Client *>::iterator it = std::find(this->_clients.begin(), this->_clients.end(), client);
-
-	delete *it;
-	this->_clients.erase(it);
+	if (it != this->_clients.end()) {
+		delete *it;
+		this->_clients.erase(it);
+	}
 }
 
 // GETTERS:
