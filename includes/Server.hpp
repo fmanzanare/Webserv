@@ -25,12 +25,11 @@ class Server {
 		Server();
 
 		// PRIVATE METHODS:
-		void openSockets(void);
 
 	public:
 		// ORTHODOX CANNONICAL FORM:
-		Server(std::vector<int> ports, std::vector<std::string> methods, std::string host);
-		Server(std::vector<int> ports, std::vector<Route *> routes, std::string host);
+		Server(std::vector<int> ports, std::vector<std::string> methods, std::string host);//Deprecated
+		Server(std::string name, std::vector<int> ports, std::string host, std::string errPage, int cBodyLimit, std::vector<Route *> routes);
 		~Server();
 		Server(const Server &cp);
 		Server &operator=(const Server &cp);
@@ -56,6 +55,9 @@ class Server {
 		int getCBodyLimit(void);
 		std::vector<Route *> getRoutes(void);
 		std::vector<Client *> getClients(void);
+
+		// METHODS:
+		void openSockets(void);
 
 		// EXCEPTIONS:
 		class SocketCreationErrorException;

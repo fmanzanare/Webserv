@@ -75,7 +75,10 @@ void WebServs::getServersSockets() {
 }
 
 // SETTERS:
-void WebServs::addServer(Server *s) { this->_cluster.push_back(s); }
+void WebServs::addServer(Server *s) {
+	s->openSockets();
+	this->_cluster.push_back(s);
+}
 
 // METHODS:
 /**

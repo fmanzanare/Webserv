@@ -22,15 +22,17 @@ class Server::SocketListenErrorException : public std::exception {
 // ORTHODOX CANNONICAL FORM:
 Server::Server() {}
 
-Server::Server(std::vector<int> ports, std::vector<Route *> routes, std::string host) {
+Server::Server(std::string name, std::vector<int> ports, std::string host, std::string errPage, int cBodyLimit, std::vector<Route *> routes) {
+	this->_name = name;
 	this->_host = host;
+	this->_errPage = errPage;
+	this->_cBodyLimit = cBodyLimit;
 	for (int i = 0; i < (int)ports.size(); i++) {
 		this->_ports.push_back(ports[i]);
 	}
 	for (int i = 0; i < (int)routes.size(); i++) {
 		this->_routes.push_back(routes[i]);
 	}
-	openSockets();
 }
 
 Server::~Server() {
