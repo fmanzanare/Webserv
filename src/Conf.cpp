@@ -88,12 +88,15 @@ Conf::~Conf()
 
 
 void	Conf::setName(std::string name){
+	//No repetir
 	this->_name = name;
 }
 void	Conf::setError_page(std::string errPage){
+	//comprobar existen
 	this->_errPage = errPage;
 }
 void	Conf::setCBodyLimit(int cBodyLimit){
+	//control int
 	this->_cBodyLimit = cBodyLimit;
 }
 void	Conf::setHost(std::string host){
@@ -107,13 +110,15 @@ void	Conf::setPorts(std::string ports){
 	{
 		int result = std::atoi(token.c_str());
 		if (2000 >= result)
+		{
+			for (int i = 0; i < (int)this->_servers.size(); i++)
+				delete(this->_servers[i]);
+			for (int i = 0; i < (int)this->_routes.size(); i++)
+				delete(this->_routes[i]);
 			throw NoAllowPort();
+		}
 		this->_ports.push_back(result);
 	}
-}
-
-void	Conf::addRoute(Route *route){
-	this->_routes.push_back(route);
 }
 
 void	Conf::setMethods(std::string method){
@@ -126,14 +131,27 @@ void	Conf::setMethods(std::string method){
 	while (std::getline(iss, token, ','))
 	{
 		if (token != "GET" && token != "POST" && token != "DELETE")
+		{
+			for (int i = 0; i < (int)this->_servers.size(); i++)
+				delete(this->_servers[i]);
+			for (int i = 0; i < (int)this->_routes.size(); i++)
+				delete(this->_routes[i]);
 			throw NoAllowMethod();
+		}
 		if (token == "GET" && !nGet++)
 			this->_methods.push_back(token);
 		else if (token == "POST" && !nPost++)
 			this->_methods.push_back(token);
 		else if (token == "DELETE" && !nDelete++)
 			this->_methods.push_back(token);
-		else	throw NoAllowMethod();
+		else
+		{
+			for (int i = 0; i < (int)this->_servers.size(); i++)
+				delete(this->_servers[i]);
+			for (int i = 0; i < (int)this->_routes.size(); i++)
+				delete(this->_routes[i]);
+			throw NoAllowMethod();
+		}
 	}
 }
 void	Conf::setDirListing(std::string dirListing){
@@ -141,18 +159,29 @@ void	Conf::setDirListing(std::string dirListing){
 		this->_dirListing = true;
 	else if (dirListing.find("false"))
 		this->_dirListing = false;
-	else	throw NoAllowDirListing();
+	else
+	{
+		for (int i = 0; i < (int)this->_servers.size(); i++)
+			delete(this->_servers[i]);
+		for (int i = 0; i < (int)this->_routes.size(); i++)
+			delete(this->_routes[i]);
+		throw NoAllowDirListing();
+	}
 }
 void	Conf::setDef(std::string def){
+	//no repetir
 	this->_def = def;
 }
 void	Conf::setCgi(std::string cgi){
+	//hacer
 	this->_cgi = cgi;
 }
 void	Conf::setRedir(std::string redir){
+	//comprobar que existen y no esta repetido
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
+	//No se puede repetir por servidor
 	this->_root = root;
 }
 
