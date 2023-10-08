@@ -57,41 +57,41 @@ Conf::Conf()
 			//Añadimos los parametros del server
 			std::getline(archivo, line);
 			if (line.find("server-name:") != std::string::npos)
-				setName(line.substr(line.find(" server-name: ") + 14));
+				setName(line.substr(line.find_first_not_of(" server-name: ")));
 			std::getline(archivo, line);
 			if (line.find("error-page:") != std::string::npos)
-				setError_page(line.substr(line.find("error-page: ") + 12));
+				setError_page(line.substr(line.find_first_not_of("error-page: ")));
 			std::getline(archivo, line);
 			if (line.find("body-limit:") != std::string::npos)
-				setCBodyLimit(line.substr(line.find("body-limit: ") + 12));
+				setCBodyLimit(line.substr(line.find_first_not_of("body-limit: ")));
 			std::getline(archivo, line);
 			if (line.find("host:") != std::string::npos)
-				setHost(line.substr(line.find("host: ") + 6));
+				setHost(line.substr(line.find_first_not_of("host: ")));
 			std::getline(archivo, line);
 			if (line.find("port:") != std::string::npos)
-				setPorts(line.substr(line.find("port: ") + 6));
+				setPorts(line.substr(line.find_first_not_of("port: ")));
 			std::getline(archivo, line);
 			//Iteramos por las routes
 			while (line.find("route:") != std::string::npos)
 			{
 				std::getline(archivo, line);
 				if (line.find("methods:") != std::string::npos)
-					setMethods(line.substr(line.find("methods: ") + 9));
+					setMethods(line.substr(line.find_first_not_of("methods: ")));
 				std::getline(archivo, line);
 				if (line.find("directory-listing:") != std::string::npos)
-					setDirListing(line.substr(line.find("directory-listing: ") + 19));
+					setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
 				std::getline(archivo, line);
 				if (line.find("default-answer:") != std::string::npos)
-					setDef(line.substr(line.find("default-answer: ") + 16));
+					setDef(line.substr(line.find_first_not_of("default-answer: ")));
 				std::getline(archivo, line);
 				if (line.find("cgi:") != std::string::npos)
-					setCgi(line.substr(line.find("cgi: ") + 5));
+					setCgi(line.substr(line.find_first_not_of("cgi: ")));
 				std::getline(archivo, line);
 				if (line.find("redirection:") != std::string::npos)
-					setRedir(line.substr(line.find("redirection: ") + 13));
+					setRedir(line.substr(line.find_first_not_of("redirection: ")));
 				std::getline(archivo, line);
 				if (line.find("root:") != std::string::npos)
-					setRoot(line.substr(line.find("root: ") + 6));
+					setRoot(line.substr(line.find_first_not_of("root: ")));
 				//Crear el Router
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
 				std::getline(archivo, line);
