@@ -106,12 +106,12 @@ void Server::addRoute(Route *route) { this->_routes.push_back(route); }
 
 void Server::addClient(Client *client) { this->_clients.push_back(client); }
 
-void Server::removeClient(int idx) {
-	std::vector<Client *>::iterator it = this->_clients.begin() + idx;
-	Client *tmp = *it;
-
-	this->_clients.erase(it);
-	delete tmp;
+void Server::removeClient(Client *client) {
+	std::vector<Client *>::iterator it = std::find(this->_clients.begin(), this->_clients.end(), client);
+	if (it != this->_clients.end()) {
+		delete *it;
+		this->_clients.erase(it);
+	}
 }
 
 // GETTERS:
@@ -157,8 +157,13 @@ void Server::openSockets(void) {
 			throw SocketBindErrorException();
 		}
 
-		if (listen(this->_socks[i], 10) < 0) { // Second argument: Maximum length to which the queue of pending connections for sockets may grow
+		if (listen(this->_socks[i], LISTEN_QUEUE_SIZE) < 0) {
 			throw SocketListenErrorException();
+		}
+
+		int flags = fcntl(sockfd, F_SETFL, O_NONBLOCK);
+		if (flags < 0) {
+			throw SocketBindErrorException();
 		}
 	}
 }

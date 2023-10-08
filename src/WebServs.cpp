@@ -110,7 +110,7 @@ void WebServs::addSocketsToPoll(pollfd *fds) {
 		fds[this->_nfds].fd = this->_clients[i]->getSocket();
 		if (this->_clients[i]->isFinishedRequest()) {
 			fds[this->_nfds].events = POLLOUT;
-			std::cout << "Client socket: " << this->_clients[i]->getSocket() << std::endl;
+			// std::cout << "Client socket: " << this->_clients[i]->getSocket() << std::endl;
 		}
 		else {
 			fds[this->_nfds].events = POLLIN;
@@ -130,13 +130,11 @@ void WebServs::acceptPollinConnection(int inFd, int serverIdx) {
 	int socklen = sizeof(sockaddr);
 	int cSocket = accept(inFd, (struct sockaddr *)&sockaddr, (socklen_t *)&socklen);
 	if (cSocket <= 0) {
-		throw AcceptConnectionErrorException();
+		return ;
 	}
-	std::cout << "Accepted incoming client through fd: " << inFd << std::endl;
-	std::cout << "Assigned fd for client: " << cSocket << std::endl;
 	int flags = fcntl(cSocket, F_SETFL, O_NONBLOCK);
 	if (flags < 0) {
-		throw FcntlErrorException();
+		return ;
 	}
 	this->_cluster[serverIdx]->addClient(new Client(cSocket));
 }
@@ -175,39 +173,29 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 			for (int k = 0; k < this->_nfds; k++) {
 				if (fds[k].revents == POLLIN && fds[k].fd == serverClients[j]->getSocket()) {
 					serverClients[j]->receiveData();
-					/* ----------TESTING---------- */
-					if (serverClients[j]->isFinishedRequest())
-						std::cout << serverClients[j]->getRequest() << std::endl;
-					/* ----------TESTING---------- */
+					if (serverClients[j]->isErrorReadWrite()) {
+						this->_cluster[i]->removeClient(serverClients[j]);
+					}
 					break;
 				}
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
 					Request req = Request(serverClients[j]->getRequest());
 					Response res = Response(req);
-					/* ----------TESTING---------- */
-					std::cout << "1.REQUEST!!!!!!" << std::endl;
-					req.printHeaders();
-					std::cout << "2.REQUEST!!!!!!" << std::endl;
-					/* ----------TESTING---------- */
-					// /* ----------TESTING---------- */
-					// std::string header = "HTTP/1.1 200 OK\n"
-					// 					"Content-Type: text/html\n"
-					// 					"Content-Length: XX\r\n"
-					// 					"\r\n";
-					// std::string body = "<!DOCTYPE html><html><head></head><body><h1>"
-					// 					"Hello World!<br>"
-					// 					"</h1></body></html>\r\n\r\n";
-					// std::string response = header + body;
-					/* ----------TESTING---------- */
 
 					serverClients[j]->sendData(res.responseMaker());
-					if (serverClients[j]->isFinishedResponse())
-						this->_cluster[i]->removeClient(j);
+					if (serverClients[j]->isFinishedResponse() || serverClients[j]->isErrorReadWrite()) {
+						usleep(2100);
+						this->_cluster[i]->removeClient(serverClients[j]);
+					}
 					break;
 				}
+				if (fds[k].revents == POLLNVAL && fds[k].fd == serverClients[j]->getSocket()) {
+					this->_cluster[i]->removeClient(serverClients[j]);
+					break ;
+				}
 				if (fds[k].revents == POLLHUP && fds[k].fd == serverClients[j]->getSocket()) {
-					this->_cluster[i]->removeClient(j);
+					this->_cluster[i]->removeClient(serverClients[j]);
 					break;
 				}
 			}

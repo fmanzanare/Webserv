@@ -15,6 +15,7 @@ Client::Client(int socket) {
 	this->_request = "";
 	this->_finishedReq = false;
 	this->_finishedRes = false;
+	this->_errReadWrite = false;
 	this->_resPos = 0;
 }
 
@@ -53,12 +54,21 @@ bool Client::isFinishedRequest() { return (this->_finishedReq); }
 
 bool Client::isFinishedResponse() { return (this->_finishedRes); }
 
+bool Client::isErrorReadWrite() { return (this->_errReadWrite); }
+
+// OPERATORS:
+bool Client::operator==(const Client client) {
+	return (this->_socket == client._socket);
+}
+
 // METHODS:
 void Client::receiveData() {
 	char	buffer[BUFFER_SIZE + 1] = {0};
 
-	if (recv(this->_socket, buffer, BUFFER_SIZE, 0) == -1) {
-		throw RecvErrorException();
+	int recvValue = recv(this->_socket, buffer, BUFFER_SIZE, 0);
+	if (recvValue == -1 || recvValue == 0) {
+		this->_errReadWrite = true;
+		return ;
 	}
 
 	this->_request += buffer;
@@ -100,6 +110,10 @@ void Client::sendData(std::string response) {
 	size_t sent = 0;
 
 	sent = send(this->_socket, &response.c_str()[this->_resPos], response.size(), 0);
+	if ((int)sent == -1 || (int)sent == 0) {
+		this->_errReadWrite = true;
+		return ;
+	}
 	this->_resPos += sent;
 
 	if (this->_resPos >= response.size()) {
