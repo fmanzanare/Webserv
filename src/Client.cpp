@@ -20,7 +20,6 @@ Client::Client(int socket) {
 }
 
 Client::~Client() {
-	// std::cout << "Client socket: " << this->_socket << " erased" << std::endl;
 	close(this->_socket);
 }
 

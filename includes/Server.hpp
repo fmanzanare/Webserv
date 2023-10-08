@@ -6,9 +6,12 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <algorithm>
 #include "Client.hpp"
 #include "Route.hpp"
+
+#define LISTEN_QUEUE_SIZE 100
 
 class Server {
 	private:

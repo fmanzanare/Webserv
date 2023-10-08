@@ -157,8 +157,13 @@ void Server::openSockets(void) {
 			throw SocketBindErrorException();
 		}
 
-		if (listen(this->_socks[i], 10) < 0) { // Second argument: Maximum length to which the queue of pending connections for sockets may grow
+		if (listen(this->_socks[i], LISTEN_QUEUE_SIZE) < 0) {
 			throw SocketListenErrorException();
+		}
+
+		int flags = fcntl(sockfd, F_SETFL, O_NONBLOCK);
+		if (flags < 0) {
+			throw SocketBindErrorException();
 		}
 	}
 }

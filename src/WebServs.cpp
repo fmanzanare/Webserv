@@ -130,11 +130,11 @@ void WebServs::acceptPollinConnection(int inFd, int serverIdx) {
 	int socklen = sizeof(sockaddr);
 	int cSocket = accept(inFd, (struct sockaddr *)&sockaddr, (socklen_t *)&socklen);
 	if (cSocket <= 0) {
-		throw AcceptConnectionErrorException();
+		return ;
 	}
 	int flags = fcntl(cSocket, F_SETFL, O_NONBLOCK);
 	if (flags < 0) {
-		throw FcntlErrorException();
+		return ;
 	}
 	this->_cluster[serverIdx]->addClient(new Client(cSocket));
 }
@@ -184,9 +184,15 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 					Response res = Response(req);
 
 					serverClients[j]->sendData(res.responseMaker());
-					if (serverClients[j]->isFinishedResponse() || serverClients[j]->isErrorReadWrite())
+					if (serverClients[j]->isFinishedResponse() || serverClients[j]->isErrorReadWrite()) {
+						usleep(2100);
 						this->_cluster[i]->removeClient(serverClients[j]);
+					}
 					break;
+				}
+				if (fds[k].revents == POLLNVAL && fds[k].fd == serverClients[j]->getSocket()) {
+					this->_cluster[i]->removeClient(serverClients[j]);
+					break ;
 				}
 				if (fds[k].revents == POLLHUP && fds[k].fd == serverClients[j]->getSocket()) {
 					this->_cluster[i]->removeClient(serverClients[j]);

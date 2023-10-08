@@ -16,7 +16,6 @@ void leaks(void) {
 
 int main(void) {
 	atexit(leaks);
-	// WebServs *c1 = new WebServs();
 	WebServs c1;
 	try {
 		Conf myConf = Conf();
@@ -30,7 +29,6 @@ int main(void) {
 		c1.runWebServs();
 	} catch(...) {
 		std::cout << "Non valid config." << std::endl;
-		// delete c1;
 	}
 
 	return (0);
