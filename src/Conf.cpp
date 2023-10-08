@@ -30,6 +30,18 @@ class Conf::NoAllowHost : public std::exception {
 	}
 };
 
+class Conf::NoAllowcBodyLimit : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Body Limit\n");
+	}
+};
+
+class Conf::NoAllowRoot : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Root\n");
+	}
+};
+
 Conf::Conf()
 {
 	std::fstream archivo("conf.yml");
@@ -45,13 +57,13 @@ Conf::Conf()
 			//Añadimos los parametros del server
 			std::getline(archivo, line);
 			if (line.find("server-name:") != std::string::npos)
-				setName(line.substr(line.find("server-name: ") + 13));
+				setName(line.substr(line.find(" server-name: ") + 14));
 			std::getline(archivo, line);
 			if (line.find("error-page:") != std::string::npos)
 				setError_page(line.substr(line.find("error-page: ") + 12));
 			std::getline(archivo, line);
 			if (line.find("body-limit:") != std::string::npos)
-				setCBodyLimit(std::stoi(line.substr(line.find("body-limit: ") + 12)));
+				setCBodyLimit(line.substr(line.find("body-limit: ") + 12));
 			std::getline(archivo, line);
 			if (line.find("host:") != std::string::npos)
 				setHost(line.substr(line.find("host: ") + 6));
@@ -96,15 +108,20 @@ Conf::Conf()
 Conf::~Conf()
 {
 }
+//Methods
+void	Conf::freeServer(void)
+{
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+			delete(this->_servers[i]);
+	for (int i = 0; i < (int)this->_routes.size(); i++)
+		delete(this->_routes[i]);
+}
 //SETs
-
-
 void	Conf::setName(std::string name){
 	for (int i = 0; i < (int)this->_servers.size(); i++)
 		if (name == this->_servers[i]->getName())
 		{
-			for (int i = 0; i < (int)this->_servers.size(); i++)
-				delete(this->_servers[i]);
+			freeServer();
 			throw NoAllowNameServer();
 		}
 	this->_name = name;
@@ -113,22 +130,34 @@ void	Conf::setError_page(std::string errPage){
 	//comprobar existen
 	this->_errPage = errPage;
 }
-void	Conf::setCBodyLimit(int cBodyLimit){
-	//control int
-	this->_cBodyLimit = cBodyLimit;
+void	Conf::setCBodyLimit(std::string cBodyLimit){
+	char *aux = (char *)cBodyLimit.c_str();
+	for (int i = 0; i < (int)cBodyLimit.size(); i++)
+		{
+			if (!std::isdigit(aux[i]))
+			{
+				freeServer();
+				throw NoAllowcBodyLimit();
+			}
+		}
+	int result = std::atoi(aux);
+	if (0 > result)
+	{
+		freeServer();
+		throw NoAllowcBodyLimit();
+	}
+	this->_cBodyLimit = result;
 }
 void	Conf::setHost(std::string host){
 	for (int i = 0; i < (int)this->_servers.size(); i++)
 		if (host == this->_servers[i]->getHost())
 		{
-			for (int i = 0; i < (int)this->_servers.size(); i++)
-				delete(this->_servers[i]);
+			freeServer();
 			throw NoAllowHost();
 		}
 	this->_host = host;
 }
 void	Conf::setPorts(std::string ports){
-	//Comprobar port repetidos
 	std::istringstream iss(ports);
 	std::string			token;
 
@@ -139,20 +168,14 @@ void	Conf::setPorts(std::string ports){
 			char *aux = (char *)token.c_str();
 			if (!std::isdigit(aux[i]))
 			{
-				for (int i = 0; i < (int)this->_servers.size(); i++)
-					delete(this->_servers[i]);
-				for (int i = 0; i < (int)this->_routes.size(); i++)
-					delete(this->_routes[i]);
+				freeServer();
 				throw NoAllowPort();
 			}
 		}
 		int result = std::atoi(token.c_str());
 		if (2000 >= result)
 		{
-			for (int i = 0; i < (int)this->_servers.size(); i++)
-				delete(this->_servers[i]);
-			for (int i = 0; i < (int)this->_routes.size(); i++)
-				delete(this->_routes[i]);
+			freeServer();
 			throw NoAllowPort();
 		}
 		for (int i = 0; i < (int)this->_servers.size(); i++)
@@ -161,10 +184,7 @@ void	Conf::setPorts(std::string ports){
 			for (int j = 0; i < (int)ports[j]; j++)
 				if (ports[j] == result)
 				{
-					for (int i = 0; i < (int)this->_servers.size(); i++)
-						delete(this->_servers[i]);
-					for (int i = 0; i < (int)this->_routes.size(); i++)
-						delete(this->_routes[i]);
+					freeServer();
 					throw NoAllowPort();
 				}
 		}
@@ -183,10 +203,7 @@ void	Conf::setMethods(std::string method){
 	{
 		if (token != "GET" && token != "POST" && token != "DELETE")
 		{
-			for (int i = 0; i < (int)this->_servers.size(); i++)
-				delete(this->_servers[i]);
-			for (int i = 0; i < (int)this->_routes.size(); i++)
-				delete(this->_routes[i]);
+			freeServer();
 			throw NoAllowMethod();
 		}
 		if (token == "GET" && !nGet++)
@@ -197,14 +214,12 @@ void	Conf::setMethods(std::string method){
 			this->_methods.push_back(token);
 		else
 		{
-			for (int i = 0; i < (int)this->_servers.size(); i++)
-				delete(this->_servers[i]);
-			for (int i = 0; i < (int)this->_routes.size(); i++)
-				delete(this->_routes[i]);
+			freeServer();
 			throw NoAllowMethod();
 		}
 	}
 }
+
 void	Conf::setDirListing(std::string dirListing){
 	if (dirListing.find("true"))
 		this->_dirListing = true;
@@ -212,10 +227,7 @@ void	Conf::setDirListing(std::string dirListing){
 		this->_dirListing = false;
 	else
 	{
-		for (int i = 0; i < (int)this->_servers.size(); i++)
-			delete(this->_servers[i]);
-		for (int i = 0; i < (int)this->_routes.size(); i++)
-			delete(this->_routes[i]);
+		freeServer();
 		throw NoAllowDirListing();
 	}
 }
@@ -228,32 +240,45 @@ void	Conf::setCgi(std::string cgi){
 	this->_cgi = cgi;
 }
 void	Conf::setRedir(std::string redir){
-	//comprobar que existen y no esta repetido
+	//
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
 	//No se puede repetir por servidor
+	for (int i = 0; i < (int)this->_routes.size(); i++)
+		if (this->_routes[i]->getRoot() == root)
+		{
+			freeServer();
+			throw NoAllowRoot();
+		}
+	if (root[0] != '.')
+		root = '.' + root;
+	if (access(root.c_str(), F_OK) == -1)
+	{
+		freeServer();
+		throw NoAllowRoot();
+	}
 	this->_root = root;
 }
 
 //GET
-std::string				Conf::getName(void){
+std::string					Conf::getName(void){
 	return (this->_name);
 }
-std::string				Conf::getError_page(void){
+std::string					Conf::getError_page(void){
 	return (this->_errPage);
 }
-int						Conf::getCBodyLimit(void){
+int							Conf::getCBodyLimit(void){
 	return (this->_cBodyLimit);
 }
-std::string				Conf::getHost(void){
+std::string					Conf::getHost(void){
 	return (this->_host);
 }
-std::vector<int>		Conf::getPorts(void){
+std::vector<int>			Conf::getPorts(void){
 	return (this->_ports);
 }
 
-std::vector<Route *>	Conf::getRoutes(void){
+std::vector<Route *>		Conf::getRoutes(void){
 	return (this->_routes);
 }
 
