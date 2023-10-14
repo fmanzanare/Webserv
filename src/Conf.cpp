@@ -50,51 +50,50 @@ Conf::Conf()
     }
 	std::string line;
 	//Iteramos por los servers
+	int i = 0;
 	while(std::getline(archivo, line))
 	{
 		if (line.find("server:") != std::string::npos)
 		{
 			//Añadimos los parametros del server
-			std::getline(archivo, line);
-			if (line.find("server-name:") != std::string::npos)
-				setName(line.substr(line.find_first_not_of(" server-name: ")));
-			std::getline(archivo, line);
-			if (line.find("error-page:") != std::string::npos)
-				setError_page(line.substr(line.find_first_not_of("error-page: ")));
-			std::getline(archivo, line);
-			if (line.find("body-limit:") != std::string::npos)
-				setCBodyLimit(line.substr(line.find_first_not_of("body-limit: ")));
-			std::getline(archivo, line);
-			if (line.find("host:") != std::string::npos)
-				setHost(line.substr(line.find_first_not_of("host: ")));
-			std::getline(archivo, line);
-			if (line.find("port:") != std::string::npos)
-				setPorts(line.substr(line.find_first_not_of("port: ")));
-			std::getline(archivo, line);
+			i = 0;
+			while (std::getline(archivo, line) && i++ < 5)
+			{
+				//std::cout << line << std::endl;
+				if (line.find("server-name:") != std::string::npos)
+					setName(line.substr(line.find_first_not_of(" server-name: ")));
+				else if (line.find("error-page:") != std::string::npos)
+					setError_page(line.substr(line.find_first_not_of("error-page: ")));
+				else if (line.find("body-limit:") != std::string::npos)
+					setCBodyLimit(line.substr(line.find_first_not_of("body-limit: ")));
+				else if (line.find("host:") != std::string::npos)
+					setHost(line.substr(line.find_first_not_of("host: ")));
+				else if (line.find("port:") != std::string::npos)
+					setPorts(line.substr(line.find_first_not_of("port: ")));
+			}
 			//Iteramos por las routes
 			while (line.find("route:") != std::string::npos)
 			{
-				std::getline(archivo, line);
-				if (line.find("methods:") != std::string::npos)
-					setMethods(line.substr(line.find_first_not_of("methods: ")));
-				std::getline(archivo, line);
-				if (line.find("directory-listing:") != std::string::npos)
-					setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
-				std::getline(archivo, line);
-				if (line.find("default-answer:") != std::string::npos)
-					setDef(line.substr(line.find_first_not_of("default-answer: ")));
-				std::getline(archivo, line);
-				if (line.find("cgi:") != std::string::npos)
-					setCgi(line.substr(line.find_first_not_of("cgi: ")));
-				std::getline(archivo, line);
-				if (line.find("redirection:") != std::string::npos)
-					setRedir(line.substr(line.find_first_not_of("redirection: ")));
-				std::getline(archivo, line);
-				if (line.find("root:") != std::string::npos)
-					setRoot(line.substr(line.find_first_not_of("root: ")));
+				i = 0;
+				while (std::getline(archivo, line) && i++ < 6)
+				{
+					//std::cout << line << std::endl;
+					if (line.find("methods:") != std::string::npos)
+						setMethods(line.substr(line.find_first_not_of("methods: ")));
+					else if (line.find("directory-listing:") != std::string::npos)
+						setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
+					else if (line.find("default-answer:") != std::string::npos)
+						setDef(line.substr(line.find_first_not_of("default-answer: ")));
+					else if (line.find("cgi:") != std::string::npos)
+						setCgi(line.substr(line.find_first_not_of("cgi: ")));
+					else if (line.find("redirection:") != std::string::npos)
+						setRedir(line.substr(line.find_first_not_of("redirection: ")));
+					else if (line.find("root:") != std::string::npos)
+						setRoot(line.substr(line.find_first_not_of("root: ")));
+				}
 				//Crear el Router
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
-				std::getline(archivo, line);
+				//std::getline(archivo, line);
 			}
 			//Crear el Server
 			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));

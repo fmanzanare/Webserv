@@ -17,6 +17,9 @@ void leaks(void) {
 int main(void) {
 	atexit(leaks);
 	WebServs c1;
+
+
+
 	// try {
 		Conf myConf = Conf();
 		std::vector<Server *> servers = myConf.getServers();
@@ -26,6 +29,9 @@ int main(void) {
 		}
 
 		signal(SIGINT, signalHandler);
+	std::vector<Server *> s = c1.getCluster();
+	std::vector<Route *> r = s[1]->getRoutes();
+	std::cout << r[1]->getRoot() << std::endl;
 		c1.runWebServs();
 	// } catch(...) {
 	// 	std::cout << "Non valid config." << std::endl;
