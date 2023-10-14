@@ -20,10 +20,10 @@ server:
     root: /s1/storage
 
 server:
-  server-name: myserver1
+  server-name: myserver2
   error-page: error2.html
   body-limit: 2048
-  host: 10.13.9.6
+  host: 10.13.8.5
   port: 8002,8003,9000
   route:
     methods: GET,POST
@@ -31,11 +31,11 @@ server:
     default-answer: index2.html
     cgi: .py
     redirection: /
-    root: /server2
+    root: /src
   route:
     methods: GET,POST
     directory-listing: true
     default-answer: index.html
     cgi: .php
     redirection: /src
-    root: /server2/src
+    root: /src/Server.cpp

@@ -33,7 +33,7 @@ class Conf
 		//Metodos
 		void		setName(std::string name);
 		void		setError_page(std::string errPage);
-		void		setCBodyLimit(int cBodyLimit);
+		void		setCBodyLimit(std::string cBodyLimit);
 		void		setHost(std::string host);
         void		setPorts(std::string ports);
 
@@ -45,6 +45,8 @@ class Conf
 		void		setCgi(std::string cgi);
 		void		setRedir(std::string redir);
 		void		setRoot(std::string root);
+		//methods
+		void		freeServer(void);
 
     public:
 		//C
@@ -53,6 +55,8 @@ class Conf
 		class						NoAllowDirListing;
 		class 						NoAllowNameServer;
 		class						NoAllowHost;
+		class						NoAllowcBodyLimit;
+		class						NoAllowRoot;
 		//Atributos
         Conf();
         ~Conf();
