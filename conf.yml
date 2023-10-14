@@ -24,7 +24,7 @@ server:
   error-page: error2.html
   body-limit: 2048
   host: 10.13.8.5
-  port: 8002,8003,9000
+  port: 8002,8003
   route:
     methods: GET,POST
     directory-listing: true
