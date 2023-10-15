@@ -1,45 +1,47 @@
 #include "../includes/cgi.hpp"
 
-std::string cgi(std::string path, char **env)
+std::string cgi(std::string path)
 {
-	int fd[2];
 	int status;
 
 	if (access(path.c_str(), F_OK | R_OK) == -1)
 		return("Onde??");
+
 	//hard_code
 	char *argv[3];
 	argv[0] = (char *)path.c_str();
 	argv[1] = (char *)"./s1/cgi/holamundo.py";
 	argv[2] = 0;
-	//ERROR 500?
-	if (pipe(fd) == -1)
-		printf("Error al abrir el pipe");
-	//ERROR TIMEOUT 504?
 
-	//
+	//ERROR 500?
+
+	//creo el archivo temporal
+	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
+	//ERROR TIMEOUT 504?
 	int pid = fork();
+
 	if (!pid)
 	{
-		//ERROR 500?
-		// if (dup2(fd[1], STDOUT_FILENO) == -1 || close(fd[0]) == -1 || close(fd[1]) == -1)
-		// 	printf("Error al abrir el pipe");
+		if (dup2(temp, STDOUT_FILENO) == -1)
+			printf("Error al abrir el pipe");
+			close(temp);
 		execve(path.c_str(), argv, NULL);
 		return ("error");
 	}
-	// if (dup2(fd[0], STDIN_FILENO) == -1 || close(fd[0]) == -1 || close(fd[1]) == -1)
-	// 		printf("Error al abrir el pipe");
-
-	// std::string line;
-	// read(0, line, 1000)
-
-	// std::getline(iss, line);
-	// std::cout << line << std::endl;
 	waitpid(pid, &status, 0);
-	return ("fin");
+	temp = open(".temp.txt", O_RDONLY);
+	char buf[50];
+	std::string data;
+	ssize_t len = -1;
+	while (len)
+	{
+		len = read(temp, buf, 50);
+		data += std::string(buf, len);
+	}
+	return (data);
 }
 
-int main(int ac, char **av, char **env)
+int main()
 {
-	std::cout << cgi("/usr/local/bin/python3", env) << std::endl;
+	std::cout << cgi("/usr/local/bin/python3") << std::endl;
 }
