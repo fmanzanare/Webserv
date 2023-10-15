@@ -180,23 +180,10 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
 					Request req = Request(serverClients[j]->getRequest());
-					Response res = Response(req);
-					/* ----------TESTING---------- */
+					Response res = Response(req, _cluster[i]->getRoutes());
 					std::cout << "1.REQUEST!!!!!!" << std::endl;
 					req.printHeaders();
 					std::cout << "2.REQUEST!!!!!!" << std::endl;
-					/* ----------TESTING---------- */
-					// /* ----------TESTING---------- */
-					// std::string header = "HTTP/1.1 200 OK\n"
-					// 					"Content-Type: text/html\n"
-					// 					"Content-Length: XX\r\n"
-					// 					"\r\n";
-					// std::string body = "<!DOCTYPE html><html><head></head><body><h1>"
-					// 					"Hello World!<br>"
-					// 					"</h1></body></html>\r\n\r\n";
-					// std::string response = header + body;
-					/* ----------TESTING---------- */
-
 					serverClients[j]->sendData(res.responseMaker());
 					if (serverClients[j]->isFinishedResponse())
 						this->_cluster[i]->removeClient(j);

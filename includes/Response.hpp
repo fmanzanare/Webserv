@@ -11,6 +11,7 @@
 # include <cstdlib>
 # include <vector>
 # include "Request.hpp"
+# include "Route.hpp"
 
 /* ------------ DEFINES ------------*/
 # define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
@@ -27,7 +28,7 @@ class Response
 	public:
 		// Constructors
 		Response();
-		Response(Request &req);
+		Response(Request &req, std::vector<Route *>);
 		Response(const Response &copy);
 		
 		// Destructor
@@ -35,6 +36,16 @@ class Response
 		
 		// Operators
 		Response & operator=(const Response &assign);
+
+		std::string	getResponses(){return _response;} // testing function
+
+	private:
+		// Attributes
+		std::string				_response;
+		std::string				_statusCode;
+		std::string				_status;
+		Request					_request;
+		std::vector<Route *>	_routes;
 
 		// Methods
 		std::string		responseMaker();
@@ -44,14 +55,8 @@ class Response
 		void			postResponse(std::string);
 		void			deleteResponse(std::string);
 		void			generateFinalResponse();
+		bool			checkLocation(std::string);
 
-		std::string	getResponses(){return _response;} // testing function
-
-	private:
-		std::string		_response;
-		std::string		_statusCode;
-		std::string		_status;
-		Request			_request;
 };
 
 #endif

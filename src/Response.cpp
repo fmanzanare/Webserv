@@ -9,14 +9,14 @@ Response::Response()
 	this->_status = "";
 }
 
-Response::Response(Request &req)
+Response::Response(Request &req, std::vector<Route *> routes)
 {
 	this->_request = req;
 	this->_response = "";
 	this->_statusCode = "";
 	this->_status = "";
-	req.processRequest();
-	this->_request = req;
+	this->_request.processRequest();
+	this->_routes = routes;
 }
 
 Response::Response(const Response &copy)
@@ -175,6 +175,27 @@ void		Response::deleteResponse(std::string path)
 		return ;
 	}
 	this->_response = headerGenerator("200", "0");
+}
+
+bool Response::checkLocation(std::string rawPath)
+{
+	std::string		redir = std::string::npos;
+	std::string		root = std::string::npos;
+	size_t			maxIndexFound = 0;
+	size_t			vectorSize = _routes.size();
+
+	for (int i = 0; i < vectorSize; i++)
+	{
+		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
+		{
+			if (maxIndexFound < _routes[i].getRedir().size())
+			{
+				maxIndexFound = _routes[i]->getRedir().size();
+				root = _routes[i]->getRoot();
+			}
+		}
+
+	}
 }
 
 /**

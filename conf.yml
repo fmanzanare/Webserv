@@ -9,16 +9,18 @@ server:
     directory-listing: false
     default-answer: index.html
     cgi: .php
-    redirection: / 
-    root: /server1
+    redirection: /
+    root: /s1/
   route:
     methods: POST,DELETE
     directory-listing: true
     default-answer: none
     cgi: .php
     redirection: /storage
-    root: /server1/storage
+    root: /s1/storage
 
+/storage/cgi/hola.py
+# GET / http/1.1
 server:
   server-name: myserver2
   error-page: error2.html
