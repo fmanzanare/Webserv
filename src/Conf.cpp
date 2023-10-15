@@ -3,13 +3,43 @@
 class Conf::NoAllowPort : public std::exception {
 	virtual const char *what() const throw(){
 		return ("No Allow Port\n");
-	} 
+	}
 };
 
 class Conf::NoAllowMethod : public std::exception {
 	virtual const char *what() const throw(){
 		return ("No Allow Method\n");
-	} 
+	}
+};
+
+class Conf::NoAllowDirListing : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow DirListing\n");
+	}
+};
+
+class Conf::NoAllowNameServer : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Name Server\n");
+	}
+};
+
+class Conf::NoAllowHost : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Host\n");
+	}
+};
+
+class Conf::NoAllowcBodyLimit : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Body Limit\n");
+	}
+};
+
+class Conf::NoAllowRoot : public std::exception {
+	virtual const char *what() const throw(){
+		return ("No Allow Root\n");
+	}
 };
 
 Conf::Conf()
@@ -17,58 +47,58 @@ Conf::Conf()
 	std::fstream archivo("conf.yml");
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
-        
     }
 	std::string line;
 	//Iteramos por los servers
+	int i = 0;
 	while(std::getline(archivo, line))
 	{
 		if (line.find("server:") != std::string::npos)
 		{
 			//Añadimos los parametros del server
-			std::getline(archivo, line);
-			if (line.find("server-name:") != std::string::npos)
-				setName(line.substr(line.find("server-name: ") + 13));
-			std::getline(archivo, line);
-			if (line.find("error-page:") != std::string::npos)
-				setError_page(line.substr(line.find("error-page: ") + 12));
-			std::getline(archivo, line);
-			if (line.find("body-limit:") != std::string::npos)
-				setCBodyLimit(std::stoi(line.substr(line.find("body-limit: ") + 12)));
-			std::getline(archivo, line);
-			if (line.find("host:") != std::string::npos)
-				setHost(line.substr(line.find("host: ") + 6));
-			std::getline(archivo, line);
-			if (line.find("port:") != std::string::npos)
-				setPorts(line.substr(line.find("port: ") + 6));
-			std::getline(archivo, line);
+			i = 0;
+			while (std::getline(archivo, line) && i++ < 5)
+			{
+				//std::cout << line << std::endl;
+				if (line.find("server-name:") != std::string::npos)
+					setName(line.substr(line.find_first_not_of(" server-name: ")));
+				else if (line.find("error-page:") != std::string::npos)
+					setError_page(line.substr(line.find_first_not_of("error-page: ")));
+				else if (line.find("body-limit:") != std::string::npos)
+					setCBodyLimit(line.substr(line.find_first_not_of("body-limit: ")));
+				else if (line.find("host:") != std::string::npos)
+					setHost(line.substr(line.find_first_not_of("host: ")));
+				else if (line.find("port:") != std::string::npos)
+					setPorts(line.substr(line.find_first_not_of("port: ")));
+			}
 			//Iteramos por las routes
 			while (line.find("route:") != std::string::npos)
 			{
-				std::getline(archivo, line);
-				if (line.find("methods:") != std::string::npos)
-					setMethods(line.substr(line.find("methods: ") + 9));
-				std::getline(archivo, line);
-				if (line.find("directory-listing:") != std::string::npos)
-					setDirListing(line.substr(line.find("directory-listing: ") + 19));
-				std::getline(archivo, line);
-				if (line.find("default-answer:") != std::string::npos)
-					setDef(line.substr(line.find("default-answer: ") + 16));
-				std::getline(archivo, line);
-				if (line.find("cgi:") != std::string::npos)
-					setCgi(line.substr(line.find("cgi: ") + 5));
-				std::getline(archivo, line);
-				if (line.find("redirection:") != std::string::npos)
-					setRedir(line.substr(line.find("redirection: ") + 13));
-				std::getline(archivo, line);
-				if (line.find("root:") != std::string::npos)
-					setRoot(line.substr(line.find("root: ") + 6));
-				//Crear el Router 
+				i = 0;
+				while (std::getline(archivo, line) && i++ < 6)
+				{
+					//std::cout << line << std::endl;
+					if (line.find("methods:") != std::string::npos)
+						setMethods(line.substr(line.find_first_not_of("methods: ")));
+					else if (line.find("directory-listing:") != std::string::npos)
+						setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
+					else if (line.find("default-answer:") != std::string::npos)
+						setDef(line.substr(line.find_first_not_of("default-answer: ")));
+					else if (line.find("cgi:") != std::string::npos)
+						setCgi(line.substr(line.find_first_not_of("cgi: ")));
+					else if (line.find("redirection:") != std::string::npos)
+						setRedir(line.substr(line.find_first_not_of("redirection: ")));
+					else if (line.find("root:") != std::string::npos)
+						setRoot(line.substr(line.find_first_not_of("root: ")));
+				}
+				//Crear el Router
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
-				std::getline(archivo, line);
+				//std::getline(archivo, line);
 			}
 			//Crear el Server
 			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
+			this->_routes.clear();
+			this->_ports.clear();
 		}
 	}
 	archivo.close();
@@ -77,45 +107,91 @@ Conf::Conf()
 Conf::~Conf()
 {
 }
+//Methods
+void	Conf::freeServer(void)
+{
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+			delete(this->_servers[i]);
+	for (int i = 0; i < (int)this->_routes.size(); i++)
+		delete(this->_routes[i]);
+}
 //SETs
-
-
-int			Conf::setName(std::string name){
+void	Conf::setName(std::string name){
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+		if (name == this->_servers[i]->getName())
+		{
+			freeServer();
+			throw NoAllowNameServer();
+		}
 	this->_name = name;
-	return (1);
 }
-int			Conf::setError_page(std::string errPage){
+void	Conf::setError_page(std::string errPage){
+	//comprobar existen
 	this->_errPage = errPage;
-	return (1);
 }
-int			Conf::setCBodyLimit(int cBodyLimit){
-	this->_cBodyLimit = cBodyLimit;
-	return (1);
+void	Conf::setCBodyLimit(std::string cBodyLimit){
+	char *aux = (char *)cBodyLimit.c_str();
+	for (int i = 0; i < (int)cBodyLimit.size(); i++)
+		{
+			if (!std::isdigit(aux[i]))
+			{
+				freeServer();
+				throw NoAllowcBodyLimit();
+			}
+		}
+	int result = std::atoi(aux);
+	if (0 > result)
+	{
+		freeServer();
+		throw NoAllowcBodyLimit();
+	}
+	this->_cBodyLimit = result;
 }
-int			Conf::setHost(std::string host){
+void	Conf::setHost(std::string host){
+	for (int i = 0; i < (int)this->_servers.size(); i++)
+		if (host == this->_servers[i]->getHost())
+		{
+			freeServer();
+			throw NoAllowHost();
+		}
 	this->_host = host;
-	return (1);
 }
-int			Conf::setPorts(std::string ports){
+void	Conf::setPorts(std::string ports){
 	std::istringstream iss(ports);
 	std::string			token;
 
 	while (std::getline(iss, token, ','))
 	{
+		for (int i = 0; i < (int)token.size(); i++)
+		{
+			char *aux = (char *)token.c_str();
+			if (!std::isdigit(aux[i]))
+			{
+				freeServer();
+				throw NoAllowPort();
+			}
+		}
 		int result = std::atoi(token.c_str());
 		if (2000 >= result)
+		{
+			freeServer();
 			throw NoAllowPort();
+		}
+		for (int i = 0; i < (int)this->_servers.size(); i++)
+		{
+			std::vector<int> ports = this->_servers[i]->getPorts();
+			for (int j = 0; i < (int)ports[j]; j++)
+				if (ports[j] == result)
+				{
+					freeServer();
+					throw NoAllowPort();
+				}
+		}
 		this->_ports.push_back(result);
 	}
-	return (1);
 }
 
-int			Conf::addRoute(Route *route){
-	this->_routes.push_back(route);
-	return (1);
-}
-
-int			Conf::setMethods(std::string method){
+void	Conf::setMethods(std::string method){
 	std::istringstream iss(method);
 	std::string			token;
 
@@ -125,61 +201,83 @@ int			Conf::setMethods(std::string method){
 	while (std::getline(iss, token, ','))
 	{
 		if (token != "GET" && token != "POST" && token != "DELETE")
+		{
+			freeServer();
 			throw NoAllowMethod();
+		}
 		if (token == "GET" && !nGet++)
 			this->_methods.push_back(token);
 		else if (token == "POST" && !nPost++)
 			this->_methods.push_back(token);
 		else if (token == "DELETE" && !nDelete++)
 			this->_methods.push_back(token);
-		else	throw NoAllowMethod();
+		else
+		{
+			freeServer();
+			throw NoAllowMethod();
+		}
 	}
-	return (1);
 }
-int			Conf::setDirListing(std::string dirListing){
+
+void	Conf::setDirListing(std::string dirListing){
 	if (dirListing.find("true"))
 		this->_dirListing = true;
 	else if (dirListing.find("false"))
 		this->_dirListing = false;
 	else
-		return (0);
-	return (1);
+	{
+		freeServer();
+		throw NoAllowDirListing();
+	}
 }
-int			Conf::setDef(std::string def){
+void	Conf::setDef(std::string def){
+	//no repetir
 	this->_def = def;
-	return (1);
 }
-int			Conf::setCgi(std::string cgi){
+void	Conf::setCgi(std::string cgi){
+	//hacer
 	this->_cgi = cgi;
-	return (1);
 }
-int			Conf::setRedir(std::string redir){
+void	Conf::setRedir(std::string redir){
+	//
 	this->_redir = redir;
-	return (1);
 }
-int			Conf::setRoot(std::string root){
+void	Conf::setRoot(std::string root){
+	//No se puede repetir por servidor
+	for (int i = 0; i < (int)this->_routes.size(); i++)
+		if (this->_routes[i]->getRoot() == root)
+		{
+			freeServer();
+			throw NoAllowRoot();
+		}
+	if (root[0] != '.')
+		root = '.' + root;
+	if (access(root.c_str(), F_OK) == -1)
+	{
+		freeServer();
+		throw NoAllowRoot();
+	}
 	this->_root = root;
-	return (1);
 }
 
 //GET
-std::string				Conf::getName(void){
+std::string					Conf::getName(void){
 	return (this->_name);
 }
-std::string				Conf::getError_page(void){
+std::string					Conf::getError_page(void){
 	return (this->_errPage);
 }
-int						Conf::getCBodyLimit(void){
+int							Conf::getCBodyLimit(void){
 	return (this->_cBodyLimit);
 }
-std::string				Conf::getHost(void){
+std::string					Conf::getHost(void){
 	return (this->_host);
 }
-std::vector<int>		Conf::getPorts(void){
+std::vector<int>			Conf::getPorts(void){
 	return (this->_ports);
 }
 
-std::vector<Route *>	Conf::getRoutes(void){
+std::vector<Route *>		Conf::getRoutes(void){
 	return (this->_routes);
 }
 

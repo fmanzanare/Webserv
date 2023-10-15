@@ -16,52 +16,25 @@ void leaks(void) {
 
 int main(void) {
 	atexit(leaks);
-
-	Conf myConf = Conf();
-	std::vector<Server *> Servers = myConf.getServers();
-
-	// std::vector<std::string> methods;
-	// methods.push_back("GET");
-	// std::vector<Route *> routes;
-	// routes.push_back(new Route(methods, "./server1", "/", false, "index.html"));
-	// methods.clear();
-	// methods.push_back("POST");
-	// methods.push_back("DELETE");
-	// routes.push_back(new Route(methods, "./server1/storage", "/storage", true, "none"));
-
-	// std::vector<int> port;
-	// port.push_back(8080);
-	// port.push_back(8081);
-
 	WebServs c1;
-	// Server *s1 = new Server(port, routes, "127.0.0.1");
-	c1.addServer(Servers[0]);
 
-	// routes.clear();
-	// methods.clear();
-	// methods.push_back("GET");
-	// routes.push_back(new Route(methods, "./server2", "/", true, "hello.html"));
-	// methods.clear();
-	// methods.push_back("GET");
-	// routes.push_back(new Route(methods, "./server2/images", "/images", true, "default.html"));
 
-	// port.clear();
-	// port.push_back(8001);
-	// port.push_back(8002);
 
-	// Server *s2 = new Server(port, routes, "0.0.0.0");
-	//c1.addServer(Servers[1]);
+	// try {
+		Conf myConf = Conf();
+		std::vector<Server *> servers = myConf.getServers();
 
-	signal(SIGINT, signalHandler);
-	c1.runWebServs();
+		for (int i = 0; i < (int)servers.size(); i++) {
+			c1.addServer(servers[i]);
+		}
 
+		signal(SIGINT, signalHandler);
+	std::vector<Server *> s = c1.getCluster();
+	std::vector<Route *> r = s[1]->getRoutes();
+	std::cout << r[1]->getRoot() << std::endl;
+		c1.runWebServs();
+	// } catch(...) {
+	// 	std::cout << "Non valid config." << std::endl;
+	// }
 	return (0);
 }
-
-// int main()
-// {
-// 	Response req = Response();
-
-// 	req.errorResponse(426);
-// 	std::cout << req.getResponses();
-// }

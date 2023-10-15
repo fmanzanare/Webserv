@@ -25,7 +25,6 @@ class Server {
 		Server();
 
 		// PRIVATE METHODS:
-		void openSockets(void);
 
 	public:
 		// ORTHODOX CANNONICAL FORM:
@@ -56,6 +55,9 @@ class Server {
 		int getCBodyLimit(void);
 		std::vector<Route *> getRoutes(void);
 		std::vector<Client *> getClients(void);
+
+		// METHODS:
+		void openSockets(void);
 
 		// EXCEPTIONS:
 		class SocketCreationErrorException;

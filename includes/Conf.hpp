@@ -31,25 +31,32 @@ class Conf
 
 		
 		//Metodos
-		int			setName(std::string name);
-		int			setError_page(std::string errPage);
-		int			setCBodyLimit(int cBodyLimit);
-		int			setHost(std::string host);
-        int			setPorts(std::string ports);
+		void		setName(std::string name);
+		void		setError_page(std::string errPage);
+		void		setCBodyLimit(std::string cBodyLimit);
+		void		setHost(std::string host);
+        void		setPorts(std::string ports);
 
-		int			addRoute(Route *route);
+		void		addRoute(Route *route);
 
-		int			setMethods(std::string method);
-		int			setDirListing(std::string dirListing);
-		int			setDef(std::string def);
-		int			setCgi(std::string cgi);
-		int			setRedir(std::string redir);
-		int			setRoot(std::string root);
+		void		setMethods(std::string method);
+		void		setDirListing(std::string dirListing);
+		void		setDef(std::string def);
+		void		setCgi(std::string cgi);
+		void		setRedir(std::string redir);
+		void		setRoot(std::string root);
+		//methods
+		void		freeServer(void);
 
     public:
 		//C
 		class						NoAllowPort;
 		class						NoAllowMethod;
+		class						NoAllowDirListing;
+		class 						NoAllowNameServer;
+		class						NoAllowHost;
+		class						NoAllowcBodyLimit;
+		class						NoAllowRoot;
 		//Atributos
         Conf();
         ~Conf();

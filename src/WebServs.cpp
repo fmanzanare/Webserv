@@ -40,6 +40,7 @@ WebServs::WebServs(std::vector<Server *> cluster) {
 
 WebServs::~WebServs() {
 	for (int i = 0; i < (int)this->_cluster.size(); i++) {
+		std::cout << this->_cluster[i]->getName() << std::endl;
 		delete this->_cluster[i];
 	}
 	this->_cluster.clear();
@@ -75,7 +76,10 @@ void WebServs::getServersSockets() {
 }
 
 // SETTERS:
-void WebServs::addServer(Server *s) { this->_cluster.push_back(s); }
+void WebServs::addServer(Server *s) {
+	this->_cluster.push_back(s);
+	s->openSockets();
+}
 
 // METHODS:
 /**
