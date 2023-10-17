@@ -181,21 +181,29 @@ bool Response::checkLocation(std::string rawPath)
 {
 	std::string		redir = std::string::npos;
 	std::string		root = std::string::npos;
-	size_t			maxIndexFound = 0;
+	size_t			maxCharsFound = 0;
 	size_t			vectorSize = _routes.size();
+	bool			dirList;
 
+	if (rawPath.back() == '/')
+		dirList = true;
+	else
+		dirList = false;
 	for (int i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
 		{
-			if (maxIndexFound < _routes[i].getRedir().size())
+			if (maxCharsFound < _routes[i].getRedir().size())
 			{
-				maxIndexFound = _routes[i]->getRedir().size();
+				maxCharsFound = _routes[i]->getRedir().size();
 				root = _routes[i]->getRoot();
 			}
 		}
-
 	}
+	if (root == std::string::npos || maxCharsFound == 0)
+		return false;
+	_finalPath = "." + root + rawPath.substr(maxCharsFound);
+	return true;
 }
 
 /**

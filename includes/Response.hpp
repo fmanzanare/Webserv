@@ -42,6 +42,7 @@ class Response
 	private:
 		// Attributes
 		std::string				_response;
+		std::string				_finalPath;
 		std::string				_statusCode;
 		std::string				_status;
 		Request					_request;
