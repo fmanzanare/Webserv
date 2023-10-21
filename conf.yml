@@ -1,6 +1,6 @@
 server:
   server-name: myserver1
-  error-page: error.html
+  error-page: /s1/error.html
   body-limit: 1024
   host: 127.0.0.1
   port: 8080,9000,8001
@@ -10,7 +10,7 @@ server:
     default-answer: index.html
     cgi: .php
     redirection: /
-    root: /s1/
+    root: /s1
   route:
     methods: POST,DELETE
     directory-listing: true
@@ -18,26 +18,3 @@ server:
     cgi: .php
     redirection: /storage
     root: /s1/storage
-
-/storage/cgi/hola.py
-# GET / http/1.1
-server:
-  server-name: myserver2
-  error-page: error2.html
-  body-limit: 2048
-  host: 10.13.2.4
-  port: 8002,8003
-  route:
-    methods: GET,POST
-    directory-listing: true
-    default-answer: index2.html
-    cgi: .py
-    redirection: / 
-    root: /server2
-  route:
-    methods: GET,POST
-    directory-listing: true
-    default-answer: index.html
-    cgi: .php
-    redirection: /src
-    root: /server2/src

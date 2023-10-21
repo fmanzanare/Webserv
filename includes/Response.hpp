@@ -33,6 +33,9 @@ class Response
 		
 		// Destructor
 		~Response();
+
+		// Methods
+		std::string		responseMaker();
 		
 		// Operators
 		Response & operator=(const Response &assign);
@@ -43,16 +46,16 @@ class Response
 		// Attributes
 		std::string				_response;
 		std::string				_finalPath;
+		std::string				_defaultAnswer;
 		std::string				_statusCode;
 		std::string				_status;
 		Request					_request;
 		std::vector<Route *>	_routes;
 
 		// Methods
-		std::string		responseMaker();
 		std::string		bodyResponseCode(const int&);
 		void			errorResponse(const int&);
-		void			getResponse(std::string);
+		void			getResponse(void);
 		void			postResponse(std::string);
 		void			deleteResponse(std::string);
 		void			generateFinalResponse();

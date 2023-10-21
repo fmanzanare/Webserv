@@ -12,6 +12,8 @@ Response::Response()
 Response::Response(Request &req, std::vector<Route *> routes)
 {
 	this->_request = req;
+	this->_finalPath = "";
+	this->_defaultAnswer = "";
 	this->_response = "";
 	this->_statusCode = "";
 	this->_status = "";
@@ -75,6 +77,9 @@ std::string	Response::bodyResponseCode(const int &code)
 		case 204:
 			body += "204 No Content<br>";
 			break;
+		case 400:
+			body += "400 Bad Request<br>";
+			break;
 		case 401:
 			body += "401 Unauthorized<br>";
 			break;
@@ -115,13 +120,18 @@ void		Response::errorResponse(const int &code)
 /**
  * Implementation of the response for a GET request.
 */
-void		Response::getResponse(std::string path)
+void		Response::getResponse()
 {
 	std::string			body;
 	std::stringstream	buffer;
 
-	path.insert(0, 1, '.');
-	if (access(path.c_str(), F_OK | R_OK) == -1)
+	if (checkLocation(_request.getPath()) == false)
+	{
+		errorResponse(400);
+		return ;
+	}
+	std::cout << "final path: " << _finalPath << std::endl;
+	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
 	{
 		switch(errno)
 		{
@@ -137,7 +147,7 @@ void		Response::getResponse(std::string path)
 	}
 	else
 	{
-		std::ifstream file(path);
+		std::ifstream file(_finalPath);
 		buffer << file.rdbuf();
 		file.close();
 		body = buffer.str();
@@ -179,28 +189,40 @@ void		Response::deleteResponse(std::string path)
 
 bool Response::checkLocation(std::string rawPath)
 {
-	std::string		redir = std::string::npos;
-	std::string		root = std::string::npos;
+	std::string		redir = "";
+	std::string		root = "";
 	size_t			maxCharsFound = 0;
 	size_t			vectorSize = _routes.size();
 	bool			dirList;
 
-	if (rawPath.back() == '/')
+	if (rawPath.back() == '/' && rawPath.size() > 1)
 		dirList = true;
 	else
 		dirList = false;
-	for (int i = 0; i < vectorSize; i++)
+	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
 		{
-			if (maxCharsFound < _routes[i].getRedir().size())
+			if (rawPath == _routes[i]->getRedir())
 			{
+				_finalPath = "." + _routes[i]->getRoot()
+							+ rawPath + _routes[i]->getDefaultAnswer();
+				return true;
+			}
+			if (maxCharsFound < _routes[i]->getRedir().size()
+				&& dirList == _routes[i]->isDirListing()
+				&& _routes[i]->checkMethod(_request.getMethod()))
+			{
+				_defaultAnswer = _routes[i]->getDefaultAnswer();
 				maxCharsFound = _routes[i]->getRedir().size();
 				root = _routes[i]->getRoot();
 			}
 		}
 	}
-	if (root == std::string::npos || maxCharsFound == 0)
+	std::cout << "final path: " << _finalPath << std::endl;
+	std::cout << "root: " << root << std::endl;
+
+	if (root == "" || maxCharsFound == 0)
 		return false;
 	_finalPath = "." + root + rawPath.substr(maxCharsFound);
 	return true;
@@ -212,19 +234,21 @@ bool Response::checkLocation(std::string rawPath)
 */
 std::string	Response::responseMaker()
 {
+	std::cout << "Entra response!\n";
 	if (this->_request.getProtocol() != "HTTP/1.1")
 	{
 		errorResponse(426);
 		return this->_response;
-	}	
+	}
 	if (this->_request.getMethod() == "GET")
-		getResponse(this->_request.getPath());
+		getResponse();
 	else if (this->_request.getMethod() == "POST")
 		postResponse(this->_request.getPath());
 	else if (this->_request.getMethod() == "DELETE")
 		deleteResponse(this->_request.getPath());
 	else
 		errorResponse(405);
+	std::cout << "Sale response!\n";
 	return this->_response;
 }
 
