@@ -18,3 +18,5 @@ server:
     cgi: .php
     redirection: /storage
     root: /s1/storage
+
+/imgs/sdiaz-ru.jpeg

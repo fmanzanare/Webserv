@@ -209,22 +209,28 @@ bool Response::checkLocation(std::string rawPath)
 							+ rawPath + _routes[i]->getDefaultAnswer();
 				return true;
 			}
+			std::cout << "raw path: " << rawPath << std::endl
+						<< "route redir: " << _routes[i]->getRedir() << std::endl
+						<< "dirList: " << dirList << " isDirList: " << _routes[i]->isDirListing() << std::endl
+						<< "checkMethod: " << _routes[i]->checkMethod(_request.getMethod()) << std::endl;
 			if (maxCharsFound < _routes[i]->getRedir().size()
-				&& dirList == _routes[i]->isDirListing()
-				&& _routes[i]->checkMethod(_request.getMethod()))
+				&& _routes[i]->checkMethod(_request.getMethod()) == true)
 			{
-				_defaultAnswer = _routes[i]->getDefaultAnswer();
-				maxCharsFound = _routes[i]->getRedir().size();
-				root = _routes[i]->getRoot();
+				if ((dirList == false && _routes[i]->isDirListing())
+					|| (dirList == _routes[i]->isDirListing()))
+				{
+					_defaultAnswer = _routes[i]->getDefaultAnswer();
+					maxCharsFound = _routes[i]->getRedir().size();
+					root = _routes[i]->getRoot();
+				}
 			}
 		}
 	}
-	std::cout << "final path: " << _finalPath << std::endl;
 	std::cout << "root: " << root << std::endl;
-
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	_finalPath = "." + root + rawPath.substr(maxCharsFound);
+	std::cout << "maxchar: " << maxCharsFound << std::endl; 
+	_finalPath = "." + root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
 
