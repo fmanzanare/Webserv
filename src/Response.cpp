@@ -122,15 +122,11 @@ void		Response::errorResponse(const int &code)
 */
 void		Response::getResponse()
 {
-	std::string			body;
-	std::stringstream	buffer;
-
 	if (checkLocation(_request.getPath()) == false)
 	{
 		errorResponse(400);
 		return ;
 	}
-	std::cout << "final path: " << _finalPath << std::endl;
 	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
 	{
 		switch(errno)
@@ -147,7 +143,10 @@ void		Response::getResponse()
 	}
 	else
 	{
+		std::string			body;
+		std::stringstream	buffer;
 		std::ifstream file(_finalPath);
+
 		buffer << file.rdbuf();
 		file.close();
 		body = buffer.str();
@@ -209,10 +208,6 @@ bool Response::checkLocation(std::string rawPath)
 							+ rawPath + _routes[i]->getDefaultAnswer();
 				return true;
 			}
-			std::cout << "raw path: " << rawPath << std::endl
-						<< "route redir: " << _routes[i]->getRedir() << std::endl
-						<< "dirList: " << dirList << " isDirList: " << _routes[i]->isDirListing() << std::endl
-						<< "checkMethod: " << _routes[i]->checkMethod(_request.getMethod()) << std::endl;
 			if (maxCharsFound < _routes[i]->getRedir().size()
 				&& _routes[i]->checkMethod(_request.getMethod()) == true)
 			{
@@ -226,10 +221,8 @@ bool Response::checkLocation(std::string rawPath)
 			}
 		}
 	}
-	std::cout << "root: " << root << std::endl;
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	std::cout << "maxchar: " << maxCharsFound << std::endl; 
 	_finalPath = "." + root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
