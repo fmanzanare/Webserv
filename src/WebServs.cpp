@@ -181,9 +181,6 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 					// Sending the Response to the client.
 					Request req = Request(serverClients[j]->getRequest());
 					Response res = Response(req, _cluster[i]->getRoutes());
-					std::cout << "1.REQUEST!!!!!!" << std::endl;
-					req.printHeaders();
-					std::cout << "2.REQUEST!!!!!!" << std::endl;
 					serverClients[j]->sendData(res.responseMaker());
 					if (serverClients[j]->isFinishedResponse())
 						this->_cluster[i]->removeClient(j);
