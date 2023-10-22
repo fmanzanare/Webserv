@@ -46,7 +46,6 @@ class Response
 		// Attributes
 		std::string				_response;
 		std::string				_finalPath;
-		std::string				_defaultAnswer;
 		std::string				_statusCode;
 		std::string				_status;
 		Request					_request;
@@ -59,7 +58,9 @@ class Response
 		void			postResponse(std::string);
 		void			deleteResponse(std::string);
 		void			generateFinalResponse();
+		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
+
 
 };
 

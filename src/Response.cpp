@@ -13,7 +13,6 @@ Response::Response(Request &req, std::vector<Route *> routes)
 {
 	this->_request = req;
 	this->_finalPath = "";
-	this->_defaultAnswer = "";
 	this->_response = "";
 	this->_statusCode = "";
 	this->_status = "";
@@ -186,7 +185,28 @@ void		Response::deleteResponse(std::string path)
 	this->_response = headerGenerator("200", "0");
 }
 
-bool Response::checkLocation(std::string rawPath)
+bool	Response::chooseBest(const std::string &rawPath, size_t &maxCharsFound, size_t i, bool &dirList, std::string &root)
+{
+	if (rawPath == _routes[i]->getRedir())
+	{
+		_finalPath = "." + _routes[i]->getRoot()
+					+ rawPath + _routes[i]->getDefaultAnswer();
+		return true;
+	}
+	if (maxCharsFound < _routes[i]->getRedir().size()
+		&& _routes[i]->checkMethod(_request.getMethod()) == true)
+	{
+		if ((dirList == false && _routes[i]->isDirListing())
+			|| (dirList == _routes[i]->isDirListing()))
+		{
+			maxCharsFound = _routes[i]->getRedir().size();
+			root = _routes[i]->getRoot();
+		}
+	}
+	return false;
+}
+
+bool	Response::checkLocation(std::string rawPath)
 {
 	std::string		redir = "";
 	std::string		root = "";
@@ -201,25 +221,7 @@ bool Response::checkLocation(std::string rawPath)
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
-		{
-			if (rawPath == _routes[i]->getRedir())
-			{
-				_finalPath = "." + _routes[i]->getRoot()
-							+ rawPath + _routes[i]->getDefaultAnswer();
-				return true;
-			}
-			if (maxCharsFound < _routes[i]->getRedir().size()
-				&& _routes[i]->checkMethod(_request.getMethod()) == true)
-			{
-				if ((dirList == false && _routes[i]->isDirListing())
-					|| (dirList == _routes[i]->isDirListing()))
-				{
-					_defaultAnswer = _routes[i]->getDefaultAnswer();
-					maxCharsFound = _routes[i]->getRedir().size();
-					root = _routes[i]->getRoot();
-				}
-			}
-		}
+			if (chooseBest(rawPath, maxCharsFound, i, dirList, root)) {return true;}
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
