@@ -60,8 +60,7 @@ class Response
 		void			generateFinalResponse();
 		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
-
-
+		void			applyGetMethod(void);
 };
 
 #endif

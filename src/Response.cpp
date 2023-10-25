@@ -115,6 +115,19 @@ void		Response::errorResponse(const int &code)
 	this->_response += body;
 }
 
+void	Response::applyGetMethod(void)
+{
+	std::string			body;
+	std::stringstream	buffer;
+	std::ifstream file(_finalPath);
+
+	buffer << file.rdbuf();
+	file.close();
+	body = buffer.str();
+	body += "\r\n\r\n";
+	this->_response = headerGenerator("200", bodyLen(body));
+	this->_response += body;
+}
 
 /**
  * Implementation of the response for a GET request.
@@ -141,18 +154,7 @@ void		Response::getResponse()
 		}
 	}
 	else
-	{
-		std::string			body;
-		std::stringstream	buffer;
-		std::ifstream file(_finalPath);
-
-		buffer << file.rdbuf();
-		file.close();
-		body = buffer.str();
-		body += "\r\n\r\n";
-		this->_response = headerGenerator("200", bodyLen(body));
-		this->_response += body;
-	}
+		applyGetMethod();
 }
 
 void		Response::postResponse(std::string path)
@@ -218,6 +220,7 @@ bool	Response::checkLocation(std::string rawPath)
 		dirList = true;
 	else
 		dirList = false;
+
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
