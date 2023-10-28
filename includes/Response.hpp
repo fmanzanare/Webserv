@@ -30,13 +30,13 @@ class Response
 		Response();
 		Response(Request &req, std::vector<Route *>);
 		Response(const Response &copy);
-		
+
 		// Destructor
 		~Response();
 
 		// Methods
 		std::string		responseMaker();
-		
+
 		// Operators
 		Response & operator=(const Response &assign);
 

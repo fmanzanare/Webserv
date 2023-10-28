@@ -47,7 +47,7 @@
 		<h3 style="margin-bottom: 2em;">
 			<small style="color: #4af626; font-weight: lighter;">Fill the file name and content boxes to save a file in this amazing server!!</small>
 		</h3>
-	<form id="form" action="http://10.13.1.2:8080/s1/storage" method="post" enctype="multipart/form-data">
+		<form id="form">
 			<div class="mb-3">
 				<label for="exampleFormControlInput1" class="form-label">File name</label>
 				<input id="fileName" type="text" class="form-control" id="exampleFormControlInput1" placeholder="File name (example: myFile.txt)">
@@ -56,7 +56,7 @@
 				<label for="exampleFormControlTextarea1" class="form-label">File content</label>
 				<textarea class="form-control" id="exampleFormControlTextarea1" rows="10" name="fileContent"></textarea>
 			</div>
-			<button onclick="sendFile()" type="submit" class="btn">Submit</button>
+			<button type="submit" class="btn">Submit</button>
 		</form>
 	</div>
 	<center><h1 style="margin-bottom: 1em;">POST something on our amazing</h1></center>
@@ -69,12 +69,33 @@
  ███ ███  ███████ ██████  ███████ ███████ ██   ██   ████</pre>
 	</div>
 	<script>
-		function sendFile() {
-			let form = document.getElementById("form")
-			let fileName = "/" + document.getElementById("fileName").value
+		let form = document.querySelector('form')
+		form.addEventListener('submit', (e) => {
+			e.preventDefault()
+			let fileName = document.getElementById("fileName").value
+			let body = document.getElementById('exampleFormControlTextarea1').value
 
-			form.action += fileName
-		}
+			if (fileName == '' || body == '') {
+				alert("You must add a file name and contet")
+				return
+			}
+
+			fetch(`http://localhost:8080/storage/${fileName}`, {
+				method: 'POST',
+				headers: {
+					"Content-Type": "text/plain"
+				},
+				body: body
+			}).then( response => {
+				if (!response.ok) {
+					localStorage.setItem("status", response.status)
+					window.location.href = "./error.html"
+				} else {
+					window.location.href = "./send.html"
+				}
+
+			})
+		})
 	</script>
 </body>
 </html>

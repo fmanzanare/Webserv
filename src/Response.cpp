@@ -41,6 +41,7 @@ std::string					headerGenerator(const std::string &code, const std::string &body
 	else
 		header = "HTTP/1.1 " + code + " KO\n";
 	header += CONTTYPE;
+	header += "Access-Control-Allow-Origin: *\n";
 	header += CONTLENGTH + bodyLen + "\r\n\r\n";
 	return header;
 }
@@ -185,7 +186,7 @@ void		Response::deleteResponse()
 		errorResponse(400);
 		return ;
 	}
-	if (std::remove(_finalPath.c_str()))
+	if (std::remove(_finalPath.c_str()) < 0)
 	{
 		errorResponse(422);
 		return ;
@@ -239,7 +240,7 @@ bool	Response::checkLocation(std::string rawPath)
 }
 
 /**
- * This function generates a valid http response from the data of the 
+ * This function generates a valid http response from the data of the
  * Request object passed to Response constructor
 */
 std::string	Response::responseMaker()
