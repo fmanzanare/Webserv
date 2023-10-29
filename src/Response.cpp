@@ -5,8 +5,7 @@
 Response::Response()
 {
 	this->_response = "";
-	this->_statusCode = "";
-	this->_status = "";
+	this->_statusCode = 404;
 }
 
 Response::Response(Request &req, std::vector<Route *> routes)
@@ -14,8 +13,7 @@ Response::Response(Request &req, std::vector<Route *> routes)
 	this->_request = req;
 	this->_finalPath = "";
 	this->_response = "";
-	this->_statusCode = "";
-	this->_status = "";
+	this->_statusCode = 404;
 	this->_request.processRequest();
 	this->_routes = routes;
 }
@@ -32,19 +30,6 @@ Response::~Response()
 }
 
 // Non member functions
-std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
-{
-	std::string header;
-
-	if (code == "200")
-		header = "HTTP/1.1 " + code + " OK\n";
-	else
-		header = "HTTP/1.1 " + code + " KO\n";
-	header += CONTTYPE;
-	header += CONTLENGTH + bodyLen + "\r\n\r\n";
-	return header;
-}
-
 std::vector<std::string>	splitFilePath(std::string path)
 {
 	std::vector<std::string>	splitted;
@@ -65,6 +50,18 @@ std::string		bodyLen(std::string body)
 	return body_len.str();
 }
 
+std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
+{
+	std::string header;
+
+	if (code == "200")
+		header = "HTTP/1.1 " + code + " OK\n";
+	else
+		header = "HTTP/1.1 " + code + " KO\n";
+	header += CONTTYPE;
+	header += CONTLENGTH + bodyLen + "\r\n\r\n";
+	return header;
+}
 
 // Methods
 std::string	Response::bodyResponseCode(const int &code)
@@ -105,11 +102,12 @@ std::string	Response::bodyResponseCode(const int &code)
 
 void		Response::errorResponse(const int &code)
 {
-	std::stringstream	code_str(code);
+	std::stringstream	code_str;
 	std::stringstream	len_str;
 	std::string			body = bodyResponseCode(code);
 
 	code_str << code;
+	std::cout << "code: " << code_str << std::endl;
 	len_str << body.length();
 	this->_response = headerGenerator(code_str.str(), len_str.str());
 	this->_response += body;
@@ -136,7 +134,7 @@ void		Response::getResponse()
 {
 	if (checkLocation(_request.getPath()) == false)
 	{
-		errorResponse(400);
+		errorResponse(_statusCode);
 		return ;
 	}
 	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
@@ -229,7 +227,7 @@ bool	Response::checkLocation(std::string rawPath)
 
 	for (size_t i = 0; i < vectorSize; i++)
 	{
-		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
+		if (rawPath.find(_routes[i]->getRedir()) == 0)
 			if (chooseBest(rawPath, maxCharsFound, i, dirList, root)) {return true;}
 	}
 	if (root == "" || maxCharsFound == 0)
@@ -267,7 +265,7 @@ Response & Response::operator=(const Response &assign)
 {
 	this->_response = assign._response;
 	this->_statusCode = assign._statusCode;
-	this->_status = assign._status;
+	// this->_status = assign._status;
 	this->_request = assign._request;
 	return *this;
 }

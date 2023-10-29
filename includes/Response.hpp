@@ -44,12 +44,11 @@ class Response
 
 	private:
 		// Attributes
+		int						_statusCode;
 		std::string				_response;
 		std::string				_finalPath;
-		std::string				_statusCode;
-		std::string				_status;
-		Request					_request;
 		std::vector<Route *>	_routes;
+		Request					_request;
 
 		// Methods
 		std::string		bodyResponseCode(const int&);
