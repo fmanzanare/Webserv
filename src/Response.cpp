@@ -261,7 +261,7 @@ std::string	Response::responseMaker()
 	return this->_response;
 }
 
-std::string cgi(std::string path)
+std::string Response::cgi(std::string path)
 {
 	int status;
 
