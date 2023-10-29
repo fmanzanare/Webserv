@@ -239,7 +239,10 @@ void	Conf::setCgi(std::string cgi){
 	this->_cgi = cgi;
 }
 void	Conf::setRedir(std::string redir){
-	//
+	if (redir.back() != '/')
+		redir = redir + '/';
+
+	std::cout<< redir <<std::endl;
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
