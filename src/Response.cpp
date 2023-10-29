@@ -121,9 +121,14 @@ void	Response::applyGetMethod(void)
 	std::stringstream	buffer;
 	std::ifstream file(_finalPath);
 
-	buffer << file.rdbuf();
-	file.close();
-	body = buffer.str();
+	if (_finalPath.find(".py") != std::string::npos)
+		body = cgi(_finalPath); 
+	else
+	{
+		buffer << file.rdbuf();
+		file.close();
+		body = buffer.str();
+	}
 	body += "\r\n\r\n";
 	this->_response = headerGenerator("200", bodyLen(body));
 	this->_response += body;
