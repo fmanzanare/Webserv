@@ -15,7 +15,7 @@ void leaks(void) {
 }
 
 int main(void) {
-	atexit(leaks);
+	//atexit(leaks);
 	WebServs c1;
 
 	// try {

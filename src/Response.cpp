@@ -174,7 +174,7 @@ void		Response::postResponse(std::string path)
 	// std::ofstream	outputFile(*(splitted.end() - 1));
 	// std::cout << *(splitted.end() - 1) << std::endl;
 	std::ofstream	outputFile("." + path);
-	std::cout << "." + path << std::endl;
+	//std::cout << "." + path << std::endl;
 	outputFile << _request.getBody();
 	outputFile.close();
 	this->_response = headerGenerator("200", "0");
@@ -243,7 +243,7 @@ bool	Response::checkLocation(std::string rawPath)
 */
 std::string	Response::responseMaker()
 {
-	std::cout << "Entra response!\n";
+	//std::cout << "Entra response!\n";
 	if (this->_request.getProtocol() != "HTTP/1.1")
 	{
 		errorResponse(426);
@@ -257,7 +257,7 @@ std::string	Response::responseMaker()
 		deleteResponse(this->_request.getPath());
 	else
 		errorResponse(405);
-	std::cout << "Sale response!\n";
+	//std::cout << "Sale response!\n";
 	return this->_response;
 }
 
@@ -272,9 +272,17 @@ std::string Response::cgi(std::string path)
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
 	char *argv[3];
-	argv[0] = (char *)"/usr/local/bin/python3";
-	argv[1] = (char *)"./s1/cgi/holamundo.py";
+	argv[0] = (char *)path.c_str();
+	argv[1] = 0;
 	argv[2] = 0;
+	char *env[4];
+	std::string aux;
+	aux = "REQUEST_METHOD=" + _request.getMethod();
+	env[0] = (char *)aux.c_str();
+	//aux = "SERVER_PROTOCOL=" + _request.getProtocol();
+	env[1] = (char *)"SERVER_PROTOCOL=HTTP/1.1";
+	env[2] = (char *)"PATH_INFO=121";
+	env[3] = 0;
 	//ERROR 500?
 
 	//creo el archivo temporal
@@ -287,7 +295,7 @@ std::string Response::cgi(std::string path)
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
 		close(temp);
-		execve(argv[0], argv, NULL);
+		execve(argv[0], argv, env);
 		return ("error");
 	}
 	waitpid(pid, &status, 0);
