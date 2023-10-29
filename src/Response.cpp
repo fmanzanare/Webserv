@@ -272,10 +272,9 @@ std::string Response::cgi(std::string path)
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
 	char *argv[3];
-	argv[0] = (char *)path.c_str();
+	argv[0] = (char *)"/usr/local/bin/python3";
 	argv[1] = (char *)"./s1/cgi/holamundo.py";
 	argv[2] = 0;
-
 	//ERROR 500?
 
 	//creo el archivo temporal
@@ -287,8 +286,8 @@ std::string Response::cgi(std::string path)
 	{
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
-			close(temp);
-		execve(path.c_str(), argv, NULL);
+		close(temp);
+		execve(argv[0], argv, NULL);
 		return ("error");
 	}
 	waitpid(pid, &status, 0);
