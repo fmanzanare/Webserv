@@ -11,6 +11,7 @@
 # include <cstdlib>
 # include <vector>
 # include "Request.hpp"
+# include "Route.hpp"
 
 /* ------------ DEFINES ------------*/
 # define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
@@ -27,31 +28,39 @@ class Response
 	public:
 		// Constructors
 		Response();
-		Response(Request &req);
+		Response(Request &req, std::vector<Route *>);
 		Response(const Response &copy);
 		
 		// Destructor
 		~Response();
+
+		// Methods
+		std::string		responseMaker();
 		
 		// Operators
 		Response & operator=(const Response &assign);
 
-		// Methods
-		std::string		responseMaker();
-		std::string		bodyResponseCode(const int&);
-		void			errorResponse(const int&);
-		void			getResponse(std::string);
-		void			postResponse(std::string);
-		void			deleteResponse(std::string);
-		void			generateFinalResponse();
-
 		std::string	getResponses(){return _response;} // testing function
 
 	private:
-		std::string		_response;
-		std::string		_statusCode;
-		std::string		_status;
-		Request			_request;
+		// Attributes
+		std::string				_response;
+		std::string				_finalPath;
+		std::string				_statusCode;
+		std::string				_status;
+		Request					_request;
+		std::vector<Route *>	_routes;
+
+		// Methods
+		std::string		bodyResponseCode(const int&);
+		void			errorResponse(const int&);
+		void			getResponse(void);
+		void			postResponse(std::string);
+		void			deleteResponse(std::string);
+		void			generateFinalResponse();
+		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
+		bool			checkLocation(std::string);
+		void			applyGetMethod(void);
 };
 
 #endif
