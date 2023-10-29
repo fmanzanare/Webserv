@@ -10,8 +10,11 @@
 # include <cstdio>
 # include <cstdlib>
 # include <vector>
+# include <unistd.h>
+# include <fcntl.h>
 # include "Request.hpp"
 # include "Route.hpp"
+
 
 /* ------------ DEFINES ------------*/
 # define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
@@ -61,6 +64,7 @@ class Response
 		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
+		std::string		cgi(std::string);
 };
 
 #endif

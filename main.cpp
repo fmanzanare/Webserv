@@ -18,8 +18,6 @@ int main(void) {
 	atexit(leaks);
 	WebServs c1;
 
-
-
 	// try {
 		Conf myConf = Conf();
 		std::vector<Server *> servers = myConf.getServers();
@@ -28,7 +26,7 @@ int main(void) {
 			c1.addServer(servers[i]);
 		}
 
-		signal(SIGINT, signalHandler);
+	signal(SIGINT, signalHandler);
 	std::vector<Server *> s = c1.getCluster();
 	std::vector<Route *> r = s[1]->getRoutes();
 	std::cout << r[1]->getRoot() << std::endl;
