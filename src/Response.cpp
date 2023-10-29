@@ -183,7 +183,7 @@ void		Response::postResponse(std::string path)
 
 void		Response::deleteResponse(std::string path)
 {
-	path = "." + path;
+	//path = "." + path;
 	if (std::remove(path.c_str()))
 	{
 		errorResponse(422);
@@ -196,7 +196,7 @@ bool	Response::chooseBest(const std::string &rawPath, size_t &maxCharsFound, siz
 {
 	if (rawPath == _routes[i]->getRedir())
 	{
-		_finalPath = "." + _routes[i]->getRoot()
+		_finalPath = _routes[i]->getRoot()
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
@@ -233,7 +233,7 @@ bool	Response::checkLocation(std::string rawPath)
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	_finalPath = "." + root + rawPath.substr(maxCharsFound - 1);
+	_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
 
