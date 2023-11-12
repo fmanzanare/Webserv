@@ -128,10 +128,10 @@ void	Response::applyGetMethod(void)
 		buffer << file.rdbuf();
 		file.close();
 		body = buffer.str();
+		body += "\r\n\r\n";
+		this->_response = headerGenerator("200", bodyLen(body));
+		this->_response += body;
 	}
-	body += "\r\n\r\n";
-	this->_response = headerGenerator("200", bodyLen(body));
-	this->_response += body;
 }
 
 /**
@@ -267,21 +267,25 @@ std::string Response::cgi(std::string path)
 
 	if (access(path.c_str(), F_OK | R_OK) == -1)
 		return("Onde??");
-
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
+
+	//Tengo que mirar que tipo de archivo es (HARDCODE PYTHON3)
 	char *argv[3];
-	argv[0] = (char *)path.c_str();
-	argv[1] = 0;
+	argv[0] = (char *)"/usr/local/bin/python3";
+	argv[1] = (char *)path.c_str();
 	argv[2] = 0;
 	char *env[4];
-	std::string aux;
-	aux = "REQUEST_METHOD=" + _request.getMethod();
-	env[0] = (char *)aux.c_str();
-	//aux = "SERVER_PROTOCOL=" + _request.getProtocol();
-	env[1] = (char *)"SERVER_PROTOCOL=HTTP/1.1";
-	env[2] = (char *)"PATH_INFO=121";
+	std::string rMeth;
+	rMeth = "REQUEST_METHOD=" + _request.getMethod();
+	env[0] = (char *)rMeth.c_str();
+	std::string sProt;
+	sProt = "SERVER_PROTOCOL=" + _request.getProtocol();
+	env[1] = (char *)sProt.c_str();
+	std::string pInf;
+	pInf = "PATH_INFO=" + _request.getPath();
+	env[2] = (char *)pInf.c_str();
 	env[3] = 0;
 	//ERROR 500?
 
@@ -302,8 +306,8 @@ std::string Response::cgi(std::string path)
 	temp = open(".temp.txt", O_RDONLY);
 	char buf[50];
 	std::string data;
-	ssize_t len = -1;
-	while (len)
+	ssize_t len = 50;
+	while (len > 0)
 	{
 		len = read(temp, buf, 50);
 		data += std::string(buf, len);
@@ -311,6 +315,9 @@ std::string Response::cgi(std::string path)
 	close(temp);
 	//Borrar archivo temporal
 	remove(".temp.txt");
+	data += "\r\n\r\n";
+	this->_response = headerGenerator("200", bodyLen(data));
+	this->_response += data;
 	return (data);
 }
 
