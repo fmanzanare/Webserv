@@ -10,6 +10,8 @@
 # include <cstdio>
 # include <cstdlib>
 # include <vector>
+# include <filesystem>
+# include <dirent.h>
 # include "Request.hpp"
 # include "Route.hpp"
 
@@ -51,7 +53,6 @@ class Response
 		Request					_request;
 
 		// Methods
-		std::string		bodyResponseCode(const int&);
 		void			errorResponse(const int&);
 		void			getResponse(void);
 		void			postResponse(void);
@@ -60,6 +61,7 @@ class Response
 		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
+		bool			dirListing(std::string&);
 };
 
 #endif

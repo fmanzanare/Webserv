@@ -50,7 +50,7 @@ std::string		bodyLen(std::string body)
 	return body_len.str();
 }
 
-std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
+std::string		headerGenerator(const std::string &code, const std::string &bodyLen)
 {
 	std::string header;
 
@@ -63,8 +63,7 @@ std::string					headerGenerator(const std::string &code, const std::string &body
 	return header;
 }
 
-// Methods
-std::string	Response::bodyResponseCode(const int &code)
+std::string	bodyResponseCode(const int &code)
 {
 	std::string body = UPPERDEFBODY;
 
@@ -99,25 +98,49 @@ std::string	Response::bodyResponseCode(const int &code)
 	return body;
 }
 
-
-void		Response::errorResponse(const int &code)
+// Methods
+void	Response::errorResponse(const int &code)
 {
 	std::stringstream	code_str;
 	std::stringstream	len_str;
 	std::string			body = bodyResponseCode(code);
 
 	code_str << code;
-	std::cout << "code: " << code_str << std::endl;
 	len_str << body.length();
 	this->_response = headerGenerator(code_str.str(), len_str.str());
 	this->_response += body;
+}
+
+bool	Response::dirListing(std::string &path)
+{
+	path.erase(path.size() - 1, 1);
+	std::cout << "path: " << path << std::endl;
+	const char *cpath = path.c_str();
+	DIR *dir;
+	struct dirent *ent;
+	std::string body;
+
+	if ((dir = opendir(cpath)) != NULL)
+	{
+		// body = UPPERDEFBODY;
+		while ((ent = readdir(dir)) != NULL)
+			printf("%s\n", ent->d_name);
+		closedir(dir);
+		// body += LOWERDEFBODY;
+	} 
+	else 
+	{
+		std::cout << "Error: directory listing" << std::endl;
+		return false;
+	}
+	return true;
 }
 
 void	Response::applyGetMethod(void)
 {
 	std::string			body;
 	std::stringstream	buffer;
-	std::ifstream file(_finalPath);
+	std::ifstream		file(_finalPath);
 
 	buffer << file.rdbuf();
 	file.close();
@@ -135,6 +158,13 @@ void		Response::getResponse()
 	if (checkLocation(_request.getPath()) == false)
 	{
 		errorResponse(_statusCode);
+		return ;
+	}
+	std::cout << "final path: "<<_finalPath<<std::endl;
+	if (this->_finalPath.back() == '/')
+	{
+		if (dirListing(_finalPath) == false)
+			errorResponse(404);
 		return ;
 	}
 	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
