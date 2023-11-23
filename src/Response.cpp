@@ -114,7 +114,7 @@ void	Response::errorResponse(const int &code)
 bool	Response::dirListing(std::string &path)
 {
 	path.erase(path.size() - 1, 1);
-	std::cout << "path: " << path << std::endl;
+	std::cout << "path en dirListing: " << path << std::endl;
 	const char *cpath = path.c_str();
 	DIR *dir;
 	struct dirent *ent;
@@ -122,17 +122,22 @@ bool	Response::dirListing(std::string &path)
 
 	if ((dir = opendir(cpath)) != NULL)
 	{
-		// body = UPPERDEFBODY;
+		body = UPPERLISTINGBODY;
+		body += path + "<br>";
 		while ((ent = readdir(dir)) != NULL)
-			printf("%s\n", ent->d_name);
+		{
+			// body += "<p style=\"text-align:left \">";
+			body += ent->d_name;
+			body += "<br>";
+			// body += "</p>\n";
+		}
 		closedir(dir);
-		// body += LOWERDEFBODY;
+		body += LOWERLISTINGBODY;
 	} 
 	else 
-	{
-		std::cout << "Error: directory listing" << std::endl;
 		return false;
-	}
+	this->_response = headerGenerator("200", bodyLen(body));
+	this->_response += body + "\r\n\r\n";
 	return true;
 }
 
@@ -155,6 +160,7 @@ void	Response::applyGetMethod(void)
 */
 void		Response::getResponse()
 {
+
 	if (checkLocation(_request.getPath()) == false)
 	{
 		errorResponse(_statusCode);
@@ -225,8 +231,13 @@ bool	Response::chooseBest(const std::string &rawPath, size_t &maxCharsFound, siz
 {
 	if (rawPath == _routes[i]->getRedir())
 	{
-		_finalPath = _routes[i]->getRoot()
-					+ rawPath + _routes[i]->getDefaultAnswer();
+		if (dirList == false)
+		{
+			this->_finalPath = _routes[i]->getRoot()
+						+ rawPath + _routes[i]->getDefaultAnswer();
+		}
+		else
+			this->_finalPath = _routes[i]->getRoot() + rawPath;
 		return true;
 	}
 	if (maxCharsFound < _routes[i]->getRedir().size()
@@ -254,15 +265,15 @@ bool	Response::checkLocation(std::string rawPath)
 		dirList = true;
 	else
 		dirList = false;
-
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
-			if (chooseBest(rawPath, maxCharsFound, i, dirList, root)) {return true;}
+			if (chooseBest(rawPath, maxCharsFound, i, dirList, root))
+				return true;
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	_finalPath = root + rawPath.substr(maxCharsFound - 1);
+	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
 
@@ -287,6 +298,7 @@ std::string	Response::responseMaker()
 	else
 		errorResponse(405);
 	std::cout << "Sale response!\n";
+	std::cout << "respuesta final: " << this->_response << std::endl;
 	return this->_response;
 }
 

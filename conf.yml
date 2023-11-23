@@ -17,13 +17,13 @@ server:
     default-answer: none
     cgi: .php
     redirection: /storage/
-    root: /s1/storage
+    root: /s1
 
 server:
   server-name: myserver2
   error-page: error2.html
   body-limit: 2048
-  host: 10.13.2.2
+  host: 10.13.4.3
   port: 8002,8003
   route:
     methods: GET,POST
