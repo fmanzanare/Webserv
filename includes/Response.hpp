@@ -21,9 +21,8 @@
 						<h1 style=\"color: #4AF626;\">"
 # define LOWERDEFBODY "</h1></body></html>\r\n\r\n"
 # define UPPERLISTINGBODY	"<!DOCTYPE html><html><head></head>\
-						<body style=\"background-color: black;\">\
-						<h4 style=\"color: #4AF626;\">"
-# define LOWERLISTINGBODY "</h4></body></html>\r\n\r\n"
+							<body style=\"background-color: black; color: #4AF626;\">"
+# define LOWERLISTINGBODY "</body></html>\r\n\r\n"
 # define CONTTYPE "Content type: text/html\n"
 # define CONTLENGTH "Content length: "
 

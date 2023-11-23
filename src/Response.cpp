@@ -123,13 +123,15 @@ bool	Response::dirListing(std::string &path)
 	if ((dir = opendir(cpath)) != NULL)
 	{
 		body = UPPERLISTINGBODY;
-		body += path + "<br>";
+		body += "<h2 style=\"text-align:left\">" + path + "</h2>\n";
 		while ((ent = readdir(dir)) != NULL)
 		{
-			// body += "<p style=\"text-align:left \">";
+			body += "<a href=\"http://localhost:8080"
+					+ _request.getPath();
 			body += ent->d_name;
-			body += "<br>";
-			// body += "</p>\n";
+			body += "\">";
+			body += ent->d_name;
+			body += "</a><br>\n";
 		}
 		closedir(dir);
 		body += LOWERLISTINGBODY;
@@ -298,7 +300,7 @@ std::string	Response::responseMaker()
 	else
 		errorResponse(405);
 	std::cout << "Sale response!\n";
-	std::cout << "respuesta final: " << this->_response << std::endl;
+	// std::cout << "respuesta final: " << this->_response << std::endl;
 	return this->_response;
 }
 
