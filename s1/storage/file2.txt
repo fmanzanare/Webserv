@@ -1,0 +1,2 @@
+esta es una prueba para comprobar si 
+se responde con file2.txt

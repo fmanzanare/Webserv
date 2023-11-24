@@ -5,8 +5,7 @@
 Response::Response()
 {
 	this->_response = "";
-	this->_statusCode = "";
-	this->_status = "";
+	this->_statusCode = 404;
 }
 
 Response::Response(Request &req, std::vector<Route *> routes)
@@ -14,10 +13,10 @@ Response::Response(Request &req, std::vector<Route *> routes)
 	this->_request = req;
 	this->_finalPath = "";
 	this->_response = "";
-	this->_statusCode = "";
-	this->_status = "";
+	this->_statusCode = 404;
 	this->_request.processRequest();
 	this->_routes = routes;
+	this->_routeIndex = -1;
 }
 
 Response::Response(const Response &copy)
@@ -32,19 +31,6 @@ Response::~Response()
 }
 
 // Non member functions
-std::string					headerGenerator(const std::string &code, const std::string &bodyLen)
-{
-	std::string header;
-
-	if (code == "200")
-		header = "HTTP/1.1 " + code + " OK\n";
-	else
-		header = "HTTP/1.1 " + code + " KO\n";
-	header += CONTTYPE;
-	header += CONTLENGTH + bodyLen + "\r\n\r\n";
-	return header;
-}
-
 std::vector<std::string>	splitFilePath(std::string path)
 {
 	std::vector<std::string>	splitted;
@@ -65,9 +51,20 @@ std::string		bodyLen(std::string body)
 	return body_len.str();
 }
 
+std::string		headerGenerator(const std::string &code, const std::string &bodyLen)
+{
+	std::string header;
 
-// Methods
-std::string	Response::bodyResponseCode(const int &code)
+	if (code == "200")
+		header = "HTTP/1.1 " + code + " OK\n";
+	else
+		header = "HTTP/1.1 " + code + " KO\n";
+	header += CONTTYPE;
+	header += CONTLENGTH + bodyLen + "\r\n\r\n";
+	return header;
+}
+
+std::string	bodyResponseCode(const int &code)
 {
 	std::string body = UPPERDEFBODY;
 
@@ -102,10 +99,10 @@ std::string	Response::bodyResponseCode(const int &code)
 	return body;
 }
 
-
-void		Response::errorResponse(const int &code)
+// Methods
+void	Response::errorResponse(const int &code)
 {
-	std::stringstream	code_str(code);
+	std::stringstream	code_str;
 	std::stringstream	len_str;
 	std::string			body = bodyResponseCode(code);
 
@@ -115,11 +112,46 @@ void		Response::errorResponse(const int &code)
 	this->_response += body;
 }
 
+bool	Response::dirListing(std::string &path)
+{
+	path.erase(path.size() - 1, 1);
+	std::cout << "path en dirListing: " << path << std::endl;
+	const char *cpath = path.c_str();
+	DIR *dir;
+	struct dirent *ent;
+	std::string body;
+
+	if ((dir = opendir(cpath)) != NULL)
+	{
+		body = UPPERLISTINGBODY;
+		body += "<h2 style=\"text-align:left\"> Directory listing for "
+				+ path + "</h2>\n";
+		body += "<hr><ul>";
+		while ((ent = readdir(dir)) != NULL)
+		{
+			body += "<li><a href=\"http://localhost:8080"
+					+ _request.getPath();
+			body += ent->d_name;
+			body += "\" style=\"color: #4AF626;\">";
+			body += ent->d_name;
+			body += "</a></li>\n";
+		}
+		body += "</ul><hr>";
+		closedir(dir);
+		body += LOWERLISTINGBODY;
+	} 
+	else 
+		return false;
+	this->_response = headerGenerator("200", bodyLen(body));
+	this->_response += body + "\r\n\r\n";
+	return true;
+}
+
 void	Response::applyGetMethod(void)
 {
 	std::string			body;
 	std::stringstream	buffer;
-	std::ifstream file(_finalPath);
+	std::ifstream		file(_finalPath);
 
 	buffer << file.rdbuf();
 	file.close();
@@ -134,9 +166,18 @@ void	Response::applyGetMethod(void)
 */
 void		Response::getResponse()
 {
+
 	if (checkLocation(_request.getPath()) == false)
 	{
-		errorResponse(400);
+		errorResponse(_statusCode);
+		return ;
+	}
+	std::cout << "final path: "<<_finalPath<<std::endl;
+	if (this->_finalPath.back() == '/')
+	{
+		if (this->_routeIndex == -1 || this->_routes[this->_routeIndex]->isDirListing() == false
+			|| dirListing(_finalPath) == false)
+			errorResponse(404);
 		return ;
 	}
 	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
@@ -193,23 +234,32 @@ void		Response::deleteResponse()
 	this->_response = headerGenerator("200", "0");
 }
 
-bool	Response::chooseBest(const std::string &rawPath, size_t &maxCharsFound, size_t i, bool &dirList, std::string &root)
+bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, std::string &root)
 {
-	if (rawPath == _routes[i]->getRedir())
+	// std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
+	/*
+		En caso de que la peticion coincida con la redireccion
+		y no sea directory listing, enviar default answer
+	*/
+	if (dirList == false && this->_routes[i]->getRedir() == rawPath)
 	{
-		_finalPath = _routes[i]->getRoot()
+		this->_finalPath = _routes[i]->getRoot()
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
-	if (maxCharsFound < _routes[i]->getRedir().size()
-		&& _routes[i]->checkMethod(_request.getMethod()) == true)
+	else
 	{
+		// En caso contrario, se solicita directory listing de un directorio literal en ruta
+		this->_finalPath = _routes[i]->getRoot() + rawPath;
+		return true;
+	}
+	// Si el metodo del request coincide con el de la ruta
+	if (_routes[i]->checkMethod(_request.getMethod()) == true)
+	{
+		// Si no es directory listing, o es directory listing y la ruta tambien
 		if ((dirList == false && _routes[i]->isDirListing())
 			|| (dirList == _routes[i]->isDirListing()))
-		{
-			maxCharsFound = _routes[i]->getRedir().size();
 			root = _routes[i]->getRoot();
-		}
 	}
 	return false;
 }
@@ -226,15 +276,23 @@ bool	Response::checkLocation(std::string rawPath)
 		dirList = true;
 	else
 		dirList = false;
-
+	// std::cout << "rawPath: " << rawPath << " dirList:" << dirList << std::endl;
 	for (size_t i = 0; i < vectorSize; i++)
 	{
-		if (rawPath.find(_routes[i]->getRedir()) != std::string::npos)
-			if (chooseBest(rawPath, maxCharsFound, i, dirList, root)) {return true;}
+		if (rawPath.find(_routes[i]->getRedir()) == 0)
+		{
+			if (chooseBest(rawPath, i, dirList, root))
+			{
+				this->_routeIndex = i;
+				return true;
+			}
+		}
+		this->_routeIndex = i;
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	_finalPath = root + rawPath.substr(maxCharsFound - 1);
+	// std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
+	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
 
@@ -259,6 +317,7 @@ std::string	Response::responseMaker()
 	else
 		errorResponse(405);
 	std::cout << "Sale response!\n";
+	// std::cout << "respuesta final: " << this->_response << std::endl;
 	return this->_response;
 }
 
@@ -267,7 +326,7 @@ Response & Response::operator=(const Response &assign)
 {
 	this->_response = assign._response;
 	this->_statusCode = assign._statusCode;
-	this->_status = assign._status;
+	// this->_status = assign._status;
 	this->_request = assign._request;
 	return *this;
 }

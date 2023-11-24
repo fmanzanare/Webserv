@@ -13,7 +13,7 @@ export HEADER
 
 NAME = webserv
 
-CC = c++ -g
+CC = c++
 
 CFLAGS = -Wall -Werror -Wextra -std=c++98
 COLOR = \033[1;32m

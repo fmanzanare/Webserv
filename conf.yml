@@ -12,7 +12,7 @@ server:
     redirection: /
     root: /s1
   route:
-    methods: POST,DELETE
+    methods: POST,DELETE,GET
     directory-listing: true
     default-answer: none
     cgi: .php
@@ -23,7 +23,7 @@ server:
   server-name: myserver2
   error-page: error2.html
   body-limit: 2048
-  host: 10.13.4.4
+  host: 10.13.2.3
   port: 8002,8003
   route:
     methods: GET,POST

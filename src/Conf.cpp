@@ -247,6 +247,7 @@ void	Conf::setRoot(std::string root){
 	for (int i = 0; i < (int)this->_routes.size(); i++)
 		if (this->_routes[i]->getRoot() == root)
 		{
+			std::cout << "get root: " << this->_routes[i]->getRoot() << " root: " << root << std::endl;
 			freeServer();
 			throw NoAllowRoot();
 		}
@@ -254,6 +255,8 @@ void	Conf::setRoot(std::string root){
 		root = '.' + root;
 	if (access(root.c_str(), F_OK) == -1)
 	{
+		std::cout << "acceso denegado" << std::endl;
+		std::cout << "root: " << root << std::endl;
 		freeServer();
 		throw NoAllowRoot();
 	}

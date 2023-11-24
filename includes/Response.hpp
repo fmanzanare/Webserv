@@ -10,6 +10,8 @@
 # include <cstdio>
 # include <cstdlib>
 # include <vector>
+# include <filesystem>
+# include <dirent.h>
 # include "Request.hpp"
 # include "Route.hpp"
 
@@ -17,8 +19,10 @@
 # define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
 						<body style=\"background-color: black;\">\
 						<h1 style=\"color: #4AF626;\">"
-
 # define LOWERDEFBODY "</h1></body></html>\r\n\r\n"
+# define UPPERLISTINGBODY	"<!DOCTYPE html><html><head></head>\
+							<body style=\"background-color: black; color: #4AF626;\">"
+# define LOWERLISTINGBODY "</body></html>\r\n\r\n"
 # define CONTTYPE "Content type: text/html\n"
 # define CONTLENGTH "Content length: "
 
@@ -44,23 +48,23 @@ class Response
 
 	private:
 		// Attributes
+		int						_statusCode;
+		int						_routeIndex;
 		std::string				_response;
 		std::string				_finalPath;
-		std::string				_statusCode;
-		std::string				_status;
-		Request					_request;
 		std::vector<Route *>	_routes;
+		Request					_request;
 
 		// Methods
-		std::string		bodyResponseCode(const int&);
 		void			errorResponse(const int&);
 		void			getResponse(void);
 		void			postResponse(void);
 		void			deleteResponse(void);
 		void			generateFinalResponse(void);
-		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
+		bool			chooseBest(const std::string &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
+		bool			dirListing(std::string&);
 };
 
 #endif
