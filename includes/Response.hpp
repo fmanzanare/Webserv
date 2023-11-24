@@ -49,6 +49,7 @@ class Response
 	private:
 		// Attributes
 		int						_statusCode;
+		int						_routeIndex;
 		std::string				_response;
 		std::string				_finalPath;
 		std::vector<Route *>	_routes;
@@ -60,7 +61,7 @@ class Response
 		void			postResponse(void);
 		void			deleteResponse(void);
 		void			generateFinalResponse(void);
-		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
+		bool			chooseBest(const std::string &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
