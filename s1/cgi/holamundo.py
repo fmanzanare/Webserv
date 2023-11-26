@@ -50,7 +50,7 @@ body = """\
     </header>
     <div class="container">
         <h2>CGI</h2>
-        <p>Aqui podrias poner lo que quieras, incluso podrias esditarlo y volvera ejecutarlo y se actualizaria.</p>
+        <p>Aqui podrias poner lo que quieras, incluso podrias editarlo y volver a ejecutarlo y se actualizaria.</p>
         <a href="#" class="button">Esto no hace nada</a>
     </div>
 </body>

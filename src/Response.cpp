@@ -153,17 +153,16 @@ void	Response::applyGetMethod(void)
 	std::stringstream	buffer;
 	std::ifstream		file(_finalPath);
 
-	if (_finalPath.find(".py") != std::string::npos)
-		body = cgi(_finalPath); 
-	else
+	body = cgi(_finalPath);
+	if (body.empty())
 	{
 		buffer << file.rdbuf();
 		file.close();
 		body = buffer.str();
+	}
 		body += "\r\n\r\n";
 		this->_response = headerGenerator("200", bodyLen(body));
 		this->_response += body;
-	}
 }
 
 /**
@@ -336,20 +335,28 @@ std::string Response::cgi(std::string path)
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
 
-	//Tengo que mirar que tipo de archivo es (HARDCODE PYTHON3)
 	char *argv[3];
-	argv[0] = (char *)"/usr/local/bin/python3";
-	argv[1] = (char *)path.c_str();
-	argv[2] = 0;
-	char *env[4];
-	std::string rMeth;
-	rMeth = "REQUEST_METHOD=" + _request.getMethod();
-	env[0] = (char *)rMeth.c_str();
+	if (_finalPath.find(".py") == std::string::npos)
+	{
+		argv[0] = (char *)_finalPath.c_str();
+		argv[1] = (char *)_finalPath.c_str();
+		argv[2] = 0;
+	}
+	else
+	{
+		argv[0] = (char *)"/usr/local/bin/python3";
+		argv[1] = (char *)path.c_str();
+		argv[2] = 0;
+	}
 	std::string sProt;
-	sProt = "SERVER_PROTOCOL=" + _request.getProtocol();
-	env[1] = (char *)sProt.c_str();
+	std::string rMeth;
 	std::string pInf;
+	rMeth = "REQUEST_METHOD=" + _request.getMethod();
+	sProt = "SERVER_PROTOCOL=" + _request.getProtocol();
 	pInf = "PATH_INFO=" + _request.getPath();
+	char *env[4];
+	env[1] = (char *)sProt.c_str();
+	env[0] = (char *)rMeth.c_str();
 	env[2] = (char *)pInf.c_str();
 	env[3] = 0;
 	//ERROR 500?
