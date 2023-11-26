@@ -181,7 +181,7 @@ void WebServs::checkClientsSockets(pollfd *fds) {
 				if (fds[k].revents == POLLOUT && fds[k].fd == serverClients[j]->getSocket()) {
 					// Sending the Response to the client.
 					Request req = Request(serverClients[j]->getRequest());
-					Response res = Response(serverClients[j]->getCBodyLimit(), req, _cluster[i]->getRoutes());
+					Response res = Response(this->_cluster[i]->getCBodyLimit(), req, _cluster[i]->getRoutes());
 					serverClients[j]->sendData(res.responseMaker());
 					if (serverClients[j]->isFinishedResponse() || serverClients[j]->isErrorReadWrite()) {
 						usleep(2100);

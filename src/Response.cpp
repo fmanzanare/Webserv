@@ -322,7 +322,7 @@ std::string	Response::responseMaker()
 		errorResponse(426);
 		return this->_response;
 	}
-	if (this->_request.getBody().size() > this->_bodyLimit)
+	if ((int)this->_request.getBody().size() > this->_bodyLimit)
 	{
 		errorResponse(400);
 		return this->_response;
@@ -378,10 +378,10 @@ std::string Response::cgi(std::string path)
 	env[3] = 0;
 	std::cout << this->_response << std::endl;
 	//ERROR 500?
-	std::cout << "hola" << std::endl;
-	errorResponse(504);
-	//this->_response += "\r\n\r\n";
-	return this->_response;
+	// std::cout << "hola" << std::endl;
+	// errorResponse(504);
+	// //this->_response += "\r\n\r\n";
+	// return this->_response;
 	//creo el archivo temporal
 	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
 	//ERROR TIMEOUT 504?
