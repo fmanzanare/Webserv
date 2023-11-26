@@ -82,7 +82,7 @@ void	Request::parseHeader(void)
 	std::string 		firstLine;
 
 	std::getline(input, firstLine);
-	while (std::getline(input, line))
+	while (std::getline(input, line) && line.find(":") != std::string::npos)
 	{
 		std::string key = line.substr(0, line.find(":"));
 		std::string value = line.substr(line.find(": ") + 2);
