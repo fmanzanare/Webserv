@@ -162,29 +162,35 @@ void		Response::getResponse()
 		applyGetMethod();
 }
 
-void		Response::postResponse(std::string path)
+void		Response::postResponse()
 {
-	std::vector<std::string> splitted = splitFilePath(path);
+	// std::vector<std::string> splitted = splitFilePath(path);
 
-	if (splitted.empty() == true)
+	// if (splitted.empty() == true)
+	// {
+	// 	errorResponse(204);
+	// 	return ;
+	// }
+	if (checkLocation(_request.getPath()) == false)
 	{
-		errorResponse(204);
+		errorResponse(400);
 		return ;
 	}
-	// std::ofstream	outputFile(*(splitted.end() - 1));
-	// std::cout << *(splitted.end() - 1) << std::endl;
-	std::ofstream	outputFile("." + path);
-	//std::cout << "." + path << std::endl;
+	std::ofstream	outputFile(_finalPath);
 	outputFile << _request.getBody();
 	outputFile.close();
 	this->_response = headerGenerator("200", "0");
 
 }
 
-void		Response::deleteResponse(std::string path)
+void		Response::deleteResponse()
 {
-	//path = "." + path;
-	if (std::remove(path.c_str()))
+	if (checkLocation(_request.getPath()) == false)
+	{
+		errorResponse(400);
+		return ;
+	}
+	if (std::remove(_finalPath.c_str()))
 	{
 		errorResponse(422);
 		return ;
@@ -252,9 +258,9 @@ std::string	Response::responseMaker()
 	if (this->_request.getMethod() == "GET")
 		getResponse();
 	else if (this->_request.getMethod() == "POST")
-		postResponse(this->_request.getPath());
+		postResponse();
 	else if (this->_request.getMethod() == "DELETE")
-		deleteResponse(this->_request.getPath());
+		deleteResponse();
 	else
 		errorResponse(405);
 	//std::cout << "Sale response!\n";

@@ -16,6 +16,7 @@ class Client {
 		std::string		_request;
 		bool			_finishedReq;
 		bool			_finishedRes;
+		bool			_errReadWrite;
 		size_t			_resPos;
 
 		// PRIVATE CONSTRUCTOR:
@@ -39,6 +40,10 @@ class Client {
 		std::string getRequest(void);
 		bool isFinishedRequest(void);
 		bool isFinishedResponse(void);
+		bool isErrorReadWrite(void);
+
+		// OPERATORS:
+		bool operator==(const Client client);
 
 		// METHODS:
 		void receiveData(void);

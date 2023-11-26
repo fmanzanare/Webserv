@@ -58,9 +58,9 @@ class Response
 		std::string		bodyResponseCode(const int&);
 		void			errorResponse(const int&);
 		void			getResponse(void);
-		void			postResponse(std::string);
-		void			deleteResponse(std::string);
-		void			generateFinalResponse();
+		void			postResponse(void);
+		void			deleteResponse(void);
+		void			generateFinalResponse(void);
 		bool			chooseBest(const std::string &, size_t &, size_t i, bool &, std::string &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
