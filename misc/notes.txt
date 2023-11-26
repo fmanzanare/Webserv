@@ -5,3 +5,6 @@ TAREAS / PUNTOS A DESARROLLAR:
 - Montar la respuesta de cada petición y realizar el send correspondiente.
 - Funcionamiento de poll() y fnctl().
 - CGI.
+
+Response
+- Ver por qué hace directory listing cuando en esa ruta no está permitido, por ejemplo carpeta imgs
