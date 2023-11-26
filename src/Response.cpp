@@ -361,7 +361,7 @@ std::string Response::cgi(std::string path)
 	else if (_finalPath.find(".bin") != std::string::npos)
 	{
 		argv[0] = (char *)path.c_str();
-		argv[1] = 0;
+		argv[1] = (char *)path.c_str();
 		argv[2] = 0;
 	}
 	//ENV
@@ -376,24 +376,23 @@ std::string Response::cgi(std::string path)
 	env[1] = (char *)sProt.c_str();
 	env[2] = (char *)pInf.c_str();
 	env[3] = 0;
-	std::cout << this->_response << std::endl;
-	//ERROR 500?
-	// std::cout << "hola" << std::endl;
-	// errorResponse(504);
-	// //this->_response += "\r\n\r\n";
-	// return this->_response;
-	//creo el archivo temporal
-	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
-	//ERROR TIMEOUT 504?
-	int pid = fork();
 
+	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
+
+	int pid = fork();
 	if (!pid)
 	{
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
 		close(temp);
+		//rlimit timeout;
+		// timeout.rlim_cur = 5;
+		// timeout.rlim_max = 5;
+		// if (setrlimit(RLIMIT_CPU, &timeout) == -1)
+		// 	exit(1);
 		execve(argv[0], argv, env);
-		return ("error");
+		exit(1);
+		//return ("error");
 	}
 	waitpid(pid, &status, 0);
 	temp = open(".temp.txt", O_RDONLY);
@@ -409,8 +408,13 @@ std::string Response::cgi(std::string path)
 	//Borrar archivo temporal
 	remove(".temp.txt");
 	data += "\r\n\r\n";
-	this->_response = headerGenerator("200", bodyLen(data));
-	this->_response += data;
+	if (!status)
+	{
+		this->_response = headerGenerator("200", bodyLen(data));
+		this->_response += data;
+	}
+	else
+		errorResponse(504);
 	return (data);
 }
 

@@ -17,6 +17,7 @@
 # include <limits.h>
 # include "Request.hpp"
 # include "Route.hpp"
+# include <signal.h>
 
 
 /* ------------ DEFINES ------------*/
