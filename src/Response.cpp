@@ -8,7 +8,7 @@ Response::Response()
 	this->_statusCode = 404;
 }
 
-Response::Response(Request &req, std::vector<Route *> routes)
+Response::Response(int bodyLimit, Request &req, std::vector<Route *> routes)
 {
 	this->_request = req;
 	this->_finalPath = "";
@@ -17,6 +17,10 @@ Response::Response(Request &req, std::vector<Route *> routes)
 	this->_request.processRequest();
 	this->_routes = routes;
 	this->_routeIndex = -1;
+	if (bodyLimit > INT_MAX || bodyLimit < 0)
+		_bodyLimit = -1;
+	else
+		this->_bodyLimit = bodyLimit;
 }
 
 Response::Response(const Response &copy)
@@ -155,7 +159,7 @@ void	Response::applyGetMethod(void)
 
 	//donde se guarda el cgi que se puede utilizar?
 	if (_finalPath.find(this->_routes[this->_routeIndex]->getCgi()) != std::string::npos)
-		body = cgi(_finalPath); 
+		cgi(_finalPath); 
 	else
 	{
 		buffer << file.rdbuf();
@@ -222,7 +226,6 @@ void		Response::postResponse()
 	outputFile << _request.getBody();
 	outputFile.close();
 	this->_response = headerGenerator("200", "0");
-
 }
 
 void		Response::deleteResponse()
@@ -312,6 +315,11 @@ std::string	Response::responseMaker()
 	if (this->_request.getProtocol() != "HTTP/1.1")
 	{
 		errorResponse(426);
+		return this->_response;
+	}
+	if (this->_request.getBody().size() > this->_bodyLimit)
+	{
+		errorResponse(400);
 		return this->_response;
 	}
 	if (this->_request.getMethod() == "GET")

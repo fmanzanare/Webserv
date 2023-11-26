@@ -14,6 +14,7 @@
 # include <fcntl.h>
 # include <filesystem>
 # include <dirent.h>
+# include <limits.h>
 # include "Request.hpp"
 # include "Route.hpp"
 
@@ -35,7 +36,7 @@ class Response
 	public:
 		// Constructors
 		Response();
-		Response(Request &req, std::vector<Route *>);
+		Response(int bodyLimit, Request &req, std::vector<Route *>);
 		Response(const Response &copy);
 		
 		// Destructor
@@ -57,6 +58,7 @@ class Response
 		std::string				_finalPath;
 		std::vector<Route *>	_routes;
 		Request					_request;
+		int						_bodyLimit;
 
 		// Methods
 		void			errorResponse(const int&);
