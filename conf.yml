@@ -1,14 +1,14 @@
 server:
   server-name: myserver1
   error-page: /s1/error.html
-  body-limit: 1024
+  body-limit: 1
   host: 127.0.0.1
   port: 8080,8081,9000
   route:
     methods: GET
     directory-listing: false
     default-answer: index.html
-    cgi: .bin
+    cgi: .py
     redirection: /
     root: /s1
   route:
@@ -26,16 +26,16 @@ server:
   host: 10.13.4.4
   port: 8002,8003
   route:
-    methods: GET,POST
-    directory-listing: true
-    default-answer: index2.html
+    methods: GET
+    directory-listing: false
+    default-answer: index.html
     cgi: .py
     redirection: /
-    root: /src
+    root: /s1
   route:
-    methods: GET,POST
+    methods: POST,DELETE,GET
     directory-listing: true
-    default-answer: index.html
+    default-answer: none
     cgi: .php
-    redirection: /src
-    root: /src/Server.cpp
+    redirection: /storage/
+    root: /s1/storage

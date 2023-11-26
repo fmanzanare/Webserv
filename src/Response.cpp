@@ -95,6 +95,9 @@ std::string	bodyResponseCode(const int &code)
 		case 426:
 			body += "426 Upgrade Required<br>";
 			break;
+		case 504:
+			body += "504 Gateway Timeout<br>";
+			break;
 		default:
 			body += "505 Internal Server Error<br>";
 			break;
@@ -114,6 +117,7 @@ void	Response::errorResponse(const int &code)
 	len_str << body.length();
 	this->_response = headerGenerator(code_str.str(), len_str.str());
 	this->_response += body;
+	std::cout << "error response: " << _response << std::endl;
 }
 
 bool	Response::dirListing(std::string &path)
@@ -169,6 +173,7 @@ void	Response::applyGetMethod(void)
 		this->_response = headerGenerator("200", bodyLen(body));
 		this->_response += body;
 	}
+
 }
 
 /**
@@ -371,8 +376,12 @@ std::string Response::cgi(std::string path)
 	env[1] = (char *)sProt.c_str();
 	env[2] = (char *)pInf.c_str();
 	env[3] = 0;
+	std::cout << this->_response << std::endl;
 	//ERROR 500?
-
+	std::cout << "hola" << std::endl;
+	errorResponse(504);
+	//this->_response += "\r\n\r\n";
+	return this->_response;
 	//creo el archivo temporal
 	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
 	//ERROR TIMEOUT 504?
