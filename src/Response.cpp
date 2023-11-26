@@ -212,6 +212,12 @@ void		Response::postResponse()
 		errorResponse(400);
 		return ;
 	}
+	// TODO comprobar que _finalPath exista
+	if (access(_finalPath.erase(_finalPath.rfind("/")).c_str(), F_OK | R_OK) == -1)
+	{
+		errorResponse(404);
+		return ;
+	}
 	std::ofstream	outputFile(_finalPath);
 	outputFile << _request.getBody();
 	outputFile.close();
@@ -236,7 +242,6 @@ void		Response::deleteResponse()
 
 bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, std::string &root)
 {
-	// std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
 	/*
 		En caso de que la peticion coincida con la redireccion
 		y no sea directory listing, enviar default answer
@@ -247,8 +252,9 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
-	else
+	else if (_routes[i]->getRedir() != "/")
 	{
+		std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
 		// En caso contrario, se solicita directory listing de un directorio literal en ruta
 		this->_finalPath = _routes[i]->getRoot() + rawPath;
 		return true;
@@ -284,6 +290,7 @@ bool	Response::checkLocation(std::string rawPath)
 			if (chooseBest(rawPath, i, dirList, root))
 			{
 				this->_routeIndex = i;
+				std::cout << "final path: " << _finalPath << std::endl;
 				return true;
 			}
 		}
@@ -291,7 +298,7 @@ bool	Response::checkLocation(std::string rawPath)
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	// std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
+	std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
