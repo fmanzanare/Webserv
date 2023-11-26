@@ -154,7 +154,7 @@ void	Response::applyGetMethod(void)
 	std::ifstream		file(_finalPath);
 
 	//donde se guarda el cgi que se puede utilizar?
-	if (_finalPath.find(".py") != std::string::npos || _finalPath.find(".bin") != std::string::npos)
+	if (_finalPath.find(this->_routes[this->_routeIndex]->getCgi()) != std::string::npos)
 		body = cgi(_finalPath); 
 	else
 	{
@@ -351,6 +351,7 @@ std::string Response::cgi(std::string path)
 		argv[1] = 0;
 		argv[2] = 0;
 	}
+	//ENV
 	std::string rMeth;
 	std::string sProt;
 	std::string pInf;

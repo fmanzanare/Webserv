@@ -92,7 +92,7 @@ Conf::Conf()
 						setRoot(line.substr(line.find_first_not_of("root: ")));
 				}
 				//Crear el Router
-				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
+				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
 				//std::getline(archivo, line);
 			}
 			//Crear el Server

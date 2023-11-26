@@ -3,7 +3,7 @@
 // ORTHODOX CANNONICAL FORM:
 Route::Route() {}
 
-Route::Route(std::vector<std::string> methods, std::string redir, std::string root, bool dirListing, std::string def) {
+Route::Route(std::vector<std::string> methods, std::string redir, std::string root, bool dirListing, std::string def, std::string cgi) {
 	for (int i = 0; i < (int)methods.size(); i++) {
 		this->_methods.push_back(methods[i]);
 	}
@@ -11,6 +11,7 @@ Route::Route(std::vector<std::string> methods, std::string redir, std::string ro
 	this->_root = root;
 	this->_dirListing = dirListing;
 	this->_default = def;
+	this->_cgi = cgi;
 }
 
 Route::~Route() {}
@@ -53,6 +54,8 @@ void Route::setDirListing(bool dirListing) { this->_dirListing = dirListing; }
 
 void Route::setDefaultAnswer(std::string def) { this->_default = def; }
 
+void Route::setCgi(std::string cgi) { this->_cgi = cgi; }
+
 // GETTERS:
 std::vector<std::string> Route::getAllowdMethods() { return this->_methods; }
 
@@ -63,6 +66,8 @@ std::string Route::getRoot() { return this->_root; }
 bool Route::isDirListing() { return this->_dirListing; }
 
 std::string Route::getDefaultAnswer() { return this->_default; }
+
+std::string Route::getCgi() { return this->_cgi; }
 
 // METHODS:
 bool Route::checkMethod(std::string method) {
