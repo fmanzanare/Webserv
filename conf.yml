@@ -23,7 +23,7 @@ server:
   server-name: myserver2
   error-page: error2.html
   body-limit: 2048
-  host: 10.13.2.3
+  host: 10.13.3.2
   port: 8002,8003
   route:
     methods: GET,POST

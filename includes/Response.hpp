@@ -10,10 +10,13 @@
 # include <cstdio>
 # include <cstdlib>
 # include <vector>
+# include <unistd.h>
+# include <fcntl.h>
 # include <filesystem>
 # include <dirent.h>
 # include "Request.hpp"
 # include "Route.hpp"
+
 
 /* ------------ DEFINES ------------*/
 # define UPPERDEFBODY	"<!DOCTYPE html><html><head></head>\
@@ -61,10 +64,11 @@ class Response
 		void			postResponse(void);
 		void			deleteResponse(void);
 		void			generateFinalResponse(void);
-		bool			chooseBest(const std::string &, size_t i, bool &, std::string &);
+		bool			chooseBest(const std::string &, size_t i, bool &, std::string &, size_t &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
+		std::string		cgi(std::string);
 };
 
 #endif

@@ -166,7 +166,6 @@ void	Response::applyGetMethod(void)
 */
 void		Response::getResponse()
 {
-
 	if (checkLocation(_request.getPath()) == false)
 	{
 		errorResponse(_statusCode);
@@ -207,9 +206,17 @@ void		Response::postResponse()
 	// 	errorResponse(204);
 	// 	return ;
 	// }
+	std::string path = _finalPath;
+
 	if (checkLocation(_request.getPath()) == false)
 	{
 		errorResponse(400);
+		return ;
+	}
+	// TODO comprobar que _finalPath exista
+	if (access(path.erase(path.rfind("/")).c_str(), F_OK | R_OK) == -1)
+	{
+		errorResponse(404);
 		return ;
 	}
 	std::ofstream	outputFile(_finalPath);
@@ -234,9 +241,8 @@ void		Response::deleteResponse()
 	this->_response = headerGenerator("200", "0");
 }
 
-bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, std::string &root)
+bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, std::string &root, size_t &maxCharsFound)
 {
-	// std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
 	/*
 		En caso de que la peticion coincida con la redireccion
 		y no sea directory listing, enviar default answer
@@ -249,6 +255,7 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 	}
 	else
 	{
+		std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
 		// En caso contrario, se solicita directory listing de un directorio literal en ruta
 		this->_finalPath = _routes[i]->getRoot() + rawPath;
 		return true;
@@ -259,7 +266,10 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 		// Si no es directory listing, o es directory listing y la ruta tambien
 		if ((dirList == false && _routes[i]->isDirListing())
 			|| (dirList == _routes[i]->isDirListing()))
+		{
+			maxCharsFound = _routes[i]->getRedir().size();
 			root = _routes[i]->getRoot();
+		}
 	}
 	return false;
 }
@@ -281,9 +291,10 @@ bool	Response::checkLocation(std::string rawPath)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
 		{
-			if (chooseBest(rawPath, i, dirList, root))
+			if (chooseBest(rawPath, i, dirList, root, maxCharsFound))
 			{
 				this->_routeIndex = i;
+				std::cout << "final path: " << _finalPath << std::endl;
 				return true;
 			}
 		}
@@ -291,7 +302,7 @@ bool	Response::checkLocation(std::string rawPath)
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	// std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
+	std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
