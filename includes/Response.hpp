@@ -64,7 +64,7 @@ class Response
 		void			postResponse(void);
 		void			deleteResponse(void);
 		void			generateFinalResponse(void);
-		bool			chooseBest(const std::string &, size_t i, bool &, std::string &);
+		bool			chooseBest(const std::string &, size_t i, bool &, std::string &, size_t &);
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
