@@ -340,12 +340,31 @@ std::string	Response::responseMaker()
 	return this->_response;
 }
 
+void	timeoutHandler(int sig, siginfo_t *info, void *context) {
+
+    std::cout << "Se ha producido un timeout para el PID: " << info->si_pid << std::endl;
+    kill(info->si_pid, SIGKILL);
+}
+
+
 std::string Response::cgi(std::string path)
 {
 	int status;
 
+	//signaction
+	struct sigaction	info;
+	info.sa_sigaction = timeoutHandler;
+	info.sa_flags = SA_SIGINFO;
+	sigaction(SIGALRM, &info, NULL);
+
+	//Lo vacio por si hay basura dentro
+	this->_response.clear();
+
 	if (access(path.c_str(), F_OK | R_OK) == -1)
-		return("Onde??");
+	{
+		std::cout << "No se ha podido abrir el archivo" << std::endl;
+		return (NULL);
+	}
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
@@ -385,14 +404,18 @@ std::string Response::cgi(std::string path)
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
 		close(temp);
-		//rlimit timeout;
-		// timeout.rlim_cur = 5;
-		// timeout.rlim_max = 5;
-		// if (setrlimit(RLIMIT_CPU, &timeout) == -1)
-		// 	exit(1);
-		execve(argv[0], argv, env);
-		exit(1);
-		//return ("error");
+		alarm(5);
+		if (execve(argv[0], argv, env) == -1)
+		{
+			std::cout << "La execucion del fork ha fallado." << std::endl;
+			exit(1);
+		}
+		exit(0);
+	}
+	else
+	{
+		std::cout << "La creacion del fork ha fallado." << std::endl;
+		return (NULL);
 	}
 	waitpid(pid, &status, 0);
 	temp = open(".temp.txt", O_RDONLY);
@@ -408,13 +431,13 @@ std::string Response::cgi(std::string path)
 	//Borrar archivo temporal
 	remove(".temp.txt");
 	data += "\r\n\r\n";
-	if (!status)
+	if (this->_response.empty())
 	{
 		this->_response = headerGenerator("200", bodyLen(data));
 		this->_response += data;
 	}
 	else
-		errorResponse(504);
+		errorResponse("504");
 	return (data);
 }
 
