@@ -349,15 +349,9 @@ void	timeoutHandler(int sig, siginfo_t *info, void *context) {
 }
 
 
-std::string Response::cgi(std::string path)
+void Response::cgi(std::string path)
 {
 	int status;
-
-	//signaction
-	struct sigaction	info;
-	info.sa_sigaction = timeoutHandler;
-	info.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &info, NULL);
 
 	//Lo vacio por si hay basura dentro
 	this->_response.clear();
@@ -365,7 +359,7 @@ std::string Response::cgi(std::string path)
 	if (access(path.c_str(), F_OK | R_OK) == -1)
 	{
 		std::cout << "No se ha podido abrir el archivo" << std::endl;
-		return (NULL);
+		return ;
 	}
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
@@ -395,7 +389,7 @@ std::string Response::cgi(std::string path)
 	char *env[4];
 	env[0] = (char *)rMeth.c_str();
 	env[1] = (char *)sProt.c_str();
-	//env[2] = (char *)pInf.c_str();
+	env[2] = (char *)pInf.c_str();
 	env[3] = 0;
 
 	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
@@ -403,9 +397,16 @@ std::string Response::cgi(std::string path)
 	int pid = fork();
 	if (!pid)
 	{
+		//signaction
+		std::cout <<"Hola"<<std::endl;
+		struct sigaction	info;
+		info.sa_sigaction = timeoutHandler;
+		info.sa_flags = SA_SIGINFO;
+		sigaction(SIGALRM, &info, NULL);
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
 		close(temp);
+		alarm(5);
 		if (execve(argv[0], argv, env) == -1)
 		{
 			std::cout << "La execucion del fork ha fallado." << std::endl;
@@ -413,28 +414,29 @@ std::string Response::cgi(std::string path)
 		}
 		exit(0);
 	}
+	//alarm(0);
 	waitpid(pid, &status, 0);
-	temp = open(".temp.txt", O_RDONLY);
-	char buf[50];
-	std::string data;
-	ssize_t len = 50;
-	while (len > 0)
+	if (WIFEXITED(status))
 	{
-		len = read(temp, buf, 50);
-		data += std::string(buf, len);
-	}
-	close(temp);
-	//Borrar archivo temporal
-	remove(".temp.txt");
-	data += "\r\n\r\n";
-	if (this->_response.empty())
-	{
+		temp = open(".temp.txt", O_RDONLY);
+		char buf[50];
+		std::string data;
+		ssize_t len = 50;
+		while (len > 0)
+		{
+			len = read(temp, buf, 50);
+			data += std::string(buf, len);
+		}
+		close(temp);
+		//Borrar archivo temporal
+		remove(".temp.txt");
+		data += "\r\n\r\n";
 		this->_response = headerGenerator("200", bodyLen(data));
 		this->_response += data;
 	}
 	else
 		errorResponse(504);
-	return (data);
+	return ;
 }
 
 // Operators

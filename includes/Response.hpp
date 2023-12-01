@@ -71,7 +71,7 @@ class Response
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
-		std::string		cgi(std::string);
+		void		cgi(std::string);
 };
 
 #endif
