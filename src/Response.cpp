@@ -342,6 +342,8 @@ std::string	Response::responseMaker()
 
 void	timeoutHandler(int sig, siginfo_t *info, void *context) {
 
+	(void)sig;
+	(void)context;
     std::cout << "Se ha producido un timeout para el PID: " << info->si_pid << std::endl;
     kill(info->si_pid, SIGKILL);
 }
@@ -393,7 +395,7 @@ std::string Response::cgi(std::string path)
 	char *env[4];
 	env[0] = (char *)rMeth.c_str();
 	env[1] = (char *)sProt.c_str();
-	env[2] = (char *)pInf.c_str();
+	//env[2] = (char *)pInf.c_str();
 	env[3] = 0;
 
 	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
@@ -404,18 +406,12 @@ std::string Response::cgi(std::string path)
 		if (dup2(temp, STDOUT_FILENO) == -1)
 			printf("Error al abrir el pipe");
 		close(temp);
-		alarm(5);
 		if (execve(argv[0], argv, env) == -1)
 		{
 			std::cout << "La execucion del fork ha fallado." << std::endl;
 			exit(1);
 		}
 		exit(0);
-	}
-	else
-	{
-		std::cout << "La creacion del fork ha fallado." << std::endl;
-		return (NULL);
 	}
 	waitpid(pid, &status, 0);
 	temp = open(".temp.txt", O_RDONLY);
@@ -437,7 +433,7 @@ std::string Response::cgi(std::string path)
 		this->_response += data;
 	}
 	else
-		errorResponse("504");
+		errorResponse(504);
 	return (data);
 }
 
