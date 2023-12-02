@@ -42,6 +42,16 @@ class Conf::NoAllowRoot : public std::exception {
 	}
 };
 
+static std::string trim(std::string str)
+{
+	int i = 0;
+	while (str[i] == ' ')
+		i++;
+	return str.substr(i);
+
+
+}
+
 Conf::Conf(std::string fileName)
 {
 	std::fstream archivo(fileName);
@@ -50,9 +60,38 @@ Conf::Conf(std::string fileName)
     }
 	std::string line;
 	//Iteramos por los servers
+	std::map<std::string, std::string> m;
+	while(std::getline(archivo, line))
+	{
+		if (line.empty())
+			continue ;
+		const unsigned long pos = line.find(":");
+		if (pos == std::string::npos)
+			continue ;
+		std::string key =trim(line.substr(0, pos));
+		if (key.compare("server") && m.empty())
+		{
+			std::cout << key << std::endl;
+		}
+		m[key] = trim(line.substr(pos + 1));
+	}
+	std::map<std::string, std::string>::iterator it = m.begin();
+	while (it != m.end())
+	{
+		if (!it->first.compare("server-name"))
+		{
+			setName(it->second);
+			std::cout << "Name: " << getName() << std::endl;
+			break;
+		}
+		
+		it++;
+	}
+	return ;
 	int i = 0;
 	while(std::getline(archivo, line))
 	{
+
 		if (line.find("server:") != std::string::npos)
 		{
 			//Añadimos los parametros del server
@@ -81,9 +120,9 @@ Conf::Conf(std::string fileName)
 					if (line.find("methods:") != std::string::npos)
 						setMethods(line.substr(line.find_first_not_of("methods: ")));
 					else if (line.find("directory-listing:") != std::string::npos)
-						setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
+						setDirListing(line.substr(line.find_last_not_of("directory-listing: ")));
 					else if (line.find("default-answer:") != std::string::npos)
-						setDef(line.substr(line.find_first_not_of("default-answer: ")));
+						setDef(line.substr(line.find_first_not_of("default-answer: ") - 1));
 					else if (line.find("cgi:") != std::string::npos)
 						setCgi(line.substr(line.find_first_not_of("cgi: ")));
 					else if (line.find("redirection:") != std::string::npos)
@@ -224,10 +263,11 @@ void	Conf::setMethods(std::string method){
 }
 
 void	Conf::setDirListing(std::string dirListing){
+	std::cout << dirListing << std::endl;
 	if (dirListing.find("true"))
-		this->_dirListing = true;
-	else if (dirListing.find("false"))
 		this->_dirListing = false;
+	else if (dirListing.find("false"))
+		this->_dirListing = true;
 	else
 	{
 		freeServer();

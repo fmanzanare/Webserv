@@ -13,7 +13,7 @@ int main()
 		std::cout << "ErrorPage: " << servers[i]->getErrPage() << std::endl;
 		std::cout << "BodyLimit: " << servers[i]->getCBodyLimit() << std::endl;
 		std::cout << "Host: " << servers[i]->getHost() << std::endl;
-		std::cout << "Ports: " << std::endl;
+		std::cout << "Ports: \t";
 		std::vector<int> ports = servers[i]->getPorts();
 		for (int j = 0; j < (int)ports.size(); j++)
 			std::cout << ports[j] << "\t";
@@ -25,12 +25,14 @@ int main()
 			std::vector<std::string> methods = routes[j]->getAllowdMethods();
 			for (int k= 0; k < (int)methods.size(); k++)
 				std::cout << "\t" << methods[k] << "\t";
-			std::cout << std::endl << "\tDirList: " << routes[j]->isDirListing() << std::endl;
-			std::cout << "DefaultAnswer: " << routes[j]->getDefaultAnswer() << std::endl;
+			std::cout << std::endl << "\tDirList: \t" << routes[j]->isDirListing() << std::endl;
+			std::cout << "\tDefaultAnswer: \t" << routes[j]->getDefaultAnswer() << std::endl;
+			std::cout << "\tCgi: \t";
 			std::vector<std::string> cgis = routes[j]->getCgi();
 			for (int k= 0; k < (int)cgis.size(); k++)
 				std::cout << "\t" << cgis[k] << "\t";
-
+			std::cout << std::endl << "\tRedirection: \t" << routes[j]->getRedir() << std::endl;
+			std::cout << "\tRoot: \t\t" << routes[j]->getRoot() << std::endl;
 		}
 	}
 
