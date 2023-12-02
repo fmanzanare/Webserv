@@ -13,13 +13,13 @@ class Route {
 		bool						_dirListing;
 		std::string					_default;
 		// CGI.
-		std::string					_cgi;
+		std::vector<std::string>	_cgi;
 		// PRIVATE CONSTRUCTOR:
 		Route();
 
 	public:
 		// ORTHODOX CANNONICAL FORM:
-		Route(std::vector<std::string> methods, std::string redir, std::string root, bool dirListing, std::string def, std::string cgi);
+		Route(std::vector<std::string> methods, std::string redir, std::string root, bool dirListing, std::string def, std::vector<std::string> cgi);
 		~Route();
 		Route(const Route &cp);
 		Route &operator=(const Route &cp);
@@ -31,7 +31,7 @@ class Route {
 		void setRoot(std::string root);
 		void setDirListing(bool dirListing);
 		void setDefaultAnswer(std::string def);
-		void setCgi(std::string cgi);
+		void setCgi(std::vector<std::string> cgi);
 
 		// GETTERS:
 		std::vector<std::string> getAllowdMethods(void);
@@ -39,7 +39,7 @@ class Route {
 		std::string getRoot(void);
 		bool isDirListing(void);
 		std::string getDefaultAnswer(void);
-		std::string getCgi(void);
+		std::vector<std::string> getCgi(void);
 
 		// METHODS:
 		bool checkMethod(std::string method);

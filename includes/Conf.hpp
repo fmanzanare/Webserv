@@ -23,7 +23,7 @@ class Conf
 		std::vector<std::string>	_methods;
 		bool 						_dirListing;
 		std::string 				_def;
-		std::string 				_cgi;
+		std::vector<std::string>	_cgi;
 		std::string					_redir;
 		std::string					_root;
 
@@ -58,7 +58,7 @@ class Conf
 		class						NoAllowcBodyLimit;
 		class						NoAllowRoot;
 		//Atributos
-        Conf();
+        Conf(std::string);
         ~Conf();
 		//Metodos
 		std::string					getName(void);
@@ -72,7 +72,7 @@ class Conf
 		std::vector<std::string>	getMethods(void);
 		bool						getDirListing(void);
 		std::string					getDef(void);
-		std::string					getCgi(void);
+		std::vector<std::string>	getCgi(void);
 		std::string					getRedir(void);
 		std::string					getRoot(void);
 		std::vector<Server *>		getServers(void);

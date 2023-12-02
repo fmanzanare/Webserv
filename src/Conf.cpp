@@ -42,9 +42,9 @@ class Conf::NoAllowRoot : public std::exception {
 	}
 };
 
-Conf::Conf()
+Conf::Conf(std::string fileName)
 {
-	std::fstream archivo("conf.yml");
+	std::fstream archivo(fileName);
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
     }
@@ -93,9 +93,13 @@ Conf::Conf()
 				}
 				//Crear el Router
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
+				this->_cgi.clear();
+				this->_methods.clear();
 				//std::getline(archivo, line);
 			}
 			//Crear el Server
+			this->_cgi.clear();
+			this->_methods.clear();
 			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 			this->_routes.clear();
 			this->_ports.clear();
@@ -236,13 +240,17 @@ void	Conf::setDef(std::string def){
 }
 void	Conf::setCgi(std::string cgi){
 	//hacer
-	this->_cgi = cgi;
+	std::istringstream iss(cgi);
+	std::string			token;
+
+	while (std::getline(iss, token, ','))
+	{
+		this->_cgi.push_back(token);
+	}
 }
 void	Conf::setRedir(std::string redir){
 	if (redir.back() != '/')
 		redir = redir + '/';
-
-	std::cout<< redir <<std::endl;
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
@@ -296,7 +304,7 @@ bool						Conf::getDirListing(void){
 std::string					Conf::getDef(void){
 	return (this->_def);
 }
-std::string					Conf::getCgi(void){
+std::vector<std::string>	Conf::getCgi(void){
 	return (this->_cgi);
 }
 std::string					Conf::getRedir(void){
