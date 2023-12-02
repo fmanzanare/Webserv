@@ -69,24 +69,60 @@ Conf::Conf(std::string fileName)
 		if (pos == std::string::npos)
 			continue ;
 		std::string key =trim(line.substr(0, pos));
-		if (key.compare("server") && m.empty())
+		if (key.compare("server") && !m.empty())
 		{
-			std::cout << key << std::endl;
+			std::map<std::string, std::string>::iterator it = m.begin();
+			while (it != m.end())
+			{
+				if (!it->first.compare("server-name"))
+				{
+					setName(it->second);
+					std::cout << getName() << std::endl;
+				}
+				if (!it->first.compare("error-page"))
+				{
+					setError_page(it->second);
+					std::cout << getError_page() << std::endl;
+				}
+				if (!it->first.compare("body-limit"))
+				{
+					setCBodyLimit(it->second);
+					std::cout << getCBodyLimit() << std::endl;
+				}
+				if (!it->first.compare("host"))
+				{
+					setHost(it->second);
+					std::cout << getHost() << std::endl;
+				}
+				if (!it->first.compare("port"))
+				{
+					setPorts(it->second);
+				}
+				// if (key.compare("route") && !m.empty())
+				// {
+				// 	while (it != m.end())
+				// 	{
+				// 		if (!it->first.compare("methods"))
+				// 		{
+				// 			std::cout << "hola" <<std::endl;
+				// 			setMethods(it->second);
+				// 		}
+				// 		if (!it->first.compare("directory-listing"))
+				// 		{
+				// 			setDirListing(it->second);
+				// 			std::cout << getDirListing() <<std::endl;
+				// 		}
+				// 		it++;
+				// 	}
+				//}
+				
+				it++;
+			}
+			m.clear();
 		}
 		m[key] = trim(line.substr(pos + 1));
 	}
-	std::map<std::string, std::string>::iterator it = m.begin();
-	while (it != m.end())
-	{
-		if (!it->first.compare("server-name"))
-		{
-			setName(it->second);
-			std::cout << "Name: " << getName() << std::endl;
-			break;
-		}
-		
-		it++;
-	}
+	
 	return ;
 	int i = 0;
 	while(std::getline(archivo, line))
