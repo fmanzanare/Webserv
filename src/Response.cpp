@@ -340,7 +340,7 @@ std::string	Response::responseMaker()
 	return this->_response;
 }
 
-void	timeoutHandler(int sig, siginfo_t *info, void *context) {
+static void	timeoutHandler(int sig, siginfo_t *info, void *context) {
 
 	(void)sig;
 	(void)context;
@@ -353,14 +353,8 @@ void Response::cgi(std::string path)
 {
 	int status;
 
-	//Lo vacio por si hay basura dentro
 	this->_response.clear();
 
-	if (access(path.c_str(), F_OK | R_OK) == -1)
-	{
-		std::cout << "No se ha podido abrir el archivo" << std::endl;
-		return ;
-	}
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
 	//En el yaml tengo que añadir cgi_path con el ejecutable
