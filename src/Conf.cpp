@@ -42,64 +42,147 @@ class Conf::NoAllowRoot : public std::exception {
 	}
 };
 
-Conf::Conf()
+static std::string trim(std::string str)
 {
-	std::fstream archivo("conf.yml");
+	int i = 0;
+	while (str[i] == ' ')
+		i++;
+	return str.substr(i);
+}
+
+void Conf::loadmap(std::map <std::string, std::string> m)
+{
+	std::map<std::string, std::string>::iterator it = m.begin();
+			while (it != m.end())
+			{
+				if (!it->first.compare("methods"))
+				{
+					if (!this->_methods.empty())
+						this->_methods.clear();
+					setMethods(it->second);
+				}
+				if (!it->first.compare("directory-listing"))
+					setDirListing(it->second);
+				if (!it->first.compare("default-answer"))
+					setDef(it->second);
+				if (!it->first.compare("cgi"))
+				{
+					if (!this->_cgi.empty())
+						this->_cgi.clear();
+					setCgi(it->second);
+				}
+				if (!it->first.compare("redirection"))
+					setRedir(it->second);
+				if (!it->first.compare("root"))
+					setRoot(it->second);
+				if (!it->first.compare("server-name"))
+					setName(it->second);
+				if (!it->first.compare("error-page"))
+					setError_page(it->second);
+				if (!it->first.compare("body-limit"))
+					setCBodyLimit(it->second);
+				if (!it->first.compare("host"))
+					setHost(it->second);
+				if (!it->first.compare("port"))
+				{
+					if (!this->_ports.empty())
+						this->_ports.clear();
+					setPorts(it->second);
+				}
+				if (it != m.end())
+					it++;
+			}
+}
+
+Conf::Conf(std::string fileName)
+{
+	std::fstream archivo(fileName);
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
     }
 	std::string line;
 	//Iteramos por los servers
-	int i = 0;
+	std::map<std::string, std::string> m;
 	while(std::getline(archivo, line))
 	{
-		if (line.find("server:") != std::string::npos)
+		if (line.empty())
+			continue ;
+		const unsigned long pos = line.find(":");
+		if (pos == std::string::npos)
+			continue ;
+		std::string key = trim(line.substr(0, pos));
+		std::string value = trim(line.substr(pos + 1));
+		//std::cout << value << std::endl;
+		if (key.compare("server") && key.compare("route"))
 		{
-			//Añadimos los parametros del server
-			i = 0;
-			while (std::getline(archivo, line) && i++ < 5)
-			{
-				//std::cout << line << std::endl;
-				if (line.find("server-name:") != std::string::npos)
-					setName(line.substr(line.find_first_not_of(" server-name: ")));
-				else if (line.find("error-page:") != std::string::npos)
-					setError_page(line.substr(line.find_first_not_of("error-page: ")));
-				else if (line.find("body-limit:") != std::string::npos)
-					setCBodyLimit(line.substr(line.find_first_not_of("body-limit: ")));
-				else if (line.find("host:") != std::string::npos)
-					setHost(line.substr(line.find_first_not_of("host: ")));
-				else if (line.find("port:") != std::string::npos)
-					setPorts(line.substr(line.find_first_not_of("port: ")));
-			}
-			//Iteramos por las routes
-			while (line.find("route:") != std::string::npos)
-			{
-				i = 0;
-				while (std::getline(archivo, line) && i++ < 6)
-				{
-					//std::cout << line << std::endl;
-					if (line.find("methods:") != std::string::npos)
-						setMethods(line.substr(line.find_first_not_of("methods: ")));
-					else if (line.find("directory-listing:") != std::string::npos)
-						setDirListing(line.substr(line.find_first_not_of("directory-listing: ")));
-					else if (line.find("default-answer:") != std::string::npos)
-						setDef(line.substr(line.find_first_not_of("default-answer: ")));
-					else if (line.find("cgi:") != std::string::npos)
-						setCgi(line.substr(line.find_first_not_of("cgi: ")));
-					else if (line.find("redirection:") != std::string::npos)
-						setRedir(line.substr(line.find_first_not_of("redirection: ")));
-					else if (line.find("root:") != std::string::npos)
-						setRoot(line.substr(line.find_first_not_of("root: ")));
-				}
-				//Crear el Router
-				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef()));
-				//std::getline(archivo, line);
-			}
-			//Crear el Server
-			this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
-			this->_routes.clear();
-			this->_ports.clear();
+			m[key] = value;
+			//std::cout << line << std::endl;
 		}
+		else if (!key.compare("route"))
+		{
+			loadmap(m);
+			if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
+			{
+				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
+				this->_methods.clear();
+				this->_def.clear();
+				this->_cgi.clear();
+				this->_redir.clear();
+				this->_root.clear();
+			}
+			m.clear();
+		}
+		else if (!key.compare("server"))
+		{
+			loadmap(m);
+			if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
+			{
+				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
+				this->_methods.clear();
+				this->_def.clear();
+				this->_cgi.clear();
+				this->_redir.clear();
+				this->_root.clear();
+			}
+			if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty())
+			{
+				//std::cout << "Server" << std::endl;
+				this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
+				this->_name.clear();
+				this->_errPage.clear();
+				this->_host.clear();
+				this->_routes.clear();
+				this->_ports.clear();
+				
+			}
+			m.clear();
+		}
+	}
+	loadmap(m);
+	if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
+	{
+		this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
+		this->_methods.clear();
+		this->_def.clear();
+		this->_cgi.clear();
+		this->_redir.clear();
+		this->_root.clear();
+	}
+	if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty())
+	{
+		//std::cout << "Server" << std::endl;
+		this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
+		this->_name.clear();
+		this->_errPage.clear();
+		this->_host.clear();
+		this->_routes.clear();
+		this->_ports.clear();
+		this->_methods.clear();
+		this->_def.clear();
+		this->_cgi.clear();
+		this->_redir.clear();
+		this->_root.clear();
+		m.clear();
 	}
 	archivo.close();
 }
@@ -221,9 +304,9 @@ void	Conf::setMethods(std::string method){
 
 void	Conf::setDirListing(std::string dirListing){
 	if (dirListing.find("true"))
-		this->_dirListing = true;
-	else if (dirListing.find("false"))
 		this->_dirListing = false;
+	else if (dirListing.find("false"))
+		this->_dirListing = true;
 	else
 	{
 		freeServer();
@@ -236,10 +319,17 @@ void	Conf::setDef(std::string def){
 }
 void	Conf::setCgi(std::string cgi){
 	//hacer
-	this->_cgi = cgi;
+	std::istringstream iss(cgi);
+	std::string			token;
+
+	while (std::getline(iss, token, ','))
+	{
+		this->_cgi.push_back(token);
+	}
 }
 void	Conf::setRedir(std::string redir){
-	//
+	if (redir.back() != '/')
+		redir = redir + '/';
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
@@ -293,7 +383,7 @@ bool						Conf::getDirListing(void){
 std::string					Conf::getDef(void){
 	return (this->_def);
 }
-std::string					Conf::getCgi(void){
+std::vector<std::string>	Conf::getCgi(void){
 	return (this->_cgi);
 }
 std::string					Conf::getRedir(void){

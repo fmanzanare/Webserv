@@ -12,10 +12,14 @@
 # include <vector>
 # include <unistd.h>
 # include <fcntl.h>
+# include <unistd.h>
+# include <fcntl.h>
 # include <filesystem>
 # include <dirent.h>
+# include <limits.h>
 # include "Request.hpp"
 # include "Route.hpp"
+# include <signal.h>
 
 
 /* ------------ DEFINES ------------*/
@@ -35,7 +39,7 @@ class Response
 	public:
 		// Constructors
 		Response();
-		Response(Request &req, std::vector<Route *>);
+		Response(int bodyLimit, Request &req, std::vector<Route *>);
 		Response(const Response &copy);
 		
 		// Destructor
@@ -57,6 +61,7 @@ class Response
 		std::string				_finalPath;
 		std::vector<Route *>	_routes;
 		Request					_request;
+		int						_bodyLimit;
 
 		// Methods
 		void			errorResponse(const int&);
@@ -68,7 +73,7 @@ class Response
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
-		std::string		cgi(std::string);
+		void		cgi(std::string);
 };
 
 #endif
