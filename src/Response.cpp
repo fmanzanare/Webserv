@@ -194,7 +194,6 @@ void		Response::getResponse()
 		errorResponse(_statusCode);
 		return ;
 	}
-	std::cout << "final path: "<<_finalPath<<std::endl;
 	if (this->_finalPath.back() == '/')
 	{
 		if (this->_routeIndex == -1 || this->_routes[this->_routeIndex]->isDirListing() == false
@@ -236,8 +235,11 @@ void		Response::postResponse()
 		errorResponse(400);
 		return ;
 	}
+	for(int i = 0; (unsigned long)i < _finalPath.find_last_of('/'); i++)
+		path[i] = _finalPath[i];
+
 	// TODO comprobar que _finalPath exista
-	if (access(path.erase(path.rfind("/")).c_str(), F_OK | R_OK) == -1)
+	if (access(path.c_str(), F_OK | R_OK) == -1)
 	{
 		errorResponse(404);
 		return ;
