@@ -14,12 +14,17 @@ void leaks(void) {
 	system("leaks -q webserv");
 }
 
-int main(void) {
+int main(int argc,char **argv) {
 	//atexit(leaks);
 	WebServs c1;
+	if (argc != 2)
+	{
+		std::cout << "Not Valid Arguments" << std::endl;
+		return (-1);
+	}
 
-	// try {
-		Conf myConf = Conf();
+		std::string arg(argv[1]);
+		Conf myConf = Conf(arg);
 		std::vector<Server *> servers = myConf.getServers();
 
 		for (int i = 0; i < (int)servers.size(); i++) {
@@ -30,9 +35,7 @@ int main(void) {
 	std::vector<Server *> s = c1.getCluster();
 	std::vector<Route *> r = s[1]->getRoutes();
 	std::cout << r[1]->getRoot() << std::endl;
-		c1.runWebServs();
-	// } catch(...) {
-	// 	std::cout << "Non valid config." << std::endl;
-	// }
+	c1.runWebServs();
+
 	return (0);
 }

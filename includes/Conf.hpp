@@ -77,6 +77,7 @@ class Conf
 		std::string					getRedir(void);
 		std::string					getRoot(void);
 		std::vector<Server *>		getServers(void);
+		void 						loadmap(std::map <std::string, std::string> m);
 
 };
 

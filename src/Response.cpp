@@ -160,11 +160,19 @@ void	Response::applyGetMethod(void)
 	std::string			body;
 	std::stringstream	buffer;
 	std::ifstream		file(_finalPath);
+	int					flag = 0;
 
-	//donde se guarda el cgi que se puede utilizar?
-	if (_finalPath.find(this->_routes[this->_routeIndex]->getCgi()) != std::string::npos)
-		cgi(_finalPath); 
-	else
+	std::vector <std::string> cgis = this->_routes[this->_routeIndex]->getCgi();
+	for (int i = 0; i < (int)cgis.size(); i++)
+	{
+		if (_finalPath.find(cgis[i]) != std::string::npos)
+		{
+			std::cout << "hola" << std::endl;
+			flag = 1;
+			cgi(_finalPath); 
+		}
+	}
+	if (flag == 0)
 	{
 		buffer << file.rdbuf();
 		file.close();
