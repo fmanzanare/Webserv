@@ -279,13 +279,14 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
-	else
-	{
-		std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
-		// En caso contrario, se solicita directory listing de un directorio literal en ruta
-		this->_finalPath = _routes[i]->getRoot() + rawPath;
-		return true;
-	}
+	// else if (dirList != && this->_routes[i]->getRedir() != rawPath)
+	// {
+	// 	std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
+	// 	// En caso contrario, se solicita directory listing de un directorio literal en ruta
+	// 	this->_finalPath = _routes[i]->getRoot() + rawPath;
+	// 	std::cout << "final path: "<<_finalPath<<std::endl;
+	// 	return true;
+	// }
 	// Si el metodo del request coincide con el de la ruta
 	if (_routes[i]->checkMethod(_request.getMethod()) == true)
 	{
@@ -325,7 +326,10 @@ bool	Response::checkLocation(std::string rawPath)
 		this->_routeIndex = i;
 	}
 	if (root == "" || maxCharsFound == 0)
+	{
+		std::cout << "error checklocation\n";
 		return false;
+	}
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
