@@ -135,7 +135,7 @@ Conf::Conf(std::string fileName)
 		else if (!key.compare("server"))
 		{
 			loadmap(m);
-			if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
+			if (!this->_methods.empty() && !this->_def.empty() && !this->_redir.empty() && !this->_root.empty())
 			{
 				this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
 				this->_methods.clear();
@@ -159,7 +159,7 @@ Conf::Conf(std::string fileName)
 		}
 	}
 	loadmap(m);
-	if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
+	if (!this->_methods.empty() && !this->_def.empty() && !this->_redir.empty() && !this->_root.empty())
 	{
 		std::cout << "Ultima ruta" << std::endl;
 		this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));

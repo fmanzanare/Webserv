@@ -184,6 +184,7 @@ void	Response::applyGetMethod(void)
 			}
 		}
 	}
+	else 
 	if (flag == 0)
 	{
 		buffer << file.rdbuf();
@@ -308,7 +309,6 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 			maxCharsFound = _routes[i]->getRedir().size();
 			// std::cout << "max chars: " << maxCharsFound << std::endl;
 			// std::cout << "route index: " << _routeIndex << std::endl;
-
 			root = _routes[i]->getRoot();
 		}
 	}
