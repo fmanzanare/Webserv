@@ -113,17 +113,21 @@ void	Response::errorResponse(const int &code)
 	std::stringstream	len_str;
 	std::string			body = bodyResponseCode(code);
 
-	code_str << code;
-	len_str << body.length();
-	this->_response = headerGenerator(code_str.str(), len_str.str());
-	this->_response += body;
-	std::cout << "error response: " << _response << std::endl;
+	_finalPath = "./s1/error.html";
+	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
+	{
+		code_str << code;
+		len_str << body.length();
+		this->_response = headerGenerator(code_str.str(), len_str.str());
+		this->_response += body;
+	}
+	_statusCode = code;
+	applyGetMethod();
 }
 
 bool	Response::dirListing(std::string &path)
 {
 	path.erase(path.size() - 1, 1);
-	std::cout << "path en dirListing: " << path << std::endl;
 	const char *cpath = path.c_str();
 	DIR *dir;
 	struct dirent *ent;
@@ -167,7 +171,6 @@ void	Response::applyGetMethod(void)
 	{
 		if (_finalPath.find(cgis[i]) != std::string::npos)
 		{
-			std::cout << "hola" << std::endl;
 			flag = 1;
 			cgi(_finalPath); 
 		}
@@ -178,7 +181,7 @@ void	Response::applyGetMethod(void)
 		file.close();
 		body = buffer.str();
 		body += "\r\n\r\n";
-		this->_response = headerGenerator("200", bodyLen(body));
+		this->_response = headerGenerator(std::to_string(_statusCode), bodyLen(body));
 		this->_response += body;
 	}
 
@@ -232,13 +235,12 @@ void		Response::postResponse()
 
 	if (checkLocation(_request.getPath()) == false)
 	{
-		errorResponse(400);
+		errorResponse(_statusCode);
 		return ;
 	}
 	for(int i = 0; (unsigned long)i < _finalPath.find_last_of('/'); i++)
 		path[i] = _finalPath[i];
 
-	// TODO comprobar que _finalPath exista
 	if (access(path.c_str(), F_OK | R_OK) == -1)
 	{
 		errorResponse(404);
@@ -310,7 +312,6 @@ bool	Response::checkLocation(std::string rawPath)
 		dirList = true;
 	else
 		dirList = false;
-	// std::cout << "rawPath: " << rawPath << " dirList:" << dirList << std::endl;
 	for (size_t i = 0; i < vectorSize; i++)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
@@ -318,7 +319,6 @@ bool	Response::checkLocation(std::string rawPath)
 			if (chooseBest(rawPath, i, dirList, root, maxCharsFound))
 			{
 				this->_routeIndex = i;
-				std::cout << "final path: " << _finalPath << std::endl;
 				return true;
 			}
 		}
@@ -326,7 +326,6 @@ bool	Response::checkLocation(std::string rawPath)
 	}
 	if (root == "" || maxCharsFound == 0)
 		return false;
-	std::cout << "root: " << root << " rawPath.substr(): " << rawPath.substr(maxCharsFound - 1) << std::endl;
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
 	return true;
 }
@@ -337,7 +336,7 @@ bool	Response::checkLocation(std::string rawPath)
 */
 std::string	Response::responseMaker()
 {
-	//std::cout << "Entra response!\n";
+	//std::cout << "Entra response!\n"
 	if (this->_request.getProtocol() != "HTTP/1.1")
 	{
 		errorResponse(426);

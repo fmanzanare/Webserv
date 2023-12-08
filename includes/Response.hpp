@@ -55,6 +55,7 @@ class Response
 
 	private:
 		// Attributes
+		
 		int						_statusCode;
 		int						_routeIndex;
 		std::string				_response;
@@ -73,7 +74,7 @@ class Response
 		bool			checkLocation(std::string);
 		void			applyGetMethod(void);
 		bool			dirListing(std::string&);
-		void		cgi(std::string);
+		void			cgi(std::string);
 };
 
 #endif
