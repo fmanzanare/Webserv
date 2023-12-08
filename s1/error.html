@@ -43,8 +43,25 @@
  ███ ███  ███████ ██████  ███████ ███████ ██   ██   ████</pre>
 	</div>
 	<script>
-		let catErr = "401"
-		document.getElementById("catImg").src = "https://http.cat/" + catErr
+		// Obtén la URL actual de la página
+        var currentUrl = window.location.href;
+
+        // Realiza una solicitud fetch con la URL actual
+        fetch(currentUrl)
+            .then(response => {
+                // Obtén el código de estado de la respuesta
+                var statusCode = response.status;
+
+                // Muestra el código de estado en la consola
+                console.log("Código de estado: " + statusCode);
+
+                // Asigna la URL de la imagen basada en el código de estado
+                document.getElementById("catImg").src = "https://http.cat/" + statusCode;
+            })
+            .catch(error => {
+                // Maneja los errores aquí
+                console.error('Error en la solicitud:', error);
+            });
 	</script>
 </body>
 </html>
