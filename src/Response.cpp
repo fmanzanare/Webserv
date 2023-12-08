@@ -449,7 +449,10 @@ void Response::cgi(std::string path)
 		this->_response += data;
 	}
 	else
+	{
+		remove(".temp.txt");
 		errorResponse(504);
+	}
 	return ;
 }
 
