@@ -161,6 +161,7 @@ Conf::Conf(std::string fileName)
 	loadmap(m);
 	if (!this->_methods.empty() && !this->_def.empty() && !this->_cgi.empty() && !this->_redir.empty() && !this->_root.empty())
 	{
+		std::cout << "Ultima ruta" << std::endl;
 		this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
 		this->_methods.clear();
 		this->_def.clear();
@@ -170,7 +171,7 @@ Conf::Conf(std::string fileName)
 	}
 	if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty())
 	{
-		//std::cout << "Server" << std::endl;
+		std::cout << "ultimo Server" << std::endl;
 		this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 		this->_name.clear();
 		this->_errPage.clear();
@@ -184,6 +185,7 @@ Conf::Conf(std::string fileName)
 		this->_root.clear();
 		m.clear();
 	}
+	std::cout<<"hola"<<std::endl;
 	archivo.close();
 }
 

@@ -27,15 +27,18 @@ int main(int argc,char **argv) {
 		std::string arg(argv[1]);
 		Conf myConf = Conf(arg);
 		std::vector<Server *> servers = myConf.getServers();
-
-		for (int i = 0; i < (int)servers.size(); i++) {
-			c1.addServer(servers[i]);
+		std::vector<Server *> serverss = myConf.getServers();
+		if (servers.empty())
+		{
+			std::cout << "Not Servers in Configuration" << std::endl;
+			std::cout << "Check your conf." << std::endl;
+			return (-1);
+		}
+		for (int i = 0; i < (int)serverss.size(); i++) {
+			c1.addServer(serverss[i]);
 		}
 
 	signal(SIGINT, signalHandler);
-	std::vector<Server *> s = c1.getCluster();
-	std::vector<Route *> r = s[1]->getRoutes();
-	std::cout << r[1]->getRoot() << std::endl;
 	c1.runWebServs();
 
 	return (0);
