@@ -8,7 +8,7 @@ Response::Response()
 	this->_statusCode = 404;
 }
 
-Response::Response(int bodyLimit, Request &req, std::vector<Route *> routes)
+Response::Response(int bodyLimit, Request &req, std::vector<Route *> routes, std::string errPage)
 {
 	this->_request = req;
 	this->_finalPath = "";
@@ -21,6 +21,7 @@ Response::Response(int bodyLimit, Request &req, std::vector<Route *> routes)
 		_bodyLimit = -1;
 	else
 		this->_bodyLimit = bodyLimit;
+	this->_errPage = errPage;
 }
 
 Response::Response(const Response &copy)
@@ -113,7 +114,8 @@ void	Response::errorResponse(const int &code)
 	std::stringstream	len_str;
 	std::string			body = bodyResponseCode(code);
 
-	_finalPath = "./s1/error.html";
+	_finalPath = "." + _errPage;
+	std::cout << "final path: " << _finalPath << std::endl;
 	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
 	{
 		code_str << code;
@@ -166,13 +168,20 @@ void	Response::applyGetMethod(void)
 	std::ifstream		file(_finalPath);
 	int					flag = 0;
 
-	std::vector <std::string> cgis = this->_routes[this->_routeIndex]->getCgi();
-	for (int i = 0; i < (int)cgis.size(); i++)
+	std::cout << "final path: " << _finalPath << std::endl;
+	
+	std::cout << "routa index: " << _routeIndex<<std::endl;
+	if (this->_routeIndex != -1)
 	{
-		if (_finalPath.find(cgis[i]) != std::string::npos)
+		std::vector <std::string> cgis = this->_routes[this->_routeIndex]->getCgi();
+		for (int i = 0; i < (int)cgis.size(); i++)
 		{
-			flag = 1;
-			cgi(_finalPath); 
+			std::cout << "estamo en cgi: "<< cgis[0] << std::endl;
+			if (_finalPath.find(cgis[i]) != std::string::npos)
+			{
+				flag = 1;
+				cgi(_finalPath); 
+			}
 		}
 	}
 	if (flag == 0)
@@ -279,7 +288,7 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
-	// else if (dirList != && this->_routes[i]->getRedir() != rawPath)
+	// else if (dirList && this->_routes[i]->getRedir() != rawPath)
 	// {
 	// 	std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
 	// 	// En caso contrario, se solicita directory listing de un directorio literal en ruta
@@ -294,7 +303,12 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 		if ((dirList == false && _routes[i]->isDirListing())
 			|| (dirList == _routes[i]->isDirListing()))
 		{
+			if (_routes[i]->getRedir().size() > maxCharsFound)
+				this->_routeIndex = i;
 			maxCharsFound = _routes[i]->getRedir().size();
+			// std::cout << "max chars: " << maxCharsFound << std::endl;
+			// std::cout << "route index: " << _routeIndex << std::endl;
+
 			root = _routes[i]->getRoot();
 		}
 	}
@@ -317,20 +331,19 @@ bool	Response::checkLocation(std::string rawPath)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
 		{
+			// std::cout <<"raw path. "<< rawPath << std::endl;
 			if (chooseBest(rawPath, i, dirList, root, maxCharsFound))
 			{
 				this->_routeIndex = i;
 				return true;
 			}
 		}
-		this->_routeIndex = i;
 	}
 	if (root == "" || maxCharsFound == 0)
-	{
-		std::cout << "error checklocation\n";
 		return false;
-	}
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
+	// std::cout << "route index en checkLocation: " << _routeIndex
+	// 			<< " _finalPath: "<< _finalPath<<std::endl;
 	return true;
 }
 
@@ -359,7 +372,7 @@ std::string	Response::responseMaker()
 		deleteResponse();
 	else
 		errorResponse(405);
-	//std::cout << "Sale response!\n";
+	// std::cout << "Sale response!\n";
 	// std::cout << "respuesta final: " << this->_response << std::endl;
 	return this->_response;
 }
@@ -378,6 +391,8 @@ void Response::cgi(std::string path)
 	int status;
 
 	this->_response.clear();
+
+
 
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos

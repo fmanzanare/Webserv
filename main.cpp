@@ -27,6 +27,7 @@ int main(int argc,char **argv) {
 		std::string arg(argv[1]);
 		Conf myConf = Conf(arg);
 		std::vector<Server *> servers = myConf.getServers();
+		
 		std::vector<Server *> serverss = myConf.getServers();
 		if (servers.empty())
 		{

@@ -211,7 +211,10 @@ void	Conf::setName(std::string name){
 	this->_name = name;
 }
 void	Conf::setError_page(std::string errPage){
-	//comprobar existen
+	std::cout << "errpage1: " << errPage << std::endl;
+	if (errPage.front() != '/')
+		errPage = "/" + errPage;
+	std::cout << "errpage2: " << errPage << std::endl;
 	this->_errPage = errPage;
 }
 void	Conf::setCBodyLimit(std::string cBodyLimit){

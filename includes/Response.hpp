@@ -39,7 +39,7 @@ class Response
 	public:
 		// Constructors
 		Response();
-		Response(int bodyLimit, Request &req, std::vector<Route *>);
+		Response(int bodyLimit, Request &req, std::vector<Route *>, std::string errPage);
 		Response(const Response &copy);
 		
 		// Destructor
@@ -63,6 +63,7 @@ class Response
 		std::vector<Route *>	_routes;
 		Request					_request;
 		int						_bodyLimit;
+		std::string				_errPage;
 
 		// Methods
 		void			errorResponse(const int&);

@@ -5,8 +5,8 @@ server:
   host: 127.0.0.1
   port: 8080,8081,9000
   route:
-    methods:
-    directory-listing: false
+    methods: GET
+    directory-listing: true
     default-answer: index.html
     cgi: .py,.bin
     redirection: /
@@ -32,6 +32,13 @@ server:
     cgi: .bin
     redirection: /
     root: /s1
+  route:
+    methods: GET
+    directory-listing: true
+    default-answer: /s1/error.html
+    cgi: .bin,.py
+    redirection: /cgi/
+    root: /s1/cgi
   route:
     methods: POST,DELETE,GET
     directory-listing: true
