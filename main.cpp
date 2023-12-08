@@ -19,8 +19,9 @@ int main(int argc,char **argv) {
 	WebServs c1;
 	if (argc != 2)
 	{
-		std::cout << "Not Valid Arguments" << std::endl;
-		return (-1);
+		std::cout << "Default Configuration" << std::endl;
+		//comprobar si existe;
+		argv[1] = (char *)"conf.yml";
 	}
 
 		std::string arg(argv[1]);
