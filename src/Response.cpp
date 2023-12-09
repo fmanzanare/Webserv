@@ -210,10 +210,12 @@ void		Response::getResponse()
 		errorResponse(_statusCode);
 		return ;
 	}
-	if (this->_finalPath.back() == '/' || stat(_finalPath.c_str(), &sb) == 0)
+	stat(_finalPath.c_str(), &sb);
+	if (this->_finalPath.back() != '/' && S_ISDIR(sb.st_mode))
+		this->_finalPath += '/';
+	if (this->_finalPath.back() == '/')
 	{
-		if (this->_finalPath.back() != '/' && stat(_finalPath.c_str(), &sb) == 0)
-			this->_finalPath += '/';
+		std::cout << "dentro de dirlist getPath " << _request.getPath()<<std::endl;
 		if (this->_routeIndex == -1 || this->_routes[this->_routeIndex]->isDirListing() == false
 			|| dirListing(_finalPath) == false)
 			errorResponse(404);
