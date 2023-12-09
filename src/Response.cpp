@@ -366,6 +366,8 @@ std::string	Response::responseMaker()
 		errorResponse(426);
 		return this->_response;
 	}
+	std::cout << "BODY LIMIT: "<<this->_bodyLimit<<std::endl;
+	std::cout << "BODY LIMIT SIZE: "<<_request.getBody().size()<<std::endl;
 	if ((int)this->_request.getBody().size() > this->_bodyLimit)
 	{
 		errorResponse(400);
