@@ -183,8 +183,7 @@ void	Response::applyGetMethod(void)
 				cgi(_finalPath); 
 			}
 		}
-	}
-	else 
+	} 
 	if (flag == 0)
 	{
 		buffer << file.rdbuf();
@@ -392,7 +391,7 @@ void Response::cgi(std::string path)
 
 	this->_response.clear();
 
-
+std::cout << "estamos en las cosas\n";
 
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
@@ -447,7 +446,7 @@ void Response::cgi(std::string path)
 		}
 		exit(0);
 	}
-	//alarm(0);
+	// alarm(0);
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 	{
@@ -470,6 +469,7 @@ void Response::cgi(std::string path)
 	else
 	{
 		remove(".temp.txt");
+		std::cout << "he dado time aut\n";
 		errorResponse(504);
 	}
 	return ;

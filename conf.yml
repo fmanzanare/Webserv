@@ -8,7 +8,7 @@ server:
     methods: GET
     directory-listing: true
     default-answer: index.html
-    cgi: 
+    cgi: .bin,.py
     redirection: /
     root: /s1
   route:
