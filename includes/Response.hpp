@@ -20,6 +20,7 @@
 # include "Request.hpp"
 # include "Route.hpp"
 # include <signal.h>
+# include <sys/stat.h>
 
 
 /* ------------ DEFINES ------------*/

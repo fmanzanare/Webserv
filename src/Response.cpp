@@ -122,6 +122,7 @@ void	Response::errorResponse(const int &code)
 		len_str << body.length();
 		this->_response = headerGenerator(code_str.str(), len_str.str());
 		this->_response += body;
+		return ;
 	}
 	_statusCode = code;
 	applyGetMethod();
@@ -176,10 +177,10 @@ void	Response::applyGetMethod(void)
 		std::vector <std::string> cgis = this->_routes[this->_routeIndex]->getCgi();
 		for (int i = 0; i < (int)cgis.size(); i++)
 		{
-			std::cout << "estamo en cgi: "<< cgis[0] << std::endl;
 			if (_finalPath.find(cgis[i]) != std::string::npos)
 			{
 				flag = 1;
+				std::cout << "estamo en cgi: "<< cgis[0] << std::endl;
 				cgi(_finalPath); 
 			}
 		}
@@ -201,13 +202,18 @@ void	Response::applyGetMethod(void)
 */
 void		Response::getResponse()
 {
+	struct stat sb;
+	std::cout << "getPath " << _request.getPath()<<std::endl;
 	if (checkLocation(_request.getPath()) == false)
 	{
+		std::cout << "falla check location\n";
 		errorResponse(_statusCode);
 		return ;
 	}
-	if (this->_finalPath.back() == '/')
+	if (this->_finalPath.back() == '/' || stat(_finalPath.c_str(), &sb) == 0)
 	{
+		if (this->_finalPath.back() != '/' && stat(_finalPath.c_str(), &sb) == 0)
+			this->_finalPath += '/';
 		if (this->_routeIndex == -1 || this->_routes[this->_routeIndex]->isDirListing() == false
 			|| dirListing(_finalPath) == false)
 			errorResponse(404);
@@ -330,7 +336,7 @@ bool	Response::checkLocation(std::string rawPath)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
 		{
-			// std::cout <<"raw path. "<< rawPath << std::endl;
+			std::cout <<"raw path. "<< rawPath << std::endl;
 			if (chooseBest(rawPath, i, dirList, root, maxCharsFound))
 			{
 				this->_routeIndex = i;
@@ -341,8 +347,8 @@ bool	Response::checkLocation(std::string rawPath)
 	if (root == "" || maxCharsFound == 0)
 		return false;
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
-	// std::cout << "route index en checkLocation: " << _routeIndex
-	// 			<< " _finalPath: "<< _finalPath<<std::endl;
+	std::cout << "route index en checkLocation: " << _routeIndex
+				<< " _finalPath: "<< _finalPath<<std::endl;
 	return true;
 }
 
