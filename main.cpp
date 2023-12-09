@@ -6,7 +6,7 @@
 
 void signalHandler(int signal) {
 	(void)signal;
-	std::cout << "Webserv closed!" << std::endl;
+	// std::cout << "Webserv closed!" << std::endl;
 	std::exit(0);
 }
 
@@ -15,7 +15,7 @@ void leaks(void) {
 }
 
 int main(int argc,char **argv) {
-	atexit(leaks);
+	// atexit(leaks);
 	WebServs c1;
 	if (argc != 2)
 	{

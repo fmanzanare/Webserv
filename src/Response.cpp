@@ -115,8 +115,7 @@ void	Response::errorResponse(const int &code)
 	std::string			body = bodyResponseCode(code);
 
 	_finalPath = "." + _errPage;
-	std::cout << "final path: " << _finalPath << std::endl;
-	if (access(_finalPath.c_str(), F_OK | R_OK) == -1)
+	if (access(_finalPath.c_str(), F_OK | R_OK) == -1 || _errPage == "/")
 	{
 		code_str << code;
 		len_str << body.length();
@@ -169,9 +168,6 @@ void	Response::applyGetMethod(void)
 	std::ifstream		file(_finalPath);
 	int					flag = 0;
 
-	std::cout << "final path: " << _finalPath << std::endl;
-	
-	std::cout << "routa index: " << _routeIndex<<std::endl;
 	if (this->_routeIndex != -1)
 	{
 		std::vector <std::string> cgis = this->_routes[this->_routeIndex]->getCgi();
@@ -180,7 +176,6 @@ void	Response::applyGetMethod(void)
 			if (_finalPath.find(cgis[i]) != std::string::npos)
 			{
 				flag = 1;
-				std::cout << "estamo en cgi: "<< cgis[0] << std::endl;
 				cgi(_finalPath); 
 			}
 		}
@@ -203,10 +198,8 @@ void	Response::applyGetMethod(void)
 void		Response::getResponse()
 {
 	struct stat sb;
-	std::cout << "getPath " << _request.getPath()<<std::endl;
 	if (checkLocation(_request.getPath()) == false)
 	{
-		std::cout << "falla check location\n";
 		errorResponse(_statusCode);
 		return ;
 	}
@@ -215,7 +208,6 @@ void		Response::getResponse()
 		this->_finalPath += '/';
 	if (this->_finalPath.back() == '/')
 	{
-		std::cout << "dentro de dirlist getPath " << _request.getPath()<<std::endl;
 		if (this->_routeIndex == -1 || this->_routes[this->_routeIndex]->isDirListing() == false
 			|| dirListing(_finalPath) == false)
 			errorResponse(404);
@@ -241,13 +233,6 @@ void		Response::getResponse()
 
 void		Response::postResponse()
 {
-	// std::vector<std::string> splitted = splitFilePath(path);
-
-	// if (splitted.empty() == true)
-	// {
-	// 	errorResponse(204);
-	// 	return ;
-	// }
 	std::string path = _finalPath;
 
 	if (checkLocation(_request.getPath()) == false)
@@ -296,14 +281,6 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 					+ rawPath + _routes[i]->getDefaultAnswer();
 		return true;
 	}
-	// else if (dirList && this->_routes[i]->getRedir() != rawPath)
-	// {
-	// 	std::cout << "rawPath: " << rawPath << " redir de ruta: " << _routes[i]->getRedir() << std::endl;
-	// 	// En caso contrario, se solicita directory listing de un directorio literal en ruta
-	// 	this->_finalPath = _routes[i]->getRoot() + rawPath;
-	// 	std::cout << "final path: "<<_finalPath<<std::endl;
-	// 	return true;
-	// }
 	// Si el metodo del request coincide con el de la ruta
 	if (_routes[i]->checkMethod(_request.getMethod()) == true)
 	{
@@ -314,8 +291,6 @@ bool	Response::chooseBest(const std::string &rawPath, size_t i, bool &dirList, s
 			if (_routes[i]->getRedir().size() > maxCharsFound)
 				this->_routeIndex = i;
 			maxCharsFound = _routes[i]->getRedir().size();
-			// std::cout << "max chars: " << maxCharsFound << std::endl;
-			// std::cout << "route index: " << _routeIndex << std::endl;
 			root = _routes[i]->getRoot();
 		}
 	}
@@ -338,7 +313,6 @@ bool	Response::checkLocation(std::string rawPath)
 	{
 		if (rawPath.find(_routes[i]->getRedir()) == 0)
 		{
-			std::cout <<"raw path. "<< rawPath << std::endl;
 			if (chooseBest(rawPath, i, dirList, root, maxCharsFound))
 			{
 				this->_routeIndex = i;
@@ -349,8 +323,6 @@ bool	Response::checkLocation(std::string rawPath)
 	if (root == "" || maxCharsFound == 0)
 		return false;
 	this->_finalPath = root + rawPath.substr(maxCharsFound - 1);
-	std::cout << "route index en checkLocation: " << _routeIndex
-				<< " _finalPath: "<< _finalPath<<std::endl;
 	return true;
 }
 
@@ -360,14 +332,11 @@ bool	Response::checkLocation(std::string rawPath)
 */
 std::string	Response::responseMaker()
 {
-	//std::cout << "Entra response!\n"
 	if (this->_request.getProtocol() != "HTTP/1.1")
 	{
 		errorResponse(426);
 		return this->_response;
 	}
-	std::cout << "BODY LIMIT: "<<this->_bodyLimit<<std::endl;
-	std::cout << "BODY LIMIT SIZE: "<<_request.getBody().size()<<std::endl;
 	if ((int)this->_request.getBody().size() > this->_bodyLimit)
 	{
 		errorResponse(400);
@@ -381,8 +350,6 @@ std::string	Response::responseMaker()
 		deleteResponse();
 	else
 		errorResponse(405);
-	// std::cout << "Sale response!\n";
-	// std::cout << "respuesta final: " << this->_response << std::endl;
 	return this->_response;
 }
 
@@ -390,7 +357,6 @@ static void	timeoutHandler(int sig, siginfo_t *info, void *context) {
 
 	(void)sig;
 	(void)context;
-    std::cout << "Se ha producido un timeout para el PID: " << info->si_pid << std::endl;
     kill(info->si_pid, SIGKILL);
 }
 
@@ -398,10 +364,13 @@ static void	timeoutHandler(int sig, siginfo_t *info, void *context) {
 void Response::cgi(std::string path)
 {
 	int status;
-
+	if (access(path.c_str(), F_OK | R_OK | X_OK) == -1)
+	{
+		errorResponse(401);
+		return ;
+	}
 	this->_response.clear();
 
-std::cout << "estamos en las cosas\n";
 
 	//hard_code Tengo que añadir el ejecutable correspondiente, si es necesario
 	//me pasan argv, el path seria el ejecutable y argv seria ejecutable + argumentos
@@ -415,9 +384,9 @@ std::cout << "estamos en las cosas\n";
 		argv[1] = (char *)path.c_str();
 		argv[2] = 0;
 	}
-	else if (_finalPath.find(".bin") != std::string::npos)
+	else if (_finalPath.find(".sh") != std::string::npos)
 	{
-		argv[0] = (char *)path.c_str();
+		argv[0] = (char *)"/bin/bash";
 		argv[1] = (char *)path.c_str();
 		argv[2] = 0;
 	}
@@ -435,29 +404,31 @@ std::cout << "estamos en las cosas\n";
 	env[3] = 0;
 
 	int temp = open(".temp.txt", O_CREAT | O_RDWR | O_TRUNC, 0777);
-
 	int pid = fork();
 	if (!pid)
 	{
 		//signaction
-		std::cout <<"Hola"<<std::endl;
 		struct sigaction	info;
 		info.sa_sigaction = timeoutHandler;
 		info.sa_flags = SA_SIGINFO;
 		sigaction(SIGALRM, &info, NULL);
 		if (dup2(temp, STDOUT_FILENO) == -1)
-			printf("Error al abrir el pipe");
+			std::cout << "Pipe error" << std::endl;
 		close(temp);
-		alarm(5);
+		alarm(5);	
 		if (execve(argv[0], argv, env) == -1)
 		{
-			std::cout << "La execucion del fork ha fallado." << std::endl;
+			std::cout << "CGI execution failed" << std::endl;
 			exit(1);
 		}
 		exit(0);
 	}
 	// alarm(0);
 	waitpid(pid, &status, 0);
+	if (WEXITSTATUS(status)) {
+		errorResponse(422);
+		return ;
+	}
 	if (WIFEXITED(status))
 	{
 		temp = open(".temp.txt", O_RDONLY);
@@ -479,7 +450,6 @@ std::cout << "estamos en las cosas\n";
 	else
 	{
 		remove(".temp.txt");
-		std::cout << "he dado time aut\n";
 		errorResponse(504);
 	}
 	return ;

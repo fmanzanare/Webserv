@@ -112,12 +112,8 @@ Conf::Conf(std::string fileName)
 			continue ;
 		std::string key = trim(line.substr(0, pos));
 		std::string value = trim(line.substr(pos + 1));
-		//std::cout << value << std::endl;
 		if (key.compare("server") && key.compare("route"))
-		{
 			m[key] = value;
-			//std::cout << line << std::endl;
-		}
 		else if (!key.compare("route"))
 		{
 			loadmap(m);
@@ -146,7 +142,6 @@ Conf::Conf(std::string fileName)
 			}
 			if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty() && this->_cBodyLimit > 0)
 			{
-				//std::cout << "Server" << std::endl;
 				this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 				this->_name.clear();
 				this->_errPage.clear();
@@ -161,7 +156,6 @@ Conf::Conf(std::string fileName)
 	loadmap(m);
 	if (!this->_methods.empty() && !this->_def.empty() && !this->_redir.empty() && !this->_root.empty())
 	{
-		std::cout << "Ultima ruta" << std::endl;
 		this->_routes.push_back(new Route(getMethods(), getRedir(), getRoot(), getDirListing(), getDef(), getCgi()));
 		this->_methods.clear();
 		this->_def.clear();
@@ -171,7 +165,6 @@ Conf::Conf(std::string fileName)
 	}
 	if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty() && this->_cBodyLimit > 0)
 	{
-		std::cout << "ultimo Server" << std::endl;
 		this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
 		this->_name.clear();
 		this->_errPage.clear();
@@ -186,7 +179,6 @@ Conf::Conf(std::string fileName)
 		this->_cBodyLimit = -1;
 		m.clear();
 	}
-	std::cout<<"hola"<<std::endl;
 	archivo.close();
 }
 
@@ -212,10 +204,8 @@ void	Conf::setName(std::string name){
 	this->_name = name;
 }
 void	Conf::setError_page(std::string errPage){
-	std::cout << "errpage1: " << errPage << std::endl;
 	if (errPage.front() != '/')
 		errPage = "/" + errPage;
-	std::cout << "errpage2: " << errPage << std::endl;
 	this->_errPage = errPage;
 }
 void	Conf::setCBodyLimit(std::string cBodyLimit){
@@ -237,12 +227,6 @@ void	Conf::setCBodyLimit(std::string cBodyLimit){
 	this->_cBodyLimit = result;
 }
 void	Conf::setHost(std::string host){
-	for (int i = 0; i < (int)this->_servers.size(); i++)
-		if (host == this->_servers[i]->getHost())
-		{
-			freeServer();
-			throw NoAllowHost();
-		}
 	this->_host = host;
 }
 void	Conf::setPorts(std::string ports){
@@ -320,11 +304,9 @@ void	Conf::setDirListing(std::string dirListing){
 	}
 }
 void	Conf::setDef(std::string def){
-	//no repetir
 	this->_def = def;
 }
 void	Conf::setCgi(std::string cgi){
-	//hacer
 	std::istringstream iss(cgi);
 	std::string			token;
 
@@ -339,11 +321,9 @@ void	Conf::setRedir(std::string redir){
 	this->_redir = redir;
 }
 void	Conf::setRoot(std::string root){
-	//No se puede repetir por servidor
 	for (int i = 0; i < (int)this->_routes.size(); i++)
 		if (this->_routes[i]->getRoot() == root)
 		{
-			std::cout << "get root: " << this->_routes[i]->getRoot() << " root: " << root << std::endl;
 			freeServer();
 			throw NoAllowRoot();
 		}
@@ -402,17 +382,3 @@ std::string					Conf::getRoot(void){
 std::vector<Server *>		Conf::getServers(void){
 	return (this->_servers);
 }
-
-
-// Conf::Conf(Conf const &copy)
-// {
-// /* Class::Class(const Class &copy) : someValue(copy.someValue) {} */
-// }
-
-// Conf    &Conf::operator=(const Conf &copy)
-// {
-//     // if (this != &copy) {
-//         // someValue = copy.someValue;
-//     // }
-//     // return *this;
-// }

@@ -1,14 +1,14 @@
 server:
   server-name: myserver1
   error-page: /s1/error.html
-  body-limit: 1
+  body-limit: 1024
   host: 127.0.0.1
   port: 8080,8081,9000
   route:
-    methods: GET
+    methods: GET,POST
     directory-listing: true
     default-answer: index.html
-    cgi: .bin,.py
+    cgi: .sh,.py
     redirection: /
     root: /s1
   route:
@@ -21,10 +21,38 @@ server:
 
 server:
   server-name: myserver2
-  error-page: index.html
+  error-page: /s1/error.html
   body-limit: 2048
   host: 10.13.3.3
   port: 8002,8003
+  route:
+    methods: GET
+    directory-listing: true
+    default-answer: index.html
+    cgi: .sh
+    redirection: /
+    root: /s1
+  route:
+    methods: GET
+    directory-listing: true
+    default-answer: /s1/error.html
+    cgi: .bin,.py
+    redirection: /cgi/
+    root: /s1/cgi
+  route:
+    methods: POST,DELETE,GET
+    directory-listing: true
+    default-answer: none
+    cgi: .php
+    redirection: /storage/
+    root: /s1/storage
+
+server:
+  server-name: myserver3
+  error-page: /s1/error.html
+  body-limit: 2048
+  host: 10.13.3.3
+  port: 8006,8007
   route:
     methods: GET
     directory-listing: true

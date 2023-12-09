@@ -43,7 +43,7 @@ int main(void) {
 		} else {
 			char buffer[1000];
 			read(connection, buffer, 1000);
-			std::cout << "The message was: " << buffer << std::endl;
+			// std::cout << "The message was: " << buffer << std::endl;
 
 			std::string body =
 				"<!DOCTYPE html>"

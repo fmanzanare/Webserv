@@ -87,7 +87,6 @@ void	Request::parseHeader(void)
 		std::string key = line.substr(0, line.find(":"));
 		std::string value = line.substr(line.find(": ") + 2);
 		_headers[key] = value;
-		// std::cout << line << std::endl;
 	}
 }
 
