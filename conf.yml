@@ -1,7 +1,7 @@
 server:
   server-name: myserver1
   error-page: /s1/error.html
-  body-limit: 1024
+  body-limit: 1
   host: 127.0.0.1
   port: 8080,8081,9000
   route:

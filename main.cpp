@@ -15,7 +15,7 @@ void leaks(void) {
 }
 
 int main(int argc,char **argv) {
-	//atexit(leaks);
+	atexit(leaks);
 	WebServs c1;
 	if (argc != 2)
 	{

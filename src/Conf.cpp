@@ -144,7 +144,7 @@ Conf::Conf(std::string fileName)
 				this->_redir.clear();
 				this->_root.clear();
 			}
-			if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty())
+			if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty() && this->_cBodyLimit > 0)
 			{
 				//std::cout << "Server" << std::endl;
 				this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
@@ -153,7 +153,7 @@ Conf::Conf(std::string fileName)
 				this->_host.clear();
 				this->_routes.clear();
 				this->_ports.clear();
-				
+				this->_cBodyLimit = -1;
 			}
 			m.clear();
 		}
@@ -169,7 +169,7 @@ Conf::Conf(std::string fileName)
 		this->_redir.clear();
 		this->_root.clear();
 	}
-	if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty())
+	if (!this->_name.empty() && !this->_errPage.empty() && !this->_host.empty() && !this->_ports.empty() && !this->_routes.empty() && this->_cBodyLimit > 0)
 	{
 		std::cout << "ultimo Server" << std::endl;
 		this->_servers.push_back(new Server(getName(), getPorts(), getHost(), getError_page(), getCBodyLimit(), this->_routes));
@@ -183,6 +183,7 @@ Conf::Conf(std::string fileName)
 		this->_cgi.clear();
 		this->_redir.clear();
 		this->_root.clear();
+		this->_cBodyLimit = -1;
 		m.clear();
 	}
 	std::cout<<"hola"<<std::endl;
